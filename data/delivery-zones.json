@@ -1,0 +1,30 @@
+{
+  "deliveryZones": [
+    { "id": "zoneA", "name": { "ar": "المنطقة أ — وسط المدينة",  "en": "Zone A — Downtown" },     "fee": 10, "etaMinutes": 25 },
+    { "id": "zoneB", "name": { "ar": "المنطقة ب — الضواحي القريبة", "en": "Zone B — Nearby Suburbs" }, "fee": 18, "etaMinutes": 40 },
+    { "id": "zoneC", "name": { "ar": "المنطقة ج — خارج المدينة",  "en": "Zone C — Outer Areas" },   "fee": 28, "etaMinutes": 60 }
+  ],
+  "minimumOrder": 35,
+  "restaurant": {
+    "name": { "ar": "Over Sauce Lounge", "en": "Over Sauce Lounge" },
+    "tagline": { "ar": "مطعم وكافيه • أجواء وجلسات مميزة في قلب جدة", "en": "Restaurant & cafe — a distinctive lounge in the heart of Jeddah" },
+    "phone": "+966533500392",
+    "whatsapp": "966533500392",
+    "address": { "ar": "حي الحمراء، جدة، السعودية", "en": "Al Hamra District, Jeddah, Saudi Arabia" },
+    "mapsUrl": "https://maps.app.goo.gl/atzVhkm9tY8mXZ159",
+    "openingHours": { "ar": "مفتوح ٢٤ ساعة يوميًا", "en": "Open 24 hours, daily" },
+    "social": {
+      "instagram": "https://www.instagram.com/oversauce1",
+      "whatsappChannel": "https://wa.me/966533500392",
+      "tiktok": "",
+      "snapchat": "https://snapchat.com/t/Mj0oXzyV",
+      "facebook": "https://www.facebook.com/share/1CrxvWv1h1/"
+    },
+    "stats": {
+      "yearsOfExperience": 12,
+      "happyCustomers": 24000,
+      "menuItems": 50,
+      "averageRating": 4.5
+    }
+  }
+}
