@@ -1,0 +1,44 @@
+{
+  "coupons": [
+    {
+      "code": "WELCOME10",
+      "type": "percentage",
+      "value": 10,
+      "minOrder": 50,
+      "label": { "ar": "خصم ١٠٪ على أول طلب", "en": "10% off your first order" },
+      "active": true
+    },
+    {
+      "code": "SAVE20",
+      "type": "fixed",
+      "value": 20,
+      "minOrder": 120,
+      "label": { "ar": "خصم ٢٠ ر.س على الطلبات فوق ١٢٠ ر.س", "en": "20 SAR off orders above 120 SAR" },
+      "active": true
+    },
+    {
+      "code": "OSAUCE25",
+      "type": "percentage",
+      "value": 25,
+      "minOrder": 200,
+      "label": { "ar": "خصم ٢٥٪ على الطلبات الكبيرة", "en": "25% off large orders" },
+      "active": true
+    }
+  ],
+  "flashDeals": [
+    {
+      "id": "deal1",
+      "title": { "ar": "عرض الغداء", "en": "Lunch Deal" },
+      "subtitle": { "ar": "خصم ١٥٪ من ١ ظهرًا حتى ٤ عصرًا", "en": "15% off from 1 PM to 4 PM" },
+      "discountPercent": 15,
+      "endsInHours": 3
+    },
+    {
+      "id": "deal2",
+      "title": { "ar": "عرض نهاية الأسبوع", "en": "Weekend Special" },
+      "subtitle": { "ar": "اطلب مشاوي مشكلة واحصل على مشروب مجاني", "en": "Order the Mixed Grill, get a free drink" },
+      "discountPercent": 0,
+      "endsInHours": 48
+    }
+  ]
+}

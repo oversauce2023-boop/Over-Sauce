@@ -1,0 +1,39 @@
+{
+  "reviews": [
+    {
+      "id": "rv1",
+      "name": "سارة العبدالله",
+      "rating": 5,
+      "text": { "ar": "أفضل مشاوي جربتها هذا العام. التوصيل كان سريعًا والطعم لا يوصف.", "en": "Best grills I've tried this year. Delivery was fast and the taste was unforgettable." },
+      "item": "مشاوي مشكلة"
+    },
+    {
+      "id": "rv2",
+      "name": "أحمد الكواري",
+      "rating": 5,
+      "text": { "ar": "الكبسة عندهم أصبحت طلبنا الأسبوعي الثابت. جودة ثابتة في كل مرة.", "en": "Their kabsa has become our weekly staple. Consistent quality every single time." },
+      "item": "كبسة لحم"
+    },
+    {
+      "id": "rv3",
+      "name": "مريم حسن",
+      "rating": 4,
+      "text": { "ar": "تجربة طلب سهلة جدًا عبر واتساب، والطعام يصل ساخنًا ومرتبًا.", "en": "Super easy ordering experience through WhatsApp, and the food arrives hot and well-packed." },
+      "item": "شاورما دجاج"
+    },
+    {
+      "id": "rv4",
+      "name": "خالد يوسف",
+      "rating": 5,
+      "text": { "ar": "الكنافة بالجبن أشبه بالموجودة في أفضل المطاعم الشامية.", "en": "The cheese kunafa rivals what you'd get at the best Levantine restaurants." },
+      "item": "كنافة بالجبن"
+    },
+    {
+      "id": "rv5",
+      "name": "ليان الشمري",
+      "rating": 5,
+      "text": { "ar": "أحببت تفاصيل التغليف والاهتمام بالأطباق، يظهر اهتمامهم بالجودة.", "en": "I loved the packaging details and care put into each dish — you can tell quality matters to them." },
+      "item": "ريش غنم"
+    }
+  ]
+}
