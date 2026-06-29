@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#A8643C">
+<meta name="robots" content="noindex, nofollow">
+<title>Over Sauce Lounge — كاشير الموظفين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="staff.css">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div class="login-wrap" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">OS</div>
+    <h2 style="margin:0 0 4px;">كاشير الموظفين</h2>
+    <p style="color:var(--pos-soft); margin:0 0 22px;">Over Sauce Lounge</p>
+    <label class="field-label">البريد الإلكتروني</label>
+    <input id="emailInput" class="field" type="email" dir="ltr" placeholder="name@email.com" autocomplete="username">
+    <label class="field-label">كلمة المرور</label>
+    <input id="passwordInput" class="field" type="password" dir="ltr" placeholder="••••••••" autocomplete="current-password">
+    <button class="pos-btn block lg" id="loginBtn" style="margin-top:6px;">دخول</button>
+    <p class="login-err" id="loginErr"></p>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="pos-app hidden" id="app">
+  <header class="pos-top">
+    <div class="pos-avatar" id="avatar">??</div>
+    <div class="pos-who">
+      <b id="whoName">—</b>
+      <small><span id="whoRole">موظف</span> · <span id="shiftLabel">مناوبة نشطة</span><span class="shift-dot"></span></small>
+    </div>
+    <div class="spacer"></div>
+    <button class="top-tab active" data-view="order">طلب جديد</button>
+    <button class="top-tab" data-view="orders">طلباتي</button>
+    <button class="top-tab" data-view="perf">أدائي</button>
+    <button class="pos-btn ghost" id="logoutBtn" style="min-height:46px; padding:0 14px;">خروج</button>
+  </header>
+
+  <!-- ORDER VIEW -->
+  <div class="pos-body" id="viewOrder">
+    <section class="pos-menu">
+      <div class="pos-search">
+        <input id="prodSearch" inputmode="search" placeholder="🔎 ابحث بالاسم أو الكود...">
+        <button class="scan-btn" id="scanBtn" title="مسح باركود / QR">📷</button>
+      </div>
+      <div class="cat-bar" id="catBar"></div>
+      <div class="prod-grid" id="prodGrid"></div>
+    </section>
+
+    <aside class="pos-cart" id="cartPanel">
+      <div class="cart-head">
+        <b>الطلب الحالي</b>
+        <button class="pos-btn ghost cart-close" id="cartCloseBtn" style="min-height:40px; padding:0 12px;">إغلاق</button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-setup">
+        <div class="row2">
+          <div>
+            <label class="field-label" style="margin-bottom:4px;">رقم الطاولة</label>
+            <input id="tableInput" class="mini" inputmode="numeric" placeholder="مثال: 5">
+          </div>
+          <div>
+            <label class="field-label" style="margin-bottom:4px;">العميل</label>
+            <input id="custInput" class="mini" placeholder="ضيف">
+          </div>
+        </div>
+        <input id="custPhone" class="mini" dir="ltr" inputmode="tel" placeholder="جوال العميل (اختياري)">
+        <div class="pay-row" id="payRow">
+          <button class="pay-pill active" data-pay="cash">نقدًا</button>
+          <button class="pay-pill" data-pay="mada">مدى</button>
+          <button class="pay-pill" data-pay="applepay">Apple Pay</button>
+          <button class="pay-pill" data-pay="stcpay">STC Pay</button>
+          <button class="pay-pill" data-pay="card">بطاقة</button>
+        </div>
+        <input id="orderNotes" class="mini" placeholder="ملاحظات الطلب (اختياري)">
+      </div>
+      <div class="cart-foot">
+        <div class="tline"><span>الإجمالي الفرعي</span><span id="tSub">0 ر.س</span></div>
+        <div class="tline"><span>شامل ض.ق.م 15%</span><span id="tVat">0 ر.س</span></div>
+        <div class="tline grand"><span>الإجمالي</span><span id="tGrand">0 ر.س</span></div>
+        <button class="pos-btn success block lg" id="confirmBtn" disabled>تأكيد الطلب · إرسال للمطبخ</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- MY ORDERS VIEW -->
+  <div class="panel hidden" id="viewOrders">
+    <div class="cart-head" style="background:transparent; border:none; padding:0 0 12px;">
+      <b style="font-size:1.2rem;">طلباتي اليوم</b>
+      <button class="pos-btn ghost" id="ordersRefresh" style="min-height:44px;">🔄 تحديث</button>
+    </div>
+    <div id="ordersList"></div>
+  </div>
+
+  <!-- PERFORMANCE VIEW -->
+  <div class="panel hidden" id="viewPerf">
+    <b style="font-size:1.2rem; display:block; margin-bottom:14px;">أدائي اليوم</b>
+    <div class="stat-grid" id="perfStats"></div>
+    <p style="color:var(--pos-soft); font-size:.85rem;">الإحصائيات محسوبة من طلباتك المسجّلة اليوم.</p>
+  </div>
+
+  <!-- SUCCESS VIEW -->
+  <div class="success-wrap hidden" id="viewSuccess">
+    <div class="success-card">
+      <div class="success-ico">✓</div>
+      <h2>تم إرسال الطلب للمطبخ</h2>
+      <p style="color:var(--pos-soft); margin:0;">ظهر الطلب في لوحة المدير مباشرة.</p>
+      <div class="inv-line">
+        <div id="successOrderNo">طلب —</div>
+        <div id="successInvNo" style="color:var(--pos-soft); font-size:.9rem; margin-top:4px;">فاتورة —</div>
+      </div>
+      <button class="pos-btn block lg" id="newOrderBtn">＋ طلب جديد</button>
+      <div class="adv-row" style="margin-top:10px;">
+        <button class="pos-btn ghost" id="printBtn" style="flex:1;">🖨️ طباعة الفاتورة</button>
+        <button class="pos-btn ghost" id="waBtn" style="flex:1;">💬 إرسال واتساب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- mobile floating cart -->
+  <button class="pos-btn block cart-fab" id="cartFab">🛒 السلة (<span id="fabCount">0</span>) · <span id="fabTotal">0 ر.س</span></button>
+</div>
+
+<!-- product options sheet -->
+<div class="sheet-scrim hidden" id="optSheet">
+  <div class="sheet" id="optSheetInner"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="staff.js"></script>
+</body>
+</html>

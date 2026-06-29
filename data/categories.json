@@ -1,0 +1,58 @@
+{
+  "categories": [
+    {
+      "id": "breakfast",
+      "name": {
+        "ar": "الفطار",
+        "en": "Breakfast"
+      },
+      "icon": "🍳",
+      "order": 1
+    },
+    {
+      "id": "manakish",
+      "name": {
+        "ar": "مناقيش",
+        "en": "Manakish"
+      },
+      "icon": "🫓",
+      "order": 2
+    },
+    {
+      "id": "pizza",
+      "name": {
+        "ar": "بيتزا",
+        "en": "Pizza"
+      },
+      "icon": "🍕",
+      "order": 3
+    },
+    {
+      "id": "pasta",
+      "name": {
+        "ar": "الباستا",
+        "en": "Pasta"
+      },
+      "icon": "🍝",
+      "order": 4
+    },
+    {
+      "id": "soup",
+      "name": {
+        "ar": "شوربة",
+        "en": "Soups"
+      },
+      "icon": "🍲",
+      "order": 5
+    },
+    {
+      "id": "drinks",
+      "name": {
+        "ar": "مشروبات",
+        "en": "Drinks"
+      },
+      "icon": "🥤",
+      "order": 6
+    }
+  ]
+}

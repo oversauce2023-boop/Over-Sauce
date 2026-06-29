@@ -1,0 +1,172 @@
+{
+  "products": [
+    {
+      "id": "bf1",
+      "category": "breakfast",
+      "name": {
+        "ar": "قطعتين فطير قشدة عسل مربى",
+        "en": "Two Fteer with Cream, Honey & Jam"
+      },
+      "description": {
+        "ar": "قطعتين فطير مشلتت طازج محشي قشطة، يُقدّم مع عسل ومربى.",
+        "en": "Two pieces of fresh flaky fteer filled with cream, served with honey and jam."
+      },
+      "price": 30,
+      "oldPrice": null,
+      "image": "/assets/images/fteer-cream-honey.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 1
+    },
+    {
+      "id": "bf2",
+      "category": "breakfast",
+      "name": {
+        "ar": "بيض أومليت",
+        "en": "Omelette"
+      },
+      "description": {
+        "ar": "أومليت بيض طازج مع الخضار، يُقدّم ساخناً مع الخبز.",
+        "en": "Fresh egg omelette with vegetables, served hot with bread."
+      },
+      "price": 12,
+      "oldPrice": null,
+      "image": "/assets/images/omelette.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 2
+    },
+    {
+      "id": "mn1",
+      "category": "manakish",
+      "name": {
+        "ar": "مناقيش جبنة بالعسل",
+        "en": "Cheese & Honey Manakish"
+      },
+      "description": {
+        "ar": "عجينة طازجة بجبنة موزاريلا ولمسة عسل، مخبوزة في الفرن.",
+        "en": "Fresh dough with mozzarella cheese and a touch of honey, oven-baked."
+      },
+      "price": 20,
+      "oldPrice": null,
+      "image": "/assets/images/manakish-cheese-honey.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 1
+    },
+    {
+      "id": "pz1",
+      "category": "pizza",
+      "name": {
+        "ar": "بيتزا خضار",
+        "en": "Vegetable Pizza"
+      },
+      "description": {
+        "ar": "بيتزا بعجينة طازجة وخضار ملوّنة وجبنة موزاريلا.",
+        "en": "Pizza with fresh dough, colorful vegetables and mozzarella cheese."
+      },
+      "price": 32,
+      "oldPrice": null,
+      "image": "/assets/images/pizza-veg.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 1
+    },
+    {
+      "id": "pa1",
+      "category": "pasta",
+      "name": {
+        "ar": "فرايد شرمب",
+        "en": "Fried Shrimp"
+      },
+      "description": {
+        "ar": "جمبري مقرمش مقلي بتتبيلة خاصة، يُقدّم مع صوص جانبي.",
+        "en": "Crispy fried shrimp with a special seasoning, served with a side sauce."
+      },
+      "price": 50,
+      "oldPrice": null,
+      "image": "/assets/images/fried-shrimp.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 1
+    },
+    {
+      "id": "sp1",
+      "category": "soup",
+      "name": {
+        "ar": "شوربة عدس",
+        "en": "Lentil Soup"
+      },
+      "description": {
+        "ar": "شوربة عدس كريمية ساخنة بنكهة غنية، تُقدّم مع الليمون.",
+        "en": "Warm creamy lentil soup with a rich flavor, served with lemon."
+      },
+      "price": 18,
+      "oldPrice": null,
+      "image": "/assets/images/lentil-soup.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 1
+    },
+    {
+      "id": "dr1",
+      "category": "drinks",
+      "name": {
+        "ar": "موهيتو كود ريد",
+        "en": "Mojito Code Red"
+      },
+      "description": {
+        "ar": "موهيتو كود ريد المنعش بالنعناع والليمون ولمسة من التوت الأحمر.",
+        "en": "Refreshing Code Red mojito with mint, lime and a hint of red berries."
+      },
+      "price": 27,
+      "oldPrice": null,
+      "image": "/assets/images/mojito.jpg",
+      "badges": [],
+      "rating": 4.5,
+      "orders": 0,
+      "inStock": true,
+      "sizes": [],
+      "extras": [],
+      "calories": null,
+      "allergens": [],
+      "sortOrder": 1
+    }
+  ]
+}
