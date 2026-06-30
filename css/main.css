@@ -378,8 +378,8 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
   border-color: color-mix(in srgb, var(--copper) 28%, transparent);
   box-shadow: var(--shadow-deep);
 }
-.product-img-wrap{ position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--panel); }
-.product-img{ width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2,.8,.2,1); opacity: 0; }
+.product-img-wrap{ position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: var(--panel); }
+.product-img{ width: 100%; height: 100%; object-fit: contain; transition: transform .8s cubic-bezier(.2,.8,.2,1); opacity: 0; }
 .product-img.loaded{ opacity: 1; }
 .product-card:hover .product-img{ transform: scale(1.07); }
 
@@ -589,6 +589,13 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .social-row{ display: flex; gap: var(--space-3); margin-top: var(--space-2); }
 .social-btn{ width: 42px; height: 42px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; transition: background .2s, color .2s, transform .2s; }
 .social-btn:hover{ background: var(--copper); color: #fff; transform: translateY(-2px); }
+
+/* شعار اللوجو (صورة) بديل حرف O */
+.logo-mark-img{ height: 44px; width: auto; object-fit: contain; display: block; }
+.portal-logo-img{ height: 84px; width: auto; object-fit: contain; margin: 0 auto 18px; display: block; }
+.login-logo-img{ height: 64px; width: auto; object-fit: contain; margin: 0 auto; display: block; }
+@media (max-width: 639px){ .logo-mark-img{ height: 38px; } }
+
 .footer-bottom{ text-align: center; color: var(--brass); font-size: 0.78rem; padding-bottom: var(--space-6); }
 /* رابط دخول فريق العمل — نقطة باهتة غير لافتة للعملاء، يكبر قليلاً عند المرور */
 .staff-portal-link{ color: var(--brass); opacity: 0.45; padding: 0 6px; font-weight: 900; text-decoration: none; transition: opacity .2s, color .2s; }

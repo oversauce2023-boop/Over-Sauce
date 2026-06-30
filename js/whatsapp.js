@@ -22,38 +22,21 @@
   }
 
   function validateCheckoutForm(){
+    const tableInput = document.getElementById("custTable");
     const nameInput = document.getElementById("custName");
     const phoneInput = document.getElementById("custPhone");
-    const addressInput = document.getElementById("custAddress");
-    const zoneSelect = document.getElementById("deliveryZoneSelect");
-    const orderTypeInput = document.querySelector('input[name="orderType"]:checked');
 
     let valid = true;
 
-    if(!orderTypeInput){
-      showToast(M.lang === "ar" ? "يرجى اختيار طريقة الاستلام" : "Please choose an order type", "⚠️", true);
-      return { valid: false };
-    }
-    const orderType = orderTypeInput.value;
+    // رقم الطاولة مطلوب (طلب من داخل المكان)
+    const table = sanitizeLine(tableInput.value);
+    valid = setFieldValidity(tableInput, "custTableError", table.length >= 1) && valid;
 
     const name = sanitizeLine(nameInput.value);
     valid = setFieldValidity(nameInput, "custNameError", name.length >= 2) && valid;
 
     const phoneDigits = phoneInput.value.replace(/[^\d٠-٩]/g, "");
     valid = setFieldValidity(phoneInput, "custPhoneError", phoneDigits.length >= 8 && phoneDigits.length <= 15) && valid;
-
-    if(orderType === "delivery"){
-      const address = sanitizeLine(addressInput.value);
-      valid = setFieldValidity(addressInput, "custAddressError", address.length >= 3) && valid;
-      const zoneValid = !!zoneSelect.value;
-      setFieldValidity(zoneSelect, "deliveryZoneError", zoneValid);
-      valid = zoneValid && valid;
-    }
-
-    if(orderType === "delivery" && !window.OverSauceCart.meetsMinimumOrder()){
-      showToast(`${t("minOrderWarning")}: ${formatPrice(M.minimumOrder)}`, "⚠️", true);
-      valid = false;
-    }
 
     if(!valid){
       showToast("requiredField", "⚠️");
@@ -62,13 +45,12 @@
 
     return {
       valid,
-      orderType,
+      orderType: "dine_in",
+      table,
       name,
       phone: phoneInput.value.trim(),
-      address: orderType === "delivery" ? sanitizeLine(addressInput.value) : "",
-      zoneId: orderType === "delivery" ? zoneSelect.value : null,
       notes: sanitizeLine(document.getElementById("custNotes").value).slice(0, 200),
-      payment: (document.querySelector('input[name="paymentMethod"]:checked') || {}).value || "cash"
+      payment: "cash" // الدفع عند الاستلام
     };
   }
 
@@ -85,7 +67,6 @@
     const isAr = M.lang === "ar";
     const restaurantName = M.restaurant ? localized(M.restaurant.name) : "Over Sauce Lounge";
     const { subtotal, discount, fee, total } = window.OverSauceCart.cartTotals();
-    const zone = formData.zoneId ? M.deliveryZones.find(z => z.id === formData.zoneId) : null;
 
     const lines = [];
     lines.push(`*${isAr ? "طلب جديد" : "New Order"} — ${restaurantName}*`);
@@ -95,11 +76,7 @@
     }
     lines.push(`👤 *${isAr ? "اسم العميل" : "Customer Name"}:* ${formData.name}`);
     lines.push(`📞 *${isAr ? "رقم الهاتف" : "Phone Number"}:* ${formData.phone}`);
-    lines.push(`📦 *${isAr ? "طريقة الاستلام" : "Order Type"}:* ${formData.orderType === "delivery" ? (isAr ? "توصيل" : "Delivery") : (isAr ? "استلام من الفرع" : "Pickup")}`);
-    if(formData.orderType === "delivery"){
-      if(zone) lines.push(`🗺️ *${isAr ? "منطقة التوصيل" : "Delivery Zone"}:* ${localized(zone.name)}`);
-      lines.push(`📍 *${isAr ? "العنوان" : "Address"}:* ${formData.address}`);
-    }
+    lines.push(`🪑 *${isAr ? "رقم الطاولة" : "Table No."}:* ${formData.table}`);
     lines.push("");
     lines.push(`🍽️ *${isAr ? "الأطباق المطلوبة" : "Items"}:*`);
 
@@ -123,9 +100,6 @@
 
     lines.push("━━━━━━━━━━━━━━━");
     lines.push(`💵 *${isAr ? "المجموع الفرعي" : "Subtotal"}:* ${formatPrice(subtotal)}`);
-    if(formData.orderType === "delivery"){
-      lines.push(`🚚 *${isAr ? "رسوم التوصيل" : "Delivery Fee"}:* ${formatPrice(fee)}`);
-    }
     if(discount > 0){
       const couponLabel = M.appliedCoupon ? ` (${M.appliedCoupon.code})` : "";
       lines.push(`🏷️ *${isAr ? "الخصم" : "Discount"}:* −${formatPrice(discount)}${couponLabel}`);
@@ -164,7 +138,6 @@
      ================================================================= */
   function buildOrderPayload(formData){
     const { subtotal, discount, fee, total } = window.OverSauceCart.cartTotals();
-    const zone = formData.zoneId ? M.deliveryZones.find(z => z.id === formData.zoneId) : null;
 
     const items = Object.values(M.cart).map(line => {
       const unitPrice = window.OverSauceCart.lineUnitPrice(line);
@@ -188,16 +161,17 @@
       id: "ord_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       customerName: formData.name,
       phone: formData.phone,
-      address: formData.address || "",
+      tableNumber: formData.table || "",
+      address: "",
       mapsLink: "",
-      orderType: formData.orderType,
-      zone: zone ? `${(zone.name && zone.name.ar) || ""} / ${(zone.name && zone.name.en) || ""}`.trim() : "",
+      orderType: "dine_in",
+      zone: "",
       items: items,
       notes: formData.notes || "",
       couponCode: M.appliedCoupon ? M.appliedCoupon.code : "",
       discount: discount || 0,
       vat: 0,
-      deliveryFee: formData.orderType === "delivery" ? (fee || 0) : 0,
+      deliveryFee: 0,
       subtotal: subtotal || 0,
       grandTotal: total || 0,
       paymentMethod: formData.payment || "cash",

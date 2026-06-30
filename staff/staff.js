@@ -345,7 +345,7 @@
     const html = `<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>فاتورة ${esc(o.invoiceNumber || o.orderNumber || "")}</title>
 <style>body{font-family:Arial,sans-serif;padding:18px;color:#111;max-width:380px;}h1{font-size:18px;margin:0;}table{width:100%;border-collapse:collapse;margin-top:10px;}td{padding:5px;border-bottom:1px solid #ddd;text-align:right;}.tot td{font-weight:bold;font-size:15px;border-top:2px solid #333;}.muted{color:#666;font-size:12px;}</style>
 </head><body>
-<h1>Over Sauce Lounge</h1><div class="muted">${vatNo ? "فاتورة ضريبية مبسطة" : "إيصال"}</div>
+<img src="/assets/brand/logo-192.png" alt="Over Sauce Lounge" style="height:70px;margin:0 auto 6px;display:block;"><h1 style="font-size:15px;">Over Sauce Lounge</h1><div class="muted">${vatNo ? "فاتورة ضريبية مبسطة" : "إيصال"}</div>
 <div style="margin-top:8px;">فاتورة: <b>${esc(o.invoiceNumber || "")}</b> · طلب: ${esc(o.orderNumber || "")}</div>
 ${vatBlock}
 <div>${o.tableNumber ? ("طاولة: " + esc(o.tableNumber) + " · ") : ""}الموظف: ${esc(o.assignedEmployee || "")}</div>

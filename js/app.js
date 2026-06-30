@@ -427,15 +427,6 @@ function applyFeatureFlags(){
   b.classList.toggle("ff-no-delivery", f.delivery === false);
   b.classList.toggle("ff-no-ordering", f.whatsappOrdering === false);
 
-  // Delivery off → force pickup selection.
-  if(f.delivery === false){
-    const pickup = document.querySelector('input[name="orderType"][value="pickup"]');
-    const delivery = document.querySelector('input[name="orderType"][value="delivery"]');
-    if(pickup && delivery && delivery.checked){
-      pickup.checked = true;
-      pickup.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-  }
   // Ordering off → disable the send button.
   const sendBtn = document.getElementById("sendOrderBtn");
   if(sendBtn && !(M.restaurant && M.restaurant.ordersPaused)) sendBtn.disabled = (f.whatsappOrdering === false);
@@ -449,7 +440,15 @@ function bindRestaurantInfo(){
   document.querySelectorAll("[data-bind='restaurantTagline']").forEach(el => el.textContent = localized(M.restaurant.tagline));
   document.querySelectorAll("[data-bind='restaurantAddress']").forEach(el => el.textContent = localized(M.restaurant.address));
   document.querySelectorAll("[data-bind='restaurantHours']").forEach(el => el.textContent = localized(M.restaurant.openingHours));
-  document.querySelectorAll("[data-bind='restaurantPhone']").forEach(el => { el.textContent = M.restaurant.phone; el.setAttribute("href", `tel:${M.restaurant.phone}`); });
+  document.querySelectorAll("[data-bind='restaurantPhone']").forEach(el => {
+    // نعرض الرقم بصيغة 05 المحلية المألوفة، مع إبقاء رابط الاتصال بالصيغة الدولية ليعمل صح.
+    const raw = (M.restaurant.phone || "").replace(/\s/g, "");
+    let display = raw;
+    if(raw.startsWith("+966")) display = "0" + raw.slice(4);
+    else if(raw.startsWith("966")) display = "0" + raw.slice(3);
+    el.textContent = display;
+    el.setAttribute("href", `tel:${raw}`);
+  });
   document.querySelectorAll("[data-bind='mapsLink']").forEach(el => el.setAttribute("href", M.restaurant.mapsUrl));
   const bindSocial = (name, url) => document.querySelectorAll(`[data-bind='${name}']`).forEach(el => {
     if(url){ el.setAttribute("href", url); el.classList.remove("hidden"); }

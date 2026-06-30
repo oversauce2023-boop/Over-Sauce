@@ -1122,7 +1122,7 @@
         <td><strong>${escapeHTML(o.orderNumber || "—")}</strong></td>
         <td>${escapeHTML(o.customerName || "—")}</td>
         <td dir="ltr" style="text-align:right;">${escapeHTML(o.phone || "—")}</td>
-        <td>${o.orderType === "delivery" ? "توصيل" : "استلام"}</td>
+        <td>${o.orderType === "delivery" ? "توصيل" : (o.orderType === "dine_in" ? "صالة / طاولة" : "استلام")}</td>
         <td style="white-space:nowrap;">${money(o.grandTotal)}</td>
         <td>${PAY_LABELS[o.paymentMethod] || escapeHTML(o.paymentMethod)}</td>
         <td><span class="order-status-badge status-${o.status}">${s.icon} ${s.ar}</span></td>

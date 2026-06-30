@@ -15,9 +15,9 @@
 <link rel="canonical" href="https://over-sauce.vercel.app/">
 <meta name="theme-color" content="#FAFAFA">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/assets/brand/logo-96.png">
+<link rel="icon" type="image/png" href="/assets/brand/logo-96.png">
+<link rel="apple-touch-icon" href="/assets/brand/logo-192.png">
 
 <!-- Open Graph / Twitter Card -->
 <meta property="og:type" content="website">
@@ -72,7 +72,7 @@
   <div class="glass-strong" style="border-bottom:1px solid var(--line);">
     <div class="header-top">
       <a href="#hero" class="flex" style="align-items:center; gap:10px;" aria-label="Over Sauce Lounge">
-        <div class="logo-mark" aria-hidden="true">O</div>
+        <img class="logo-mark-img" src="/assets/brand/logo-192.png" alt="Over Sauce Lounge">
         <div class="logo-text" style="line-height:1.1;">
           <p class="logo-text-name" data-bind="restaurantName">Over Sauce Lounge</p>
           <p class="logo-text-sub">Restaurant &amp; Café · Jeddah</p>
@@ -280,7 +280,7 @@
       <a class="contact-card" data-bind="restaurantPhone" href="tel:+966533500392">
         <div class="contact-icon" aria-hidden="true">📞</div>
         <h4 class="h3" style="font-size:1.05rem; margin-bottom:6px;" data-i18n="callNow">اتصل الآن</h4>
-        <p class="muted">+966533500392</p>
+        <p class="muted">٠٥٣٣٥٠٠٣٩٢</p>
       </a>
       <a class="contact-card" data-bind="mapsLink" href="#" target="_blank" rel="noopener noreferrer">
         <div class="contact-icon" aria-hidden="true">📍</div>
@@ -303,7 +303,7 @@
   <div class="container footer-grid">
     <div>
       <div class="flex" style="align-items:center; gap:10px; margin-bottom:12px;">
-        <div class="logo-mark" aria-hidden="true">O</div>
+        <img class="logo-mark-img" src="/assets/brand/logo-192.png" alt="Over Sauce Lounge">
         <p class="font-display" style="font-size:1.1rem; color:var(--parchment);" data-bind="restaurantName">Over Sauce Lounge</p>
       </div>
       <p class="muted" style="max-width:320px; line-height:1.7;">تجربة طهي راقية تجمع بين عبق الشرق وروح الضيافة المعاصرة.</p>
@@ -319,7 +319,7 @@
       <h4 class="footer-heading" data-i18n="footerContactTitle">معلومات التواصل</h4>
       <ul class="footer-list">
         <li data-bind="restaurantAddress">حي الحمراء، جدة</li>
-        <li><a data-bind="restaurantPhone" href="tel:+966533500392" style="transition:color .2s;">+966533500392</a></li>
+        <li><a data-bind="restaurantPhone" href="tel:+966533500392" style="transition:color .2s;">٠٥٣٣٥٠٠٣٩٢</a></li>
         <li data-bind="restaurantHours">مفتوح ٢٤ ساعة يوميًا</li>
       </ul>
     </div>
@@ -364,7 +364,6 @@
     <div>
       <div class="summary-line"><span data-i18n="subtotal">المجموع الفرعي</span><span id="cartSubtotal">٠ ر.س</span></div>
       <div class="summary-line hidden" id="cartDiscountRow"><span data-i18n="discount">الخصم</span><span id="cartDiscount">٠ ر.س</span></div>
-      <div class="summary-line hidden" id="cartFeeRow"><span data-i18n="deliveryFee">رسوم التوصيل</span><span id="cartFee">٠ ر.س</span></div>
       <div class="summary-total"><span data-i18n="total">الإجمالي</span><span id="cartTotal">٠ ر.س</span></div>
     </div>
     <button id="checkoutOpenBtn" class="btn btn-primary" style="width:100%;">
@@ -452,42 +451,22 @@
       </div>
 
       <form id="checkoutForm" novalidate onsubmit="return false;" style="display:flex; flex-direction:column; gap:20px;">
-        <fieldset>
-          <legend class="field-label" data-i18n="orderType">طريقة الاستلام</legend>
-          <div class="grid" style="grid-template-columns:1fr 1fr; gap:12px;">
-            <label class="choice-pill ot-delivery">
-              <input type="radio" name="orderType" value="delivery" checked>
-              <div class="choice-pill-box">🛵 <span data-i18n="delivery">توصيل</span></div>
-            </label>
-            <label class="choice-pill">
-              <input type="radio" name="orderType" value="pickup">
-              <div class="choice-pill-box">🏠 <span data-i18n="pickup">استلام من الفرع</span></div>
-            </label>
-          </div>
-        </fieldset>
-
-        <div id="deliveryZoneField">
-          <label for="deliveryZoneSelect" class="field-label"><span data-i18n="deliveryZone">منطقة التوصيل</span> <span class="field-required">*</span></label>
-          <select id="deliveryZoneSelect" class="field"></select>
-          <p id="deliveryZoneError" class="field-error hidden" data-i18n="invalidZone">يرجى اختيار منطقة التوصيل</p>
+        <div>
+          <label for="custTable" class="field-label"><span data-i18n="tableNumber">رقم الطاولة</span> <span class="field-required">*</span></label>
+          <input id="custTable" type="text" class="field" required inputmode="numeric" data-i18n-placeholder="tablePlaceholder" placeholder="مثال: ٥">
+          <p id="custTableError" class="field-error hidden" data-i18n="invalidTable">يرجى إدخال رقم الطاولة</p>
         </div>
 
         <div>
-          <label for="custName" class="field-label"><span data-i18n="fullName">الاسم الكامل</span> <span class="field-required">*</span></label>
+          <label for="custName" class="field-label"><span data-i18n="fullName">الاسم</span> <span class="field-required">*</span></label>
           <input id="custName" type="text" class="field" required minlength="2" autocomplete="name" data-i18n-placeholder="fullName" placeholder="مثال: أحمد محمد">
           <p id="custNameError" class="field-error hidden" data-i18n="invalidName">يرجى إدخال اسم لا يقل عن حرفين</p>
         </div>
 
         <div>
           <label for="custPhone" class="field-label"><span data-i18n="phoneNumber">رقم الهاتف</span> <span class="field-required">*</span></label>
-          <input id="custPhone" type="tel" class="field" required inputmode="tel" autocomplete="tel" placeholder="٠١٢٣٤٥٦٧٨٩">
+          <input id="custPhone" type="tel" class="field" required inputmode="tel" autocomplete="tel" placeholder="٠٥xxxxxxxx">
           <p id="custPhoneError" class="field-error hidden" data-i18n="invalidPhone">يرجى إدخال رقم هاتف صحيح</p>
-        </div>
-
-        <div id="addressField">
-          <label for="custAddress" class="field-label"><span data-i18n="deliveryAddress">عنوان التوصيل</span> <span class="field-required">*</span></label>
-          <input id="custAddress" type="text" class="field" autocomplete="street-address" data-i18n-placeholder="addressPlaceholder" placeholder="المنطقة، الشارع، رقم المبنى">
-          <p id="custAddressError" class="field-error hidden" data-i18n="invalidAddress">يرجى إدخال عنوان التوصيل</p>
         </div>
 
         <div>
@@ -533,13 +512,11 @@
           <p class="muted" style="font-size:0.74rem; margin-top:8px;" data-i18n="payNote">يتم ترتيب الدفع مع المطعم عند تأكيد الطلب عبر واتساب</p>
         </fieldset>
 
-        <p id="minOrderNotice" class="field-error hidden" style="background:color-mix(in srgb, var(--danger) 12%, transparent); padding:10px 14px; border-radius:10px;"></p>
 
         <div style="background:var(--panel); border-radius:var(--radius-md); padding:16px;">
           <div class="summary-line"><span id="checkoutItemCount">٠ أطباق</span><span id="checkoutSubtotal">٠ ر.س</span></div>
           <div class="summary-line hidden" id="checkoutDiscountRow"><span data-i18n="discount">الخصم</span><span id="checkoutDiscount">٠ ر.س</span></div>
-          <div class="summary-line hidden" id="checkoutFeeRow"><span data-i18n="deliveryFee">رسوم التوصيل</span><span id="checkoutFee">٠ ر.س</span></div>
-          <div class="summary-total"><span data-i18n="total">الإجمالي</span><span id="checkoutTotal">٠ ر.س</span></div>
+            <div class="summary-total"><span data-i18n="total">الإجمالي</span><span id="checkoutTotal">٠ ر.س</span></div>
         </div>
 
         <button id="sendOrderBtn" type="button" class="btn btn-primary wa-btn" style="width:100%; padding:16px;">
@@ -569,7 +546,7 @@
      INSTALL (PWA) BANNER
      ============================================================ -->
 <div id="installBanner" class="install-banner">
-  <div class="logo-mark" aria-hidden="true" style="flex-shrink:0;">O</div>
+  <img class="logo-mark-img" src="/assets/brand/logo-192.png" alt="Over Sauce Lounge" style="flex-shrink:0;">
   <div style="flex:1;">
     <p style="font-weight:700; font-size:0.9rem; color:var(--parchment);">ثبّت تطبيق Over Sauce Lounge</p>
     <p class="muted" style="font-size:0.78rem;">وصول أسرع، حتى بدون إنترنت.</p>

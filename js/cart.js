@@ -79,10 +79,7 @@
     return M.deliveryZones.find(z => z.id === M.deliveryZoneId) || null;
   }
   function deliveryFee(){
-    if(M.orderType !== "delivery") return 0;
-    if(cartCount() === 0) return 0; // never charge delivery on an empty cart
-    const zone = activeDeliveryZone();
-    return zone ? zone.fee : 0;
+    return 0; // المطعم استلام من داخل المكان — لا توصيل
   }
 
   function couponDiscount(subtotal){
@@ -451,24 +448,12 @@
   /* =================================================================
      CHECKOUT MODAL
      ================================================================= */
-  function populateDeliveryZoneSelect(){
-    const select = document.getElementById("deliveryZoneSelect");
-    if(!select) return;
-    select.innerHTML = `<option value="" disabled ${M.deliveryZoneId ? "" : "selected"}>${t("chooseZone")}</option>` +
-      M.deliveryZones.map(z => `
-        <option value="${z.id}" ${z.id === M.deliveryZoneId ? "selected" : ""}>
-          ${escapeHTML(localized(z.name))} — ${formatPrice(z.fee)}
-        </option>
-      `).join("");
-  }
-
   function openCheckout(){
     if(cartCount() === 0){
       showToast("toastCartEmpty", "⚠️");
       return;
     }
     closeCart();
-    populateDeliveryZoneSelect();
     renderSummary();
 
     const scrim = document.getElementById("checkoutScrim");
@@ -495,24 +480,7 @@
      ORDER TYPE / ZONE WIRING
      ================================================================= */
   function setupOrderTypeToggle(){
-    document.querySelectorAll('input[name="orderType"]').forEach(radio => {
-      radio.addEventListener("change", (e) => {
-        M.orderType = e.target.value;
-        const zoneField = document.getElementById("deliveryZoneField");
-        const addressField = document.getElementById("addressField");
-        const isDelivery = M.orderType === "delivery";
-        zoneField?.classList.toggle("hidden", !isDelivery);
-        addressField?.classList.toggle("hidden", !isDelivery);
-        persistCart();
-        renderSummary();
-      });
-      if(radio.value === M.orderType) radio.checked = true;
-    });
-    document.getElementById("deliveryZoneSelect")?.addEventListener("change", (e) => {
-      M.deliveryZoneId = e.target.value || null;
-      persistCart();
-      renderSummary();
-    });
+    // المطعم استلام من داخل المكان فقط — لا توجد خيارات توصيل/مناطق.
   }
 
   function setupCouponUI(){
