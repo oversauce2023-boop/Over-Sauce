@@ -201,7 +201,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    7. HEADER
    --------------------------------------------------------------------- */
 .site-header{
-  position: fixed; inset-inline: 0; top: 0; z-index: 50;
+  position: sticky; inset-inline: 0; top: 0; z-index: 50;
   background: color-mix(in srgb, var(--ink) 78%, transparent);
   backdrop-filter: blur(22px) saturate(140%);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
@@ -307,8 +307,10 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 .announce-bar{
   background: linear-gradient(90deg, var(--copper), var(--copper-light));
   color: #FFF7EC; font-size: 0.82rem; font-weight: 700; text-align: center;
-  padding: 9px var(--space-4); position: relative; z-index: 1;
+  padding: 9px var(--space-4); position: static; z-index: auto;
+  width: 100%;
 }
+@media (max-width: 639px){ .announce-bar{ font-size: 0.74rem; padding: 7px var(--space-3); } }
 .announce-bar a{ text-decoration: underline; text-underline-offset: 2px; }
 
 /* ---------------------------------------------------------------------
@@ -316,7 +318,7 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
    --------------------------------------------------------------------- */
 .hero{
   position: relative; min-height: 90vh; display: flex; align-items: flex-end; overflow: hidden;
-  padding-top: 7rem;
+  padding-top: 1.5rem;
   background: #0d0d10;
 }
 .hero-media{ position: absolute; inset: 0; }

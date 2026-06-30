@@ -69,7 +69,7 @@
 /* ---------------- Print (menu can be printed for in-store use) ---------------- */
 @media print{
   .site-header, .fab-cart, .drawer, .scrim, .toast-container,
-  .install-banner, .announce-bar, .dust-field{ display: none !important; }
+  .install-banner, .dust-field{ display: none !important; }
   body{ background: #fff; color: #111; }
   .product-card{ break-inside: avoid; border: 1px solid #ccc; }
 }
