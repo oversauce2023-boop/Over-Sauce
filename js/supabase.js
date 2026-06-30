@@ -61,7 +61,8 @@
     return {
       id: r.id, title: { ar: r.title_ar, en: r.title_en },
       subtitle: { ar: r.subtitle_ar || "", en: r.subtitle_en || "" },
-      discountPercent: r.discount_percent, endsInHours: r.ends_in_hours
+      discountPercent: r.discount_percent, endsInHours: r.ends_in_hours,
+      imageUrl: r.image_url || ""
     };
   }
   function toRestaurant(r) {
@@ -173,6 +174,7 @@
       id: d.id, title_ar: d.title.ar, title_en: d.title.en,
       subtitle_ar: (d.subtitle && d.subtitle.ar) || "", subtitle_en: (d.subtitle && d.subtitle.en) || "",
       discount_percent: d.discountPercent || 0, ends_in_hours: d.endsInHours || 24,
+      image_url: d.imageUrl || "",
       active: d.active !== false
     };
   }

@@ -690,19 +690,44 @@
         <div><label class="field-label">الوصف (إنجليزي)</label><input id="dealSubEn" class="field" value="${deal && deal.subtitle ? escapeHTML(deal.subtitle.en) : ''}"></div>
         <div><label class="field-label">نسبة الخصم (%)</label><input id="dealDiscount" type="number" min="0" max="100" class="field" value="${deal ? (deal.discountPercent || 0) : 0}"></div>
         <div><label class="field-label">ينتهي خلال (ساعة)</label><input id="dealHours" type="number" min="0" class="field" value="${deal ? (deal.endsInHours || 24) : 24}"></div>
+        <div>
+          <label class="field-label">صورة العرض (اختياري — لو رفعت صورة/تصميم، تظهر بدل النص)</label>
+          <input id="dealImageInput" type="file" accept="image/*" class="field">
+          <div id="dealImagePreview" style="margin-top:8px;">${deal && deal.imageUrl ? `<img src="${deal.imageUrl}" alt="" style="max-width:100%; border-radius:10px;">` : ''}</div>
+          <input id="dealImageUrl" type="hidden" value="${deal && deal.imageUrl ? escapeHTML(deal.imageUrl) : ''}">
+        </div>
         <button id="dealSaveBtn" class="btn btn-primary">حفظ العرض</button>
       </div>
     `, () => {
+      const dealImgInput = document.getElementById("dealImageInput");
+      if(dealImgInput){
+        dealImgInput.addEventListener("change", async (ev) => {
+          const file = ev.target.files && ev.target.files[0];
+          if(!file) return;
+          showToast("جارٍ معالجة الصورة...", "🖼️");
+          try {
+            const compressed = await compressImage(file, 1400, 0.82);
+            let url = compressed;
+            try { url = await OSDB.uploadProductImage(compressed); } catch(e){ /* fallback to data url */ }
+            document.getElementById("dealImageUrl").value = url;
+            document.getElementById("dealImagePreview").innerHTML = `<img src="${url}" alt="" style="max-width:100%; border-radius:10px;">`;
+            showToast("تم رفع الصورة", "✅");
+          } catch(e){ showToast("تعذّر رفع الصورة", "⚠️"); }
+        });
+      }
       document.getElementById("dealSaveBtn").addEventListener("click", () => {
         const titleAr = document.getElementById("dealTitleAr").value.trim();
         const titleEn = document.getElementById("dealTitleEn").value.trim();
-        if(!titleAr || !titleEn){ showToast("يرجى إدخال عنوان العرض بالعربي والإنجليزي", "⚠️"); return; }
+        const dealImageUrl = (document.getElementById("dealImageUrl").value || "").trim();
+        // لو فيه صورة، العنوان اختياري؛ لو مفيش صورة، العنوان مطلوب.
+        if(!dealImageUrl && (!titleAr || !titleEn)){ showToast("أدخل عنوان العرض أو ارفع صورة للعرض", "⚠️"); return; }
         const payload = {
           id: deal ? deal.id : uid("deal"),
-          title: { ar: titleAr, en: titleEn },
+          title: { ar: titleAr || "عرض", en: titleEn || "Offer" },
           subtitle: { ar: document.getElementById("dealSubAr").value.trim(), en: document.getElementById("dealSubEn").value.trim() },
           discountPercent: Number(document.getElementById("dealDiscount").value) || 0,
           endsInHours: Number(document.getElementById("dealHours").value) || 24,
+          imageUrl: dealImageUrl,
           active: true
         };
         if(deal){ Object.assign(deal, payload); } else { db.flashDeals.push(payload); }
@@ -1308,7 +1333,7 @@
 <style>body{font-family:Arial,Helvetica,sans-serif;padding:24px;color:#111;}h1{font-size:20px;margin:0;}table{width:100%;border-collapse:collapse;margin-top:12px;}td,th{padding:6px;border-bottom:1px solid #ddd;text-align:right;}.tot td{font-weight:bold;font-size:16px;border-top:2px solid #333;}.muted{color:#666;font-size:12px;}</style>
 </head><body>
 <h1>${escapeHTML(rest)}</h1><div class="muted">فاتورة طلب</div>
-<div style="margin-top:10px;">رقم الطلب: <strong>${escapeHTML(o.orderNumber || "")}</strong></div>
+<div style="margin-top:10px;">رقم الطلب: <strong>طلب #${escapeHTML(o.orderNumber || "")}</strong></div>
 <div>التاريخ: ${fmtDate(o.createdAt)}</div>
 <div>العميل: ${escapeHTML(o.customerName || "—")} — <span dir="ltr">${escapeHTML(o.phone || "")}</span></div>
 <div>النوع: ${o.orderType === "delivery" ? "توصيل" : "استلام"}${o.zone ? " — " + escapeHTML(o.zone) : ""}</div>

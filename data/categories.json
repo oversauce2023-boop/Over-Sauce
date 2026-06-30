@@ -15,7 +15,7 @@
         "ar": "مناقيش",
         "en": "Manakish"
       },
-      "icon": "🫓",
+      "icon": "🥙",
       "order": 2
     },
     {
@@ -53,6 +53,15 @@
       },
       "icon": "🥤",
       "order": 6
+    },
+    {
+      "id": "desserts",
+      "name": {
+        "ar": "حلويات",
+        "en": "Desserts"
+      },
+      "icon": "🍰",
+      "order": 7
     }
   ]
 }

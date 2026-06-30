@@ -265,7 +265,6 @@
                            (product && product.extras && product.extras.length);
         if(product && !hasOptions){
           window.OverSauceCart.addToCart(product, { size: null, extras: [], qty: 1 });
-          showToast("addedToCart", "✅");
         } else {
           openProductModal(id);
         }

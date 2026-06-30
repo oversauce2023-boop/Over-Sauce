@@ -499,13 +499,21 @@ function renderReviews(){
 function renderFlashDeals(){
   const wrap = document.getElementById("promoStrip");
   if(!wrap || !M.flashDeals.length) return;
-  wrap.innerHTML = M.flashDeals.map(deal => `
+  wrap.innerHTML = M.flashDeals.map(deal => {
+    // لو العرض له صورة/تصميم جاهز → نعرض الصورة فقط. وإلا نعرض النص.
+    if(deal.imageUrl){
+      return `
+    <div class="promo-card promo-card-image reveal">
+      <img src="${deal.imageUrl}" alt="${escapeHTML(localized(deal.title) || t("flashDealsTitle"))}" loading="lazy" decoding="async">
+    </div>`;
+    }
+    return `
     <div class="promo-card reveal">
       <p class="text-eyebrow">${t("flashDealsTitle")}</p>
       <h3 class="h3" style="margin-top:6px;">${escapeHTML(localized(deal.title))}</h3>
       <p class="muted" style="margin-top:6px; font-size:0.88rem;">${escapeHTML(localized(deal.subtitle))}</p>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
   setupRevealObserver();
 }
 
@@ -576,8 +584,12 @@ function setupInstallPrompt(){
     });
   }
   if(dismissBtn){
-    dismissBtn.addEventListener("click", () => {
+    dismissBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       banner.classList.remove("visible");
+      banner.style.display = "none";
+      deferredInstallPrompt = null;
       storageSet("installDismissed", "1");
     });
   }

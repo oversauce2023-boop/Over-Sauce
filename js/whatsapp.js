@@ -72,13 +72,13 @@
     lines.push(`*${isAr ? "طلب جديد" : "New Order"} — ${restaurantName}*`);
     lines.push("━━━━━━━━━━━━━━━");
     if(orderNumber){
-      lines.push(`🔖 *${isAr ? "رقم الطلب" : "Order No."}:* ${orderNumber}`);
+      lines.push(`🔖 *${isAr ? "رقم الطلب" : "Order No."}:* ${isAr ? "طلب #" : "#"}${orderNumber}`);
     }
     lines.push(`👤 *${isAr ? "اسم العميل" : "Customer Name"}:* ${formData.name}`);
     lines.push(`📞 *${isAr ? "رقم الهاتف" : "Phone Number"}:* ${formData.phone}`);
     lines.push(`🪑 *${isAr ? "رقم الطاولة" : "Table No."}:* ${formData.table}`);
     lines.push("");
-    lines.push(`🍽️ *${isAr ? "الأطباق المطلوبة" : "Items"}:*`);
+    lines.push(`🍴 *${isAr ? "الأطباق المطلوبة" : "Items"}:*`);
 
     Object.values(M.cart).forEach(line => {
       const unitPrice = window.OverSauceCart.lineUnitPrice(line);
@@ -113,7 +113,7 @@
       stcpay:   "STC Pay",
       card:     isAr ? "بطاقة" : "Card"
     };
-    lines.push(`💳 *${isAr ? "طريقة الدفع" : "Payment"}:* ${payLabels[formData.payment] || payLabels.cash}`);
+    lines.push(`💵 *${isAr ? "طريقة الدفع" : "Payment"}:* ${payLabels[formData.payment] || payLabels.cash}`);
 
     if(formData.notes){
       lines.push("");
