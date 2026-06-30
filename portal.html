@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>بوابة الدخول | Over Sauce Lounge</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1B1F18">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/animations.css">
+<style>
+  .portal-wrap{
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; position: relative; overflow: hidden;
+  }
+  .portal-card{
+    width: 100%; max-width: 440px; text-align: center;
+    background: var(--ink-soft); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 40px 28px;
+    box-shadow: var(--shadow-deep); position: relative; z-index: 2;
+  }
+  .portal-logo{
+    width: 72px; height: 72px; margin: 0 auto 18px;
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--copper), var(--copper-light));
+    font-family: var(--font-display); font-size: 2rem; color: #fff;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--copper) 40%, transparent);
+  }
+  .portal-options{ display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
+  .portal-btn{
+    display: flex; align-items: center; gap: 16px; width: 100%;
+    padding: 20px; border-radius: var(--radius-md);
+    border: 1px solid var(--line); background: var(--panel);
+    text-align: start; transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    cursor: pointer;
+  }
+  .portal-btn:hover{ transform: translateY(-2px); border-color: var(--copper); background: var(--ink-soft); }
+  .portal-btn:active{ transform: translateY(0); }
+  .portal-btn-icon{
+    width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+    background: color-mix(in srgb, var(--copper) 18%, transparent);
+  }
+  .portal-btn-text h3{ font-size: 1.05rem; color: var(--parchment); margin-bottom: 3px; font-weight: 800; }
+  .portal-btn-text p{ font-size: 0.82rem; color: var(--brass); }
+  .portal-btn-arrow{ margin-inline-start: auto; color: var(--brass); font-size: 1.2rem; }
+  .portal-back{ display: inline-flex; align-items: center; gap: 6px; margin-top: 28px; color: var(--brass); font-size: 0.85rem; font-weight: 700; }
+  .portal-back:hover{ color: var(--copper-light); }
+  .portal-glow{ position: absolute; width: 480px; height: 480px; border-radius: 50%; filter: blur(120px); opacity: 0.18; z-index: 1; }
+  .portal-glow.one{ background: var(--copper); top: -160px; inset-inline-start: -120px; }
+  .portal-glow.two{ background: var(--olive, #6b7a4f); bottom: -160px; inset-inline-end: -120px; }
+</style>
+</head>
+<body class="antialiased">
+<div class="grain"></div>
+
+<div class="portal-wrap">
+  <div class="portal-glow one" aria-hidden="true"></div>
+  <div class="portal-glow two" aria-hidden="true"></div>
+
+  <div class="portal-card reveal in">
+    <div class="portal-logo" aria-hidden="true">O</div>
+    <h1 class="h3" style="font-size:1.35rem; margin-bottom:6px;">بوابة فريق العمل</h1>
+    <p class="muted" style="font-size:0.88rem;">اختر لوحة التحكم المناسبة لك</p>
+
+    <div class="portal-options">
+      <a href="staff/" class="portal-btn">
+        <span class="portal-btn-icon" aria-hidden="true">🧾</span>
+        <span class="portal-btn-text">
+          <h3>لوحة الكاشير</h3>
+          <p>استقبال الطلبات على الطاولات وإصدار الفواتير</p>
+        </span>
+        <span class="portal-btn-arrow" aria-hidden="true">‹</span>
+      </a>
+
+      <a href="admin/" class="portal-btn">
+        <span class="portal-btn-icon" aria-hidden="true">📊</span>
+        <span class="portal-btn-text">
+          <h3>لوحة المدير</h3>
+          <p>إدارة المنيو والطلبات والموظفين والتقارير</p>
+        </span>
+        <span class="portal-btn-arrow" aria-hidden="true">‹</span>
+      </a>
+    </div>
+
+    <a href="index.html" class="portal-back">
+      <span aria-hidden="true">→</span> العودة إلى الموقع
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

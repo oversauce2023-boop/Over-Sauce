@@ -84,6 +84,7 @@
       const all = await OSDB.fetchAll();
       DATA.categories = all.categories || [];
       DATA.products = all.products || [];
+      DATA.restaurant = all.restaurant || {};
     } catch (e) { toast("تعذّر تحميل القائمة"); DATA = { categories: [], products: [] }; }
     renderCats(); renderProducts();
   }
@@ -301,13 +302,52 @@
   }
 
   /* ---------------- print + whatsapp ---------------- */
+  // ترميز ZATCA TLV ثم Base64 لرمز QR للفاتورة الضريبية المبسّطة.
+  // الحقول الخمسة الإلزامية: اسم البائع، الرقم الضريبي، الطابع الزمني،
+  // الإجمالي شامل الضريبة، مبلغ الضريبة.
+  function zatcaTLV(sellerName, vatNumber, timestamp, total, vat) {
+    function toUTF8(str){ return new TextEncoder().encode(str); }
+    function tlv(tag, valueStr){
+      const val = toUTF8(valueStr);
+      return [tag, val.length, ...val];
+    }
+    const bytes = [
+      ...tlv(1, sellerName),
+      ...tlv(2, vatNumber),
+      ...tlv(3, timestamp),
+      ...tlv(4, String(total)),
+      ...tlv(5, String(vat))
+    ];
+    let bin = "";
+    bytes.forEach(b => { bin += String.fromCharCode(b); });
+    return btoa(bin);
+  }
+
   function printInvoice(o) {
-    const rows = (o.items || []).map((it) => { const sz = it.size ? ` (${(it.size.ar) || ""})` : ""; return `<tr><td>${esc(((it.name && it.name.ar) || "") + sz)} × ${it.qty}</td><td style="text-align:left;">${money(it.lineTotal)}</td></tr>`; }).join("");
+    const rows = (o.items || []).map((it) => { const sz = it.size ? ` (${esc((it.size.ar) || "")})` : ""; return `<tr><td>${esc(((it.name && it.name.ar) || "")) + sz} × ${esc(it.qty)}</td><td style="text-align:left;">${money(it.lineTotal)}</td></tr>`; }).join("");
+
+    // الرقم الضريبي اختياري: لو موجود نطبع فاتورة ضريبية كاملة برمز QR،
+    // وإلا نطبع إيصالًا عاديًا دون رقم ضريبي أو QR.
+    const vatNo = (DATA.restaurant && DATA.restaurant.vatNumber) || "";
+    const sellerName = (DATA.restaurant && DATA.restaurant.name && DATA.restaurant.name.ar) || "Over Sauce Lounge";
+    let vatBlock = "", qrBlock = "";
+    if (vatNo) {
+      vatBlock = `<div style="margin-top:4px;">الرقم الضريبي: <b>${esc(vatNo)}</b></div>`;
+      try {
+        const qrData = zatcaTLV(sellerName, vatNo, o.createdAt || new Date().toISOString(), o.grandTotal || 0, o.vat || 0);
+        // نولّد رمز QR عبر مكتبة موثوقة من CDN داخل نافذة الطباعة نفسها.
+        qrBlock = `<div id="zatcaQr" style="margin:14px auto 4px;text-align:center;"></div>
+<scr`+`ipt src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></scr`+`ipt>
+<scr`+`ipt>try{new QRCode(document.getElementById("zatcaQr"),{text:${JSON.stringify(qrData)},width:120,height:120});}catch(e){}</scr`+`ipt>`;
+      } catch (e) { qrBlock = ""; }
+    }
+
     const html = `<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>فاتورة ${esc(o.invoiceNumber || o.orderNumber || "")}</title>
 <style>body{font-family:Arial,sans-serif;padding:18px;color:#111;max-width:380px;}h1{font-size:18px;margin:0;}table{width:100%;border-collapse:collapse;margin-top:10px;}td{padding:5px;border-bottom:1px solid #ddd;text-align:right;}.tot td{font-weight:bold;font-size:15px;border-top:2px solid #333;}.muted{color:#666;font-size:12px;}</style>
 </head><body>
-<h1>Over Sauce Lounge</h1><div class="muted">فاتورة ضريبية مبسطة</div>
+<h1>Over Sauce Lounge</h1><div class="muted">${vatNo ? "فاتورة ضريبية مبسطة" : "إيصال"}</div>
 <div style="margin-top:8px;">فاتورة: <b>${esc(o.invoiceNumber || "")}</b> · طلب: ${esc(o.orderNumber || "")}</div>
+${vatBlock}
 <div>${o.tableNumber ? ("طاولة: " + esc(o.tableNumber) + " · ") : ""}الموظف: ${esc(o.assignedEmployee || "")}</div>
 <div class="muted">${fmtFull(o.createdAt)}</div>
 <table><tbody>${rows}</tbody></table>
@@ -317,8 +357,9 @@
 <tr class="tot"><td>الإجمالي</td><td style="text-align:left;">${money(o.grandTotal)}</td></tr>
 </table>
 <div style="margin-top:6px;">الدفع: ${PAY_LABELS[o.paymentMethod] || esc(o.paymentMethod)}</div>
+${qrBlock}
 <div class="muted" style="margin-top:14px;text-align:center;">شكراً لزيارتكم</div>
-<scr` + `ipt>window.onload=function(){window.print();}</scr` + `ipt>
+<scr` + `ipt>window.onload=function(){setTimeout(function(){window.print();},${vatNo ? 350 : 0});}</scr` + `ipt>
 </body></html>`;
     const w = window.open("", "_blank", "width=400,height=640");
     if (!w) { toast("اسمح بالنوافذ المنبثقة للطباعة"); return; }

@@ -461,7 +461,6 @@ function bindRestaurantInfo(){
   bindSocial("fbLink", M.restaurant.social.facebook);
   bindSocial("tiktokLink", M.restaurant.social.tiktok);
   document.querySelectorAll("[data-bind='statYears']").forEach(el => el.setAttribute("data-stat-target", M.restaurant.stats.yearsOfExperience));
-  document.querySelectorAll("[data-bind='statCustomers']").forEach(el => el.setAttribute("data-stat-target", M.restaurant.stats.happyCustomers));
   document.querySelectorAll("[data-bind='statItems']").forEach(el => el.setAttribute("data-stat-target", M.restaurant.stats.menuItems));
 
   // Orders-paused state → notice banner + lock the WhatsApp checkout button

@@ -111,6 +111,8 @@
     <section class="admin-panel active" id="panel-dashboard">
       <h1 class="h2" style="margin-bottom:20px;">نظرة عامة</h1>
       <div class="flex" style="gap:14px; flex-wrap:wrap; margin-bottom:24px;">
+        <div class="stat-pill" style="background:linear-gradient(135deg, color-mix(in srgb, var(--copper) 22%, transparent), transparent); border:1px solid color-mix(in srgb, var(--copper) 35%, transparent);"><span class="muted" style="font-size:0.75rem;">طلبات اليوم</span><span class="font-display" id="statTodayOrders" style="font-size:1.6rem; color:var(--copper-light);">0</span></div>
+        <div class="stat-pill" style="background:linear-gradient(135deg, color-mix(in srgb, var(--copper) 22%, transparent), transparent); border:1px solid color-mix(in srgb, var(--copper) 35%, transparent);"><span class="muted" style="font-size:0.75rem;">إيرادات اليوم</span><span class="font-display" id="statTodayRevenue" style="font-size:1.6rem; color:var(--copper-light);">0</span></div>
         <div class="stat-pill"><span class="muted" style="font-size:0.75rem;">الفئات</span><span class="font-display" id="statCatCount" style="font-size:1.6rem; color:var(--copper-light);">0</span></div>
         <div class="stat-pill"><span class="muted" style="font-size:0.75rem;">الأطباق</span><span class="font-display" id="statProductCount" style="font-size:1.6rem; color:var(--copper-light);">0</span></div>
         <div class="stat-pill"><span class="muted" style="font-size:0.75rem;">غير متوفر</span><span class="font-display" id="statOutOfStockCount" style="font-size:1.6rem; color:var(--copper-light);">0</span></div>
@@ -303,6 +305,11 @@
           <input id="settingPhone" class="field" placeholder="+966533500392">
         </div>
         <div>
+          <label class="field-label">الرقم الضريبي (اختياري — للفاتورة الضريبية)</label>
+          <input id="settingVatNumber" class="field" inputmode="numeric" placeholder="300000000000003">
+          <p class="muted" style="font-size:0.75rem; margin-top:4px;">لو دخّلت رقمك الضريبي، الفاتورة هتطلع كفاتورة ضريبية مبسّطة بتفصيل الضريبة ورمز QR. اتركه فاضي لو مش مسجّل ضريبيًا.</p>
+        </div>
+        <div>
           <label class="field-label">العنوان (عربي)</label>
           <input id="settingAddressAr" class="field">
         </div>
@@ -349,10 +356,6 @@
         <div>
           <label class="field-label">سنوات الخبرة (إحصائيات)</label>
           <input id="settingYears" class="field" inputmode="numeric">
-        </div>
-        <div>
-          <label class="field-label">عدد العملاء السعداء (إحصائيات)</label>
-          <input id="settingCustomers" class="field" inputmode="numeric">
         </div>
         <div>
           <label class="field-label">عدد الأطباق (إحصائيات)</label>

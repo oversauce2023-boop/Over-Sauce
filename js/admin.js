@@ -69,13 +69,16 @@
   }
   function saveDB(){
     if(window.OSDB && OSDB.isConfigured()){
-      OSDB.syncAll(db).catch((e) => {
+      // نُعيد الوعد (promise) ليتمكّن المستدعي من انتظار نجاح الحفظ فعليًا
+      // قبل عرض رسالة النجاح، بدل افتراض النجاح فورًا.
+      return OSDB.syncAll(db).catch((e) => {
         console.error("[admin] sync failed", e);
         showToast("فشل الحفظ في قاعدة البيانات — تأكد من تسجيل دخولك", "⚠️");
+        throw e;
       });
-      return;
     }
     storageSet(STORAGE_KEY, JSON.stringify(db));
+    return Promise.resolve();
   }
 
   /* =================================================================
@@ -402,9 +405,66 @@
           </div>
         </div>
         <label class="badge-toggle" style="width:fit-content;"><input type="checkbox" id="prodInStock" ${!product || product.inStock ? 'checked' : ''}> متوفر للطلب</label>
+
+        <div>
+          <label class="field-label">الأحجام / الخيارات (اختياري — مثل: براد، كوب)</label>
+          <p class="muted" style="font-size:0.78rem; margin-bottom:8px;">لو الطبق له أحجام أو خيارات يختار منها العميل (براد/كوب، صغير/كبير). فرق السعر يُضاف للسعر الأساسي — اتركه صفرًا لو نفس السعر.</p>
+          <div id="prodSizesList" style="display:flex; flex-direction:column; gap:8px;"></div>
+          <button type="button" id="prodAddSizeBtn" class="btn btn-ghost btn-sm" style="margin-top:8px;">+ إضافة خيار</button>
+        </div>
+
+        <div>
+          <label class="field-label">الإضافات (اختياري — مثل: جبنة زيادة، صوص)</label>
+          <p class="muted" style="font-size:0.78rem; margin-bottom:8px;">إضافات يقدر العميل يختار أكثر من واحدة معًا. سعر كل إضافة يُضاف للإجمالي.</p>
+          <div id="prodExtrasList" style="display:flex; flex-direction:column; gap:8px;"></div>
+          <button type="button" id="prodAddExtraBtn" class="btn btn-ghost btn-sm" style="margin-top:8px;">+ إضافة صنف إضافي</button>
+        </div>
+
         <button id="prodSaveBtn" class="btn btn-primary">حفظ الطبق</button>
       </div>
     `, () => {
+      // ---- إدارة الأحجام/الخيارات (براد/كوب، صغير/كبير...) ----
+      // كل صف: اسم عربي + اسم إنجليزي + فرق السعر، مع زر حذف.
+      const sizesList = document.getElementById("prodSizesList");
+      function addSizeRow(size){
+        const row = document.createElement("div");
+        row.className = "prod-size-row";
+        row.style.cssText = "display:flex; gap:8px; align-items:center; flex-wrap:wrap;";
+        row.innerHTML = `
+          <input class="field size-ar" placeholder="الاسم (عربي) — مثل: براد" style="flex:1; min-width:120px;" value="${size ? escapeHTML(size.name?.ar || "") : ""}">
+          <input class="field size-en" placeholder="English — e.g. Pot" style="flex:1; min-width:100px;" value="${size ? escapeHTML(size.name?.en || "") : ""}">
+          <input class="field size-diff" type="number" step="0.01" placeholder="فرق السعر" style="width:110px;" value="${size && size.priceDiff != null ? size.priceDiff : 0}">
+          <button type="button" class="btn btn-ghost btn-sm size-del" title="حذف الخيار" aria-label="حذف الخيار">✕</button>
+        `;
+        row.querySelector(".size-del").addEventListener("click", () => row.remove());
+        sizesList.appendChild(row);
+      }
+      // تعبئة الخيارات الموجودة عند التعديل
+      if(product && Array.isArray(product.sizes)){
+        product.sizes.forEach(s => addSizeRow(s));
+      }
+      document.getElementById("prodAddSizeBtn").addEventListener("click", () => addSizeRow(null));
+
+      // ---- إدارة الإضافات (جبنة زيادة، صوص...) — العميل يختار أكثر من واحدة ----
+      const extrasList = document.getElementById("prodExtrasList");
+      function addExtraRow(extra){
+        const row = document.createElement("div");
+        row.className = "prod-extra-row";
+        row.style.cssText = "display:flex; gap:8px; align-items:center; flex-wrap:wrap;";
+        row.innerHTML = `
+          <input class="field extra-ar" placeholder="الاسم (عربي) — مثل: جبنة زيادة" style="flex:1; min-width:120px;" value="${extra ? escapeHTML(extra.name?.ar || "") : ""}">
+          <input class="field extra-en" placeholder="English — e.g. Extra cheese" style="flex:1; min-width:100px;" value="${extra ? escapeHTML(extra.name?.en || "") : ""}">
+          <input class="field extra-price" type="number" min="0" step="0.01" placeholder="السعر" style="width:110px;" value="${extra && extra.price != null ? extra.price : 0}">
+          <button type="button" class="btn btn-ghost btn-sm extra-del" title="حذف الإضافة" aria-label="حذف الإضافة">✕</button>
+        `;
+        row.querySelector(".extra-del").addEventListener("click", () => row.remove());
+        extrasList.appendChild(row);
+      }
+      if(product && Array.isArray(product.extras)){
+        product.extras.forEach(ex => addExtraRow(ex));
+      }
+      document.getElementById("prodAddExtraBtn").addEventListener("click", () => addExtraRow(null));
+
       document.getElementById("prodImageFile").addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if(!file) return;
@@ -436,14 +496,17 @@
         preview.style.display = e.target.value ? "block" : "none";
       });
 
-      document.getElementById("prodSaveBtn").addEventListener("click", () => {
+      document.getElementById("prodSaveBtn").addEventListener("click", async () => {
+        const saveBtn = document.getElementById("prodSaveBtn");
         const nameAr = document.getElementById("prodNameAr").value.trim();
         const nameEn = document.getElementById("prodNameEn").value.trim();
         const price = Number(document.getElementById("prodPrice").value);
         const image = document.getElementById("prodImageUrl").value.trim();
 
-        if(!nameAr || !nameEn || !price || !image){
-          showToast("يرجى تعبئة الاسم والسعر والصورة على الأقل", "⚠️");
+        // الاسم العربي والسعر والصورة إلزامية فقط — الاسم الإنجليزي اختياري
+        // (صاحب المطعم يكتب بالعربي، فلا نُجبره على ترجمة كل صنف).
+        if(!nameAr || !price || !image){
+          showToast("يرجى تعبئة الاسم العربي والسعر والصورة", "⚠️");
           return;
         }
 
@@ -457,7 +520,7 @@
         const payload = {
           id: product ? product.id : uid("prod"),
           category: document.getElementById("prodCategory").value,
-          name: { ar: nameAr, en: nameEn },
+          name: { ar: nameAr, en: nameEn || nameAr },
           description: {
             ar: document.getElementById("prodDescAr").value.trim(),
             en: document.getElementById("prodDescEn").value.trim()
@@ -469,8 +532,26 @@
           rating: product ? product.rating : 4.5,
           orders: product ? product.orders : 0,
           inStock: document.getElementById("prodInStock").checked,
-          sizes: product ? product.sizes : [],
-          extras: product ? product.extras : [],
+          sizes: (function(){
+            // نجمع صفوف الأحجام من الواجهة؛ نتجاهل أي صف بلا اسم عربي.
+            return Array.from(document.querySelectorAll("#prodSizesList .prod-size-row")).map((row, i) => {
+              const ar = row.querySelector(".size-ar").value.trim();
+              const en = row.querySelector(".size-en").value.trim();
+              const diff = Number(row.querySelector(".size-diff").value) || 0;
+              if(!ar) return null;
+              return { id: "s" + (i + 1), name: { ar, en: en || ar }, priceDiff: diff };
+            }).filter(Boolean);
+          })(),
+          extras: (function(){
+            // نجمع صفوف الإضافات من الواجهة؛ نتجاهل أي صف بلا اسم عربي.
+            return Array.from(document.querySelectorAll("#prodExtrasList .prod-extra-row")).map((row, i) => {
+              const ar = row.querySelector(".extra-ar").value.trim();
+              const en = row.querySelector(".extra-en").value.trim();
+              const price = Math.max(0, Number(row.querySelector(".extra-price").value) || 0);
+              if(!ar) return null;
+              return { id: "e" + (i + 1), name: { ar, en: en || ar }, price };
+            }).filter(Boolean);
+          })(),
           calories: Number(document.getElementById("prodCalories").value) || null,
           allergens: document.getElementById("prodAllergens").value.split(/[,،]/).map(s => s.trim()).filter(Boolean)
         };
@@ -480,8 +561,20 @@
         } else {
           db.products.push(payload);
         }
-        saveDB(); renderProducts(); renderDashboardStats(); closeModal();
-        showToast("تم حفظ الطبق بنجاح", "✅");
+        // تعطيل الزر أثناء الحفظ (يمنع الضغط المزدوج وإنشاء نسخ مكررة)،
+        // وإظهار النجاح فقط بعد تأكيد الحفظ في قاعدة البيانات فعليًا.
+        saveBtn.disabled = true;
+        saveBtn.textContent = "جارٍ الحفظ...";
+        try {
+          await saveDB();
+          renderProducts(); renderDashboardStats(); closeModal();
+          showToast("تم حفظ الطبق بنجاح", "✅");
+        } catch(e){
+          // فشل الحفظ — نُبقي النافذة مفتوحة ليُعيد المحاولة دون فقدان إدخاله
+          if(!product) db.products.pop(); // تراجع عن الإضافة المتفائلة
+          saveBtn.disabled = false;
+          saveBtn.textContent = "حفظ الطبق";
+        }
       });
     });
   }
@@ -692,6 +785,7 @@
     document.getElementById("settingNameEn").value = db.restaurant.name.en;
     document.getElementById("settingWhatsapp").value = db.restaurant.whatsapp;
     document.getElementById("settingPhone").value = db.restaurant.phone;
+    document.getElementById("settingVatNumber").value = db.restaurant.vatNumber || "";
     document.getElementById("settingAddressAr").value = db.restaurant.address.ar;
     document.getElementById("settingHoursAr").value = db.restaurant.openingHours.ar;
     document.getElementById("settingMaps").value = db.restaurant.mapsUrl;
@@ -705,7 +799,6 @@
     document.getElementById("settingTaglineEn").value = (db.restaurant.tagline && db.restaurant.tagline.en) || "";
     if(db.restaurant.stats){
       document.getElementById("settingYears").value = db.restaurant.stats.yearsOfExperience;
-      document.getElementById("settingCustomers").value = db.restaurant.stats.happyCustomers;
       document.getElementById("settingMenuItems").value = db.restaurant.stats.menuItems;
     }
     document.getElementById("settingPin").value = getStoredPin();
@@ -722,6 +815,7 @@
       db.restaurant.name.en = document.getElementById("settingNameEn").value.trim();
       db.restaurant.whatsapp = whatsappDigits;
       db.restaurant.phone = document.getElementById("settingPhone").value.trim();
+      db.restaurant.vatNumber = document.getElementById("settingVatNumber").value.replace(/\s/g, "").trim();
       db.restaurant.address.ar = document.getElementById("settingAddressAr").value.trim();
       db.restaurant.openingHours.ar = document.getElementById("settingHoursAr").value.trim();
       db.restaurant.mapsUrl = document.getElementById("settingMaps").value.trim();
@@ -736,7 +830,6 @@
       db.restaurant.tagline.en = document.getElementById("settingTaglineEn").value.trim();
       if(!db.restaurant.stats) db.restaurant.stats = {};
       db.restaurant.stats.yearsOfExperience = Number(document.getElementById("settingYears").value) || 0;
-      db.restaurant.stats.happyCustomers = Number(document.getElementById("settingCustomers").value) || 0;
       db.restaurant.stats.menuItems = Number(document.getElementById("settingMenuItems").value) || 0;
 
       const newPin = document.getElementById("settingPin").value.trim();
@@ -771,6 +864,26 @@
       list.innerHTML = top.length
         ? top.map(p => `<li>${escapeHTML(p.name.ar)} <span class="muted" style="font-size:0.82rem;">— ${(p.orders || 0)} طلب</span></li>`).join("")
         : '<li class="muted">لا توجد بيانات بعد</li>';
+    }
+
+    // ---- إحصائيات اليوم من الطلبات الفعلية (لا من أرقام ثابتة) ----
+    // نحسب الطلبات التي أُنشئت اليوم وإجمالي إيراداتها، ونتجاهل الملغاة.
+    const todayOrdersEl = document.getElementById("statTodayOrders");
+    const todayRevenueEl = document.getElementById("statTodayRevenue");
+    if(todayOrdersEl || todayRevenueEl){
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      let todayCount = 0, todayRevenue = 0;
+      (orders || []).forEach(o => {
+        if(!o.createdAt) return;
+        const t = new Date(o.createdAt).getTime();
+        if(isNaN(t) || t < startOfDay) return;
+        if(o.status === "cancelled") return; // لا نحسب الملغاة في الإيراد
+        todayCount++;
+        todayRevenue += Number(o.grandTotal) || 0;
+      });
+      if(todayOrdersEl) todayOrdersEl.textContent = todayCount.toLocaleString("en");
+      if(todayRevenueEl) todayRevenueEl.textContent = money(todayRevenue);
     }
 
     const toggle = document.getElementById("ordersPausedToggle");
@@ -892,6 +1005,10 @@
     renderDashboardStats();
     renderOrders();
     renderFeatures();
+    // نحمّل الطلبات الفعلية في الخلفية حتى تظهر أرقام اليوم في لوحة
+    // المعلومات فور الدخول، دون انتظار فتح قسم الطلبات. loadOrders
+    // تستدعي renderDashboardStats تلقائيًا عند وصول البيانات.
+    loadOrders();
   }
 
   /* =================================================================
@@ -908,8 +1025,10 @@
     { id: "confirmed",        ar: "مؤكد",         icon: "✅" },
     { id: "preparing",        ar: "قيد التحضير",  icon: "👨‍🍳" },
     { id: "ready",            ar: "جاهز",         icon: "📦" },
+    { id: "served",           ar: "تم التقديم",   icon: "🍽️" },
     { id: "out_for_delivery", ar: "خرج للتوصيل",  icon: "🛵" },
     { id: "delivered",        ar: "تم التسليم",    icon: "🎉" },
+    { id: "completed",        ar: "مكتمل",        icon: "✔️" },
     { id: "cancelled",        ar: "ملغي",         icon: "❌" }
   ];
   const PAY_LABELS = { cash: "نقدًا", mada: "مدى", applepay: "Apple Pay", stcpay: "STC Pay", card: "بطاقة" };
@@ -933,6 +1052,8 @@
     } else {
       orders = [];
     }
+    // بعد وصول الطلبات الفعلية، نُحدّث أرقام اليوم في لوحة المعلومات.
+    renderDashboardStats();
   }
 
   function filteredOrders(){

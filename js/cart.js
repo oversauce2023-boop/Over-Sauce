@@ -243,6 +243,41 @@
   /* =================================================================
      DRAWER RENDER
      ================================================================= */
+  // اقتراحات "كمّل طلبك" (upsell): نقترح حتى 3 أصناف ليست في السلة،
+  // من فئات غير موجودة في السلة قدر الإمكان (مشروبات/إضافات/حلويات)،
+  // ونفضّل الأرخص لأن قرار إضافتها أسهل على العميل. يرفع متوسط الطلب.
+  function upsellSuggestions(){
+    const inCart = new Set(Object.values(M.cart).map(l => l.product.id));
+    const cartCategories = new Set(Object.values(M.cart).map(l => l.product.category));
+    const available = (M.products || []).filter(p => p.inStock && !inCart.has(p.id));
+    if(!available.length) return [];
+    // نرتّب: أصناف من فئات جديدة أولاً، ثم الأرخص
+    const scored = available.map(p => ({
+      p,
+      newCat: cartCategories.has(p.category) ? 1 : 0,
+      price: p.price
+    }));
+    scored.sort((a, b) => (a.newCat - b.newCat) || (a.price - b.price));
+    return scored.slice(0, 3).map(s => s.p);
+  }
+
+  function upsellHTML(){
+    const items = upsellSuggestions();
+    if(!items.length) return "";
+    const cards = items.map(p => `
+      <button class="upsell-card" data-upsell="${p.id}" aria-label="${M.lang === 'ar' ? 'إضافة' : 'Add'} ${escapeHTML(localized(p.name))}">
+        <img src="${p.image}" alt="${escapeHTML(localized(p.name))}" loading="lazy" decoding="async" width="48" height="48">
+        <span class="upsell-name">${escapeHTML(localized(p.name))}</span>
+        <span class="upsell-price">${formatPrice(p.price)}</span>
+        <span class="upsell-plus" aria-hidden="true">+</span>
+      </button>`).join("");
+    return `
+      <div class="upsell-section">
+        <p class="upsell-title">${t("upsellTitle")}</p>
+        <div class="upsell-row no-scrollbar">${cards}</div>
+      </div>`;
+  }
+
   function renderDrawer(){
     const wrap = document.getElementById("cartItemsWrap");
     const footer = document.getElementById("cartFooter");
@@ -289,6 +324,23 @@
     wrap.querySelectorAll("[data-increment]").forEach(b => b.addEventListener("click", () => incrementLine(b.getAttribute("data-increment"))));
     wrap.querySelectorAll("[data-decrement]").forEach(b => b.addEventListener("click", () => decrementLine(b.getAttribute("data-decrement"))));
     wrap.querySelectorAll("[data-remove]").forEach(b => b.addEventListener("click", () => removeLine(b.getAttribute("data-remove"))));
+
+    // اقتراحات "كمّل طلبك" — نضيفها بعد عناصر السلة
+    const upsell = upsellHTML();
+    if(upsell){
+      wrap.insertAdjacentHTML("beforeend", upsell);
+      wrap.querySelectorAll("[data-upsell]").forEach(b => b.addEventListener("click", () => {
+        const prod = findProduct(b.getAttribute("data-upsell"));
+        if(!prod) return;
+        // المنتجات المقترحة بسيطة الإضافة: لو لها خيارات نفتح نافذتها، وإلا نضيفها مباشرة
+        const hasOptions = (prod.sizes && prod.sizes.length) || (prod.extras && prod.extras.length);
+        if(hasOptions && window.OverSauceProducts){
+          window.OverSauceProducts.openProductModal(prod.id);
+        } else {
+          addToCart(prod, { size: null, extras: [], qty: 1 });
+        }
+      }));
+    }
 
     renderSummary();
   }

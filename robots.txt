@@ -3,5 +3,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /staff/
 
-# Replace oversauce.example with your real domain after deployment.
-Sitemap: https://oversauce.example/sitemap.xml
+# Domain: over-sauce.vercel.app
+Sitemap: https://over-sauce.vercel.app/sitemap.xml

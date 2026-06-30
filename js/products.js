@@ -257,7 +257,18 @@
     scope.querySelectorAll("[data-open-product]").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        openProductModal(btn.getAttribute("data-open-product"));
+        const id = btn.getAttribute("data-open-product");
+        const product = findProduct(id);
+        // إضافة فورية بنقرة واحدة للمنتجات البسيطة (بلا أحجام أو إضافات):
+        // لا داعي لفتح نافذة لا تضيف أي خيار — يقلّل النقرات نحو الدفع.
+        const hasOptions = (product && product.sizes && product.sizes.length) ||
+                           (product && product.extras && product.extras.length);
+        if(product && !hasOptions){
+          window.OverSauceCart.addToCart(product, { size: null, extras: [], qty: 1 });
+          showToast("addedToCart", "✅");
+        } else {
+          openProductModal(id);
+        }
       });
     });
     scope.querySelectorAll(".product-card").forEach(card => {

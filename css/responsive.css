@@ -21,7 +21,6 @@
   .product-body{ padding: var(--space-3); gap: 6px; }
   .product-desc{ display: none; } /* keep mobile cards scannable */
   .btn-add-cart{ font-size: 0.78rem; padding: 9px 10px; }
-  .qty-btn{ width: 28px; height: 28px; min-width: 28px; }
 
   .drawer{ max-width: 100%; }
   .modal-panel{ border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
@@ -55,11 +54,16 @@
   .hero{ min-height: 100vh; padding-top: 5rem; }
 }
 
-/* ---------------- Larger touch areas on coarse pointers (touchscreens) ---------------- */
+/* ---------------- Larger touch areas on coarse pointers (touchscreens) ----------------
+   على الأجهزة اللمسية نرفع كل عناصر التفاعل إلى 44px (الحد الأدنى الموصى به
+   من Apple HIG و WCAG) — زر الكمية تحديدًا يُضغط كثيرًا أثناء الطلب، وأي خطأ
+   في الضغط يُحبط العميل ويعطّل إتمام الطلب. */
 @media (pointer: coarse){
-  .qty-btn{ min-width: 36px; min-height: 36px; }
+  .qty-btn{ min-width: 44px; min-height: 44px; width: 44px; height: 44px; }
   .icon-btn{ min-width: 44px; min-height: 44px; }
-  .fav-btn{ width: 38px; height: 38px; }
+  .fav-btn{ width: 44px; height: 44px; }
+  .btn-xs{ padding: 8px 14px; }
+  .stamp-pill, .cat-pill{ min-height: 40px; }
 }
 
 /* ---------------- Print (menu can be printed for in-store use) ---------------- */
