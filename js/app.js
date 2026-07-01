@@ -446,8 +446,11 @@ function bindRestaurantInfo(){
     let display = raw;
     if(raw.startsWith("+966")) display = "0" + raw.slice(4);
     else if(raw.startsWith("966")) display = "0" + raw.slice(3);
-    el.textContent = display;
-    el.setAttribute("href", `tel:${raw}`);
+    // لو الكارت يحتوي عنصرًا مخصصًا للرقم، نحدّثه وحده حتى لا نمسح الأيقونة والنص.
+    const numTarget = el.querySelector(".phone-number-text");
+    if(numTarget){ numTarget.textContent = display; }
+    else { el.textContent = display; }
+    if(el.tagName === "A") el.setAttribute("href", `tel:${raw}`);
   });
   document.querySelectorAll("[data-bind='mapsLink']").forEach(el => el.setAttribute("href", M.restaurant.mapsUrl));
   const bindSocial = (name, url) => document.querySelectorAll(`[data-bind='${name}']`).forEach(el => {
