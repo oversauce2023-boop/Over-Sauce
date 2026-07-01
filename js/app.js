@@ -530,17 +530,22 @@ function renderFlashDeals(){
    with graceful fallback text if the image fails to load (e.g. offline).
    ===================================================================== */
 function setupQRCode(){
-  const img = document.getElementById("menuQRImage");
-  if(!img) return;
-  const url = encodeURIComponent(window.location.href);
-  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${url}`;
-  img.alt = t("qrTitle");
-  img.addEventListener("error", () => {
-    img.replaceWith(Object.assign(document.createElement("p"), {
-      className: "muted",
-      textContent: window.location.href
-    }));
-  });
+  const box = document.getElementById("menuQRImage");
+  if(!box) return;
+  const url = window.location.origin + "/";
+  // توليد QR محليًا (بدون خدمة خارجية) لضمان ظهوره دائمًا وبسرعة.
+  try {
+    box.innerHTML = "";
+    if(typeof QRCode !== "undefined"){
+      new QRCode(box, { text: url, width: 96, height: 96, correctLevel: QRCode.CorrectLevel.M });
+    } else {
+      // احتياطي: خدمة خارجية لو لم تُحمّل المكتبة
+      const img = document.createElement("img");
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(url)}`;
+      img.width = 96; img.height = 96; img.alt = t("qrTitle");
+      box.appendChild(img);
+    }
+  } catch(e){ /* silent */ }
 }
 
 /* =====================================================================

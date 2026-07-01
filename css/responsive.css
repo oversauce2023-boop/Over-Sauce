@@ -6,13 +6,13 @@
 
 /* ---------------- Extra-small phones (<400px) ---------------- */
 @media (max-width: 399px){
-  .logo-text{ display: none; }
   .header-search{ max-width: 140px; }
   .hero-stats span:last-child{ font-size: 0.8rem; }
 }
 
 /* ---------------- Small phones / default mobile (<640px) ---------------- */
 @media (max-width: 639px){
+  .logo-text{ display: none; }
   .container{ padding-inline: var(--space-4); }
   .hero{ min-height: 88vh; padding-top: 6.5rem; }
   .hero-content{ padding-bottom: var(--space-12); }

@@ -132,7 +132,7 @@
         </a>
         <div class="hero-stats">
           <span aria-hidden="true">⭐</span>
-          <span><strong style="color:var(--parchment);">٤.٩</strong> <span data-i18n="ratingSuffix">تقييم العملاء</span> · <span data-i18n="ordersSuffix">أكثر من ٢٠٠٠ طلب</span></span>
+          <span><strong style="color:var(--parchment);">٤.٥</strong> <span data-i18n="ratingSuffix">تقييم جوجل</span> · <span data-i18n="ordersSuffix">أكثر من ١٤٠٠ تقييم</span></span>
         </div>
       </div>
     </div>
@@ -252,7 +252,7 @@
   <!-- ============================================================
        CUSTOMER REVIEWS
        ============================================================ -->
-  <section class="section container" id="reviewsSection">
+  <section class="section container hidden" id="reviewsSection">
     <h2 class="h2" style="text-align:center; margin-bottom:32px;" data-i18n="reviewsTitle">ماذا يقول عملاؤنا</h2>
     <div class="review-grid no-scrollbar" id="reviewGrid"></div>
   </section>
@@ -262,7 +262,7 @@
        ============================================================ -->
   <section class="section container">
     <div class="qr-card reveal">
-      <img id="menuQRImage" alt="" loading="lazy" width="96" height="96">
+      <div id="menuQRImage" style="width:96px; height:96px; display:flex; align-items:center; justify-content:center;"></div>
       <div>
         <h3 class="h3" data-i18n="qrTitle" style="margin-bottom:8px;">امسح لفتح القائمة</h3>
         <p class="muted" style="margin-bottom:16px;">شارك منيو Over Sauce Lounge مع أصدقائك بضغطة واحدة.</p>
@@ -578,6 +578,7 @@
 
 <script src="js/i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/app.js"></script>
