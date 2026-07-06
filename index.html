@@ -106,6 +106,14 @@
 <main id="main">
 
   <!-- ============================================================
+       FLASH DEALS / PROMOTIONS — أعلى الصفحة (أول ما يراه العميل)
+       ============================================================ -->
+  <section class="section container promo-top hidden" id="promoSection">
+    <p class="text-eyebrow" data-i18n="flashDealsTitle" style="margin-bottom:16px;">عروض محدودة</p>
+    <div class="promo-strip no-scrollbar" id="promoStrip"></div>
+  </section>
+
+  <!-- ============================================================
        HERO
        ============================================================ -->
   <section id="hero" class="hero">
@@ -136,14 +144,6 @@
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- ============================================================
-       FLASH DEALS / PROMOTIONS
-       ============================================================ -->
-  <section class="section container">
-    <p class="text-eyebrow" data-i18n="flashDealsTitle" style="margin-bottom:16px;">عروض محدودة</p>
-    <div class="promo-strip no-scrollbar" id="promoStrip"></div>
   </section>
 
   <!-- ============================================================
@@ -370,7 +370,7 @@
       <div class="summary-total"><span data-i18n="total">الإجمالي</span><span id="cartTotal">٠ ر.س</span></div>
     </div>
     <button id="checkoutOpenBtn" class="btn btn-primary" style="width:100%;">
-      <span data-i18n="checkoutCta">إتمام الطلب</span>
+      <span data-i18n="checkoutCta">احجز الآن</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="transform:rotate(180deg);" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
     </button>
   </div>
@@ -505,7 +505,7 @@
 
         <button id="sendOrderBtn" type="button" class="btn btn-primary wa-btn" style="width:100%; padding:16px;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.07-1.33A9.93 9.93 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm0 18c-1.6 0-3.1-.43-4.4-1.18l-.31-.19-3.27.86.87-3.18-.2-.32A7.93 7.93 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8Zm4.36-5.96c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12-.16.24-.62.77-.76.93-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.62-1.18-1.39-1.32-1.63-.14-.24-.01-.37.12-.49.13-.12.28-.32.42-.48.14-.16.18-.28.28-.46.1-.18.05-.34-.03-.46-.08-.12-.5-1.2-.68-1.62-.18-.42-.36-.36-.5-.36-.13 0-.28-.02-.43-.02-.14 0-.38.05-.58.27-.2.22-.77.75-.77 1.82s.79 2.12.9 2.27c.11.15 1.5 2.35 3.71 3.2 1.85.72 2.22.6 2.62.56.4-.04 1.4-.57 1.6-1.13.2-.55.2-1.02.14-1.13-.06-.1-.22-.16-.46-.28Z"/></svg>
-          <span data-i18n="sendWhatsApp">إرسال الطلب عبر واتساب</span>
+          <span data-i18n="sendWhatsApp">احجز الآن عبر واتساب</span>
         </button>
         <p class="muted" style="text-align:center; font-size:0.78rem;" data-i18n="whatsappNote">سيتم تحويلك إلى واتساب لتأكيد الطلب مباشرة مع المطعم</p>
       </form>
