@@ -501,7 +501,13 @@ function renderReviews(){
    ===================================================================== */
 function renderFlashDeals(){
   const wrap = document.getElementById("promoStrip");
-  if(!wrap || !M.flashDeals.length) return;
+  const section = document.getElementById("promoSection");
+  // نُظهر قسم العروض فقط عند وجود عروض، ونُخفيه تمامًا إن كان فارغًا
+  if(!wrap || !M.flashDeals.length){
+    if(section) section.classList.add("hidden");
+    return;
+  }
+  if(section) section.classList.remove("hidden");
   wrap.innerHTML = M.flashDeals.map(deal => {
     // لو العرض له صورة/تصميم جاهز → نعرض الصورة فقط. وإلا نعرض النص.
     if(deal.imageUrl){

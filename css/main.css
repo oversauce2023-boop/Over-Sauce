@@ -408,7 +408,7 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 .product-price-wrap{ display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
 .product-price{ font-family: var(--font-display); font-weight: 700; color: var(--copper-light); font-size: 1.02rem; }
 .product-old-price{ font-size: 0.78rem; color: var(--brass); text-decoration: line-through; }
-.product-desc{ color: var(--brass); font-size: 0.82rem; line-height: 1.55; flex: 1; }
+.product-desc{ color: var(--parchment-dim); font-size: 0.86rem; line-height: 1.6; flex: 1; }
 .product-meta{ display: flex; align-items: center; gap: var(--space-3); font-size: 0.76rem; color: var(--brass); }
 .rating-stars{ color: var(--copper-light); }
 
@@ -605,6 +605,9 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 
 .promo-card-image{ padding:0 !important; overflow:hidden; }
 .promo-card-image img{ width:100%; height:auto; display:block; border-radius:inherit; }
+
+.promo-top{ padding-top: var(--space-6); padding-bottom: 0; }
+@media (max-width: 639px){ .promo-top{ padding-top: var(--space-5); } }
 .footer-bottom{ text-align: center; color: var(--brass); font-size: 0.78rem; padding-bottom: var(--space-6); }
 /* رابط دخول فريق العمل — نقطة باهتة غير لافتة للعملاء، يكبر قليلاً عند المرور */
 .staff-portal-link{ color: var(--brass); opacity: 0.45; padding: 0 6px; font-weight: 900; text-decoration: none; transition: opacity .2s, color .2s; }
