@@ -79,12 +79,6 @@
           if (on) toEl("menu");
           break;
         }
-        case "cart": {
-          // Reuse the existing floating-cart open handler (works even when hidden).
-          var fab = document.getElementById("fabCart");
-          if (fab) fab.click();
-          break;
-        }
       }
     });
   });

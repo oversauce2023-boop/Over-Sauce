@@ -608,6 +608,24 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 
 .promo-top{ padding-top: var(--space-6); padding-bottom: 0; }
 @media (max-width: 639px){ .promo-top{ padding-top: var(--space-5); } }
+
+/* ===== تحسينات كتالوج العرض (Product Catalog) ===== */
+.product-card{ transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, border-color .3s ease; }
+@media (hover: hover) and (pointer: fine){
+  .product-card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.28); border-color: color-mix(in srgb, var(--copper) 45%, transparent); }
+  .product-card:hover .product-img{ transform: scale(1.06); }
+}
+.product-unavailable{ color: var(--danger); font-weight: 700; font-size: 0.82rem; margin-top: 4px; }
+
+
+/* ===== زرار احجز الآن ===== */
+.contact-card-book{ background: var(--ink-soft); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-5); text-align: center; box-shadow: var(--shadow-card); display: flex; flex-direction: column; align-items: center; }
+.book-now-btn{ display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 999px; background: linear-gradient(135deg, var(--copper), var(--copper-light)); color: #fff; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 8px 22px color-mix(in srgb, var(--copper) 40%, transparent); transition: transform .18s ease; }
+.book-now-btn:hover{ transform: translateY(-2px); }
+.book-now-fab{ position: fixed; inset-inline-start: 20px; bottom: 88px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 999px; background: linear-gradient(135deg, #25D366, #1ebe5b); color: #fff; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 10px 28px rgba(37,211,102,0.45); transition: transform .2s ease; }
+.book-now-fab:hover{ transform: scale(1.05); }
+@media (min-width: 640px){ .book-now-fab{ bottom: 28px; } }
+
 .footer-bottom{ text-align: center; color: var(--brass); font-size: 0.78rem; padding-bottom: var(--space-6); }
 /* رابط دخول فريق العمل — نقطة باهتة غير لافتة للعملاء، يكبر قليلاً عند المرور */
 .staff-portal-link{ color: var(--brass); opacity: 0.45; padding: 0 6px; font-weight: 900; text-decoration: none; transition: opacity .2s, color .2s; }

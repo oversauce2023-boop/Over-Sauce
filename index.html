@@ -8,8 +8,8 @@
   try { if (localStorage.getItem('oversauce_theme') !== 'dark') document.documentElement.classList.add('light'); }
   catch (e) { document.documentElement.classList.add('light'); }
 </script>
-<title>Over Sauce Lounge — مطعم وكافيه في جدة | المنيو والطلب أونلاين</title>
-<meta name="description" content="Over Sauce Lounge — مطعم وكافيه وجلسات مميزة في حي الحمراء بجدة. تصفّح المنيو الكامل، خصّص طلبك، واطلب أونلاين بسهولة.">
+<title>Over Sauce Lounge — مطعم وكافيه في جدة | تصفّح المنيو</title>
+<meta name="description" content="Over Sauce Lounge — مطعم وكافيه وجلسات مميزة في حي الحمراء بجدة. تصفّح منيونا الكامل بالصور والأسعار، واحجز طاولتك عبر واتساب.">
 <meta name="keywords" content="مطعم جدة, كافيه جدة, جلسات جدة, منيو, طلب أونلاين, Over Sauce Lounge, أوفر صوص">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://over-sauce.vercel.app/">
@@ -22,12 +22,12 @@
 <!-- Open Graph / Twitter Card -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Over Sauce Lounge — مطعم وكافيه في جدة">
-<meta property="og:description" content="تصفّح منيو Over Sauce Lounge الكامل واطلب أونلاين بسهولة.">
+<meta property="og:description" content="تصفّح منيو Over Sauce Lounge الكامل بالصور والأسعار، واحجز عبر واتساب.">
 <meta property="og:image" content="https://over-sauce.vercel.app/assets/og-image.png">
 <meta property="og:locale" content="ar_AR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Over Sauce Lounge — مطعم وكافيه في جدة">
-<meta name="twitter:description" content="تصفّح منيو Over Sauce Lounge الكامل واطلب أونلاين بسهولة.">
+<meta name="twitter:description" content="تصفّح منيو Over Sauce Lounge الكامل بالصور والأسعار، واحجز عبر واتساب.">
 <meta name="twitter:image" content="https://over-sauce.vercel.app/assets/og-image.png">
 
 <!-- Structured data -->
@@ -91,10 +91,7 @@
         <span class="theme-track"><span class="theme-knob"><span id="themeIcon">🌙</span></span></span>
       </button>
 
-      <button id="cartBtnHeader" class="icon-btn tap-44" data-i18n-aria="cartLabel" aria-label="عرض السلة">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l3.6-8H5.4M7 13L5.4 5M7 13l-1.6 4h12.2M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm9 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
-        <span id="headerCartCount" class="cart-count-badge hidden" aria-live="polite">0</span>
-      </button>
+      
     </div>
 
     <nav class="category-nav" aria-label="فئات القائمة">
@@ -290,11 +287,15 @@
         <h4 class="h3" style="font-size:1.05rem; margin-bottom:6px;" data-i18n="getDirections">احصل على الاتجاهات</h4>
         <p class="muted" data-bind="restaurantAddress">حي الحمراء، جدة</p>
       </a>
-      <a class="contact-card" data-bind="waLink" href="#" target="_blank" rel="noopener noreferrer">
+      <div class="contact-card contact-card-book">
         <div class="contact-icon" aria-hidden="true">💬</div>
         <h4 class="h3" style="font-size:1.05rem; margin-bottom:6px;">واتساب</h4>
-        <p class="muted" data-bind="restaurantHours">مفتوح ٢٤ ساعة يوميًا</p>
-      </a>
+        <p class="muted" data-bind="restaurantHours" style="margin-bottom:14px;">مفتوح ٢٤ ساعة يوميًا</p>
+        <a class="book-now-btn" data-bind="bookNow" href="#" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Z"/></svg>
+          احجز الآن
+        </a>
+      </div>
     </div>
   </section>
 </main>
@@ -343,38 +344,10 @@
 <!-- ============================================================
      FLOATING CART BUTTON
      ============================================================ -->
-<button id="fabCart" class="fab-cart" data-i18n-aria="cartLabel" aria-label="فتح السلة">
-  <span style="position:relative;" class="cart-icon-wrap">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l3.6-8H5.4M7 13L5.4 5M7 13l-1.6 4h12.2M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm9 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
-    <span id="fabCartCount" class="cart-count-badge hidden" aria-hidden="true">0</span>
-  </span>
-  <span class="fab-label" id="fabCartLabel">السلة فارغة</span>
-</button>
-
 <!-- ============================================================
      CART DRAWER
      ============================================================ -->
-<div id="cartScrim" class="scrim hidden"></div>
-<aside id="cartDrawer" class="drawer closed" role="dialog" aria-modal="true" aria-label="سلة الطلب">
-  <div class="drawer-header">
-    <h2 class="h3" style="font-size:1.2rem;" data-i18n="cartTitle">سلة الطلب</h2>
-    <button id="cartCloseBtn" class="icon-btn tap-44" aria-label="إغلاق السلة">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-  </div>
-  <div id="cartItemsWrap" class="drawer-body"></div>
-  <div id="cartFooter" class="drawer-footer hidden">
-    <div>
-      <div class="summary-line"><span data-i18n="subtotal">المجموع الفرعي</span><span id="cartSubtotal">٠ ر.س</span></div>
-      <div class="summary-line hidden" id="cartDiscountRow"><span data-i18n="discount">الخصم</span><span id="cartDiscount">٠ ر.س</span></div>
-      <div class="summary-total"><span data-i18n="total">الإجمالي</span><span id="cartTotal">٠ ر.س</span></div>
-    </div>
-    <button id="checkoutOpenBtn" class="btn btn-primary" style="width:100%;">
-      <span data-i18n="checkoutCta">احجز الآن</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="transform:rotate(180deg);" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-    </button>
-  </div>
-</aside>
+
 
 <!-- ============================================================
      PRODUCT DETAIL MODAL
@@ -430,99 +403,13 @@
         <p class="font-display" id="productModalPrice" style="font-size:1.5rem; color:var(--copper-light);">٠ ر.س</p>
       </div>
 
-      <button id="productModalAddBtn" class="btn btn-primary wa-btn" style="width:100%;" data-i18n="addWithPrice">أضف للسلة</button>
+      
 
       <div id="relatedSection" style="margin-top:32px;">
         <p class="text-eyebrow" data-i18n="relatedTitle" style="margin-bottom:14px;">قد يعجبك أيضًا</p>
         <div class="scroller-grid no-scrollbar" id="relatedGrid"></div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     CHECKOUT MODAL
-     ============================================================ -->
-<div id="checkoutScrim" class="scrim hidden" style="align-items:flex-end; justify-content:center; display:flex;">
-  <div id="checkoutModal" class="modal-panel modal-sheet glass-strong" style="transform:translateY(100%); opacity:0; transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;">
-    <div class="modal-inner">
-      <div class="modal-header">
-        <h2 id="checkoutTitle" class="h3" style="font-size:1.3rem;" data-i18n="checkoutTitle">بيانات الطلب</h2>
-        <button id="checkoutCloseBtn" class="icon-btn tap-44" aria-label="إغلاق">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <form id="checkoutForm" novalidate onsubmit="return false;" style="display:flex; flex-direction:column; gap:20px;">
-        <div>
-          <label for="custTable" class="field-label"><span data-i18n="tableNumber">رقم الطاولة</span> <span class="field-required">*</span></label>
-          <input id="custTable" type="text" class="field" required inputmode="numeric" data-i18n-placeholder="tablePlaceholder" placeholder="مثال: ٥">
-          <p id="custTableError" class="field-error hidden" data-i18n="invalidTable">يرجى إدخال رقم الطاولة</p>
-        </div>
-
-        <div>
-          <label for="custName" class="field-label"><span data-i18n="fullName">الاسم</span> <span class="field-required">*</span></label>
-          <input id="custName" type="text" class="field" required minlength="2" autocomplete="name" data-i18n-placeholder="fullName" placeholder="مثال: أحمد محمد">
-          <p id="custNameError" class="field-error hidden" data-i18n="invalidName">يرجى إدخال اسم لا يقل عن حرفين</p>
-        </div>
-
-        <div>
-          <label for="custPhone" class="field-label"><span data-i18n="phoneNumber">رقم الهاتف</span> <span class="field-required">*</span></label>
-          <input id="custPhone" type="tel" class="field" required inputmode="tel" autocomplete="tel" placeholder="٠٥xxxxxxxx">
-          <p id="custPhoneError" class="field-error hidden" data-i18n="invalidPhone">يرجى إدخال رقم هاتف صحيح</p>
-        </div>
-
-        <div>
-          <label for="custNotes" class="field-label"><span data-i18n="orderNotes">ملاحظات على الطلب</span> <span class="muted" data-i18n="notesOptional">(اختياري)</span></label>
-          <textarea id="custNotes" rows="2" maxlength="200" class="field" style="resize:none;" data-i18n-placeholder="notesPlaceholder" placeholder="مثال: بدون بصل، حار زيادة..."></textarea>
-        </div>
-
-        <div>
-          <label for="couponInput" class="field-label" data-i18n="haveCoupon">لديك كود خصم؟</label>
-          <div class="coupon-row">
-            <input id="couponInput" type="text" class="field" data-i18n-placeholder="couponPlaceholder" placeholder="أدخل كود الخصم" style="text-transform:uppercase;">
-            <button id="applyCouponBtn" type="button" class="btn btn-secondary btn-sm" data-i18n="applyCoupon">تطبيق</button>
-          </div>
-          <p id="couponError" class="field-error hidden"></p>
-          <p id="couponSuccess" class="hidden" style="font-size:0.78rem; color:var(--success); margin-top:6px; font-weight:700;"></p>
-          <button id="removeCouponBtn" type="button" class="btn-ghost" style="font-size:0.78rem; margin-top:4px;" data-i18n="removeCoupon">إزالة</button>
-        </div>
-
-        <div>
-          <span class="field-label" data-i18n="payMethodLabel">طريقة الدفع</span>
-          <div class="pay-cash-box">
-            <span aria-hidden="true">💵</span>
-            <span data-i18n="payCash">نقدًا عند الاستلام</span>
-          </div>
-        </div>
-
-
-        <div style="background:var(--panel); border-radius:var(--radius-md); padding:16px;">
-          <div class="summary-line"><span id="checkoutItemCount">٠ أطباق</span><span id="checkoutSubtotal">٠ ر.س</span></div>
-          <div class="summary-line hidden" id="checkoutDiscountRow"><span data-i18n="discount">الخصم</span><span id="checkoutDiscount">٠ ر.س</span></div>
-            <div class="summary-total"><span data-i18n="total">الإجمالي</span><span id="checkoutTotal">٠ ر.س</span></div>
-        </div>
-
-        <button id="sendOrderBtn" type="button" class="btn btn-primary wa-btn" style="width:100%; padding:16px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.07-1.33A9.93 9.93 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm0 18c-1.6 0-3.1-.43-4.4-1.18l-.31-.19-3.27.86.87-3.18-.2-.32A7.93 7.93 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8Zm4.36-5.96c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12-.16.24-.62.77-.76.93-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.62-1.18-1.39-1.32-1.63-.14-.24-.01-.37.12-.49.13-.12.28-.32.42-.48.14-.16.18-.28.28-.46.1-.18.05-.34-.03-.46-.08-.12-.5-1.2-.68-1.62-.18-.42-.36-.36-.5-.36-.13 0-.28-.02-.43-.02-.14 0-.38.05-.58.27-.2.22-.77.75-.77 1.82s.79 2.12.9 2.27c.11.15 1.5 2.35 3.71 3.2 1.85.72 2.22.6 2.62.56.4-.04 1.4-.57 1.6-1.13.2-.55.2-1.02.14-1.13-.06-.1-.22-.16-.46-.28Z"/></svg>
-          <span data-i18n="sendWhatsApp">احجز الآن عبر واتساب</span>
-        </button>
-        <p class="muted" style="text-align:center; font-size:0.78rem;" data-i18n="whatsappNote">سيتم تحويلك إلى واتساب لتأكيد الطلب مباشرة مع المطعم</p>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     SUCCESS OVERLAY
-     ============================================================ -->
-<div id="successOverlay" class="success-overlay hidden" role="status" aria-live="polite">
-  <div style="text-align:center; padding:0 24px;">
-    <div id="successCheck" class="success-check">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-    </div>
-    <h3 class="h3" style="margin-bottom:8px;" data-i18n="orderSuccess">تم تجهيز طلبك!</h3>
-    <p class="muted" data-i18n="redirecting">جارٍ تحويلك إلى واتساب لإتمام الطلب...</p>
   </div>
 </div>
 
@@ -545,8 +432,6 @@
 <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
 <!-- Orders-paused notice (shown only when the owner pauses ordering) -->
-<div id="ordersPausedBanner" class="orders-paused-banner hidden" role="status">🚫 الطلبات متوقفة مؤقتًا حاليًا — يمكنك تصفّح القائمة</div>
-
 <!-- ============================================================
      MOBILE BOTTOM NAVIGATION (visible ≤768px)
      ============================================================ -->
@@ -567,13 +452,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21s-7-4.6-9.5-9.1A5 5 0 0112 5a5 5 0 019.5 6.9C19 16.4 12 21 12 21z"/></svg>
     <span data-i18n="navFavorites">المفضلة</span>
   </button>
-  <button class="bottom-nav-item bottom-nav-cart" data-nav="cart" type="button">
-    <span class="bottom-cart-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6h15l-1.6 9H7.5L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
-      <span class="cart-count-badge hidden" id="bottomCartCount">0</span>
-    </span>
-    <span data-i18n="navCart">السلة</span>
-  </button>
+  
 </nav>
 
 <script src="js/i18n.js"></script>
@@ -583,10 +462,12 @@
 <script src="js/supabase.js"></script>
 <script src="js/app.js"></script>
 <script src="js/products.js"></script>
-<script src="js/cart.js"></script>
 <script src="js/search.js"></script>
-<script src="js/whatsapp.js"></script>
 <script src="js/bottom-nav.js"></script>
+  <a class="book-now-fab" data-bind="bookNow" href="#" target="_blank" rel="noopener noreferrer" aria-label="احجز الآن عبر واتساب">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Z"/></svg>
+    <span>احجز الآن</span>
+  </a>
 <script src="js/enhancements.js"></script>
 </body>
 </html>

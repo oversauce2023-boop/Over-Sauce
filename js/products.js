@@ -225,15 +225,7 @@
         </div>
         <p class="product-desc">${escapeHTML(localized(product.description))}</p>
         <p class="product-meta">${ratingHTML(product)}</p>
-        <div class="product-footer">
-          ${product.inStock
-            ? `<button class="btn-add-cart" data-open-product="${product.id}">
-                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M12 4v16m8-8H4"/></svg>
-                 ${t("addToCart")}
-               </button>`
-            : `<button class="btn-add-cart" disabled>${t("outOfStock")}</button>`
-          }
-        </div>
+        ${!product.inStock ? `<p class="product-unavailable">${t("outOfStock")}</p>` : ""}
       </div>
     </article>`;
   }
@@ -258,16 +250,7 @@
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const id = btn.getAttribute("data-open-product");
-        const product = findProduct(id);
-        // إضافة فورية بنقرة واحدة للمنتجات البسيطة (بلا أحجام أو إضافات):
-        // لا داعي لفتح نافذة لا تضيف أي خيار — يقلّل النقرات نحو الدفع.
-        const hasOptions = (product && product.sizes && product.sizes.length) ||
-                           (product && product.extras && product.extras.length);
-        if(product && !hasOptions){
-          window.OverSauceCart.addToCart(product, { size: null, extras: [], qty: 1 });
-        } else {
-          openProductModal(id);
-        }
+        openProductModal(id);
       });
     });
     scope.querySelectorAll(".product-card").forEach(card => {
@@ -522,15 +505,7 @@
       document.getElementById("productModalQty").textContent = toLocaleDigits(modalState.qty);
       renderModalPrice(activeModalProduct);
     });
-    document.getElementById("productModalAddBtn")?.addEventListener("click", () => {
-      if(!activeModalProduct || !activeModalProduct.inStock) return;
-      window.OverSauceCart.addToCart(activeModalProduct, {
-        size: modalState.size,
-        extras: [...modalState.extras],
-        qty: modalState.qty
-      });
-      closeProductModal();
-    });
+    /* زر الإضافة أُزيل — المودال للعرض فقط */
     document.getElementById("productModalCloseBtn")?.addEventListener("click", closeProductModal);
     document.getElementById("productScrim")?.addEventListener("click", (e) => {
       if(e.target.id === "productScrim") closeProductModal();

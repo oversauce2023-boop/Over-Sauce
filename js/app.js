@@ -232,10 +232,7 @@ function applyLanguage(lang){
     window.OverSauceProducts.renderCategoryNav();
     window.OverSauceProducts.renderAll();
   }
-  if(window.OverSauceCart){
-    window.OverSauceCart.renderDrawer();
-    window.OverSauceCart.updateBadges();
-  }
+  /* السلة أُزيلت — كتالوج عرض فقط */
 }
 function initLanguage(){
   const stored = storageGet("lang");
@@ -458,7 +455,13 @@ function bindRestaurantInfo(){
     else { el.classList.add("hidden"); }
   });
   bindSocial("igLink", M.restaurant.social.instagram);
+  // رابط واتساب عادي (للتواصل)
   bindSocial("waLink", M.restaurant.social.whatsappChannel || (M.restaurant.whatsapp ? `https://wa.me/${M.restaurant.whatsapp}` : ""));
+  // رابط الحجز: يحوّل لواتساب المطعم برسالة جاهزة "أريد الحجز الآن"
+  const bookNum = M.restaurant.whatsapp || M.config.whatsappNumber;
+  const bookMsg = encodeURIComponent(M.lang === "ar" ? "أريد الحجز الآن" : "I would like to book now");
+  const bookUrl = bookNum ? `https://wa.me/${bookNum}?text=${bookMsg}` : "#";
+  document.querySelectorAll("[data-bind='bookNow']").forEach(el => el.setAttribute("href", bookUrl));
   bindSocial("snapLink", M.restaurant.social.snapchat);
   bindSocial("fbLink", M.restaurant.social.facebook);
   bindSocial("tiktokLink", M.restaurant.social.tiktok);
@@ -646,7 +649,7 @@ async function initApp(){
 
   // Hand off to feature modules (each attaches itself to window.OverSauce*)
   if(window.OverSauceProducts) window.OverSauceProducts.init();
-  if(window.OverSauceCart) window.OverSauceCart.init();
+  /* السلة أُزيلت */
   if(window.OverSauceSearch) window.OverSauceSearch.init();
 
   renderReviews();
@@ -680,8 +683,7 @@ async function initApp(){
 
   document.addEventListener("keydown", (e) => {
     if(e.key === "Escape"){
-      window.OverSauceCart?.closeCart();
-      window.OverSauceCart?.closeCheckout();
+      /* السلة أُزيلت */
       window.OverSauceProducts?.closeProductModal();
     }
   });
