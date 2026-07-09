@@ -193,7 +193,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .btn-sm{ padding: 9px 18px; font-size: 0.85rem; }
 .btn-icon{ width: 44px; height: 44px; padding: 0; border-radius: var(--radius-full); }
 
-.btn-add.bump, .fab-cart.bump{ animation: bump .45s cubic-bezier(.34,1.56,.64,1); }
+.btn-add.bump, 
 
 .tap-44{ min-width: 44px; min-height: 44px; }
 
@@ -304,14 +304,8 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 .stamp-pill:active{ transform: scale(0.96); }
 
 /* Announcement bar */
-.announce-bar{
-  background: linear-gradient(90deg, var(--copper), var(--copper-light));
-  color: #FFF7EC; font-size: 0.82rem; font-weight: 700; text-align: center;
-  padding: 9px var(--space-4); position: static; z-index: auto;
-  width: 100%;
-}
-@media (max-width: 639px){ .announce-bar{ font-size: 0.74rem; padding: 7px var(--space-3); } }
-.announce-bar a{ text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 639px){  }
 
 /* ---------------------------------------------------------------------
    8. HERO — immersive dark image block (theme-independent for contrast)
@@ -393,10 +387,6 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 .badge-sale{ background: linear-gradient(135deg,#3B82A6,#27607E); color:#fff; }
 .badge-outofstock{ background: rgba(0,0,0,0.7); color:#fff; }
 
-
-
-
-
 .product-body{ padding: var(--space-4); display: flex; flex-direction: column; flex: 1; gap: var(--space-2); }
 .product-name-row{ display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
 .product-name{ font-weight: 800; color: var(--parchment); font-size: 1rem; line-height: 1.35; }
@@ -414,16 +404,6 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 .qty-btn:active{ transform: scale(0.85); }
 .qty-value{ width: 26px; text-align: center; font-weight: 700; font-size: 0.85rem; }
 
-.btn-add-cart{
-  flex: 1; background: var(--copper); color: #FFF7EC; border-radius: var(--radius-full);
-  padding: 11px 16px; font-size: 0.86rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px;
-  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--copper) 70%, transparent);
-  transition: transform .22s cubic-bezier(.34,1.56,.64,1), background .25s, box-shadow .25s;
-}
-.btn-add-cart:hover{ background: var(--copper-light); box-shadow: 0 12px 26px -8px color-mix(in srgb, var(--copper) 60%, transparent); transform: translateY(-1px); }
-.btn-add-cart:active{ transform: scale(0.94); }
-.btn-add-cart:disabled{ opacity: .5; cursor: not-allowed; box-shadow: none; background: var(--brass); }
-
 /* ---------------------------------------------------------------------
    11. SKELETON / SHIMMER
    --------------------------------------------------------------------- */
@@ -437,17 +417,10 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 /* ---------------------------------------------------------------------
    12. FLOATING CART BUTTON
    --------------------------------------------------------------------- */
-.fab-cart{
-  position: fixed; bottom: 24px; inset-inline-start: 50%; transform: translateX(-50%); z-index: 40;
-  background: var(--copper); color: #fff; border-radius: var(--radius-full);
-  padding: 16px 26px 16px 22px; display: flex; align-items: center; gap: var(--space-3); font-weight: 800;
-  box-shadow: 0 16px 38px -10px color-mix(in srgb, var(--copper) 55%, transparent), inset 0 1px 0 rgba(255,255,255,.2);
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
-}
-html[dir="rtl"] .fab-cart{ transform: translateX(50%); }
-.fab-cart:hover{ transform: translateX(-50%) translateY(-3px) scale(1.04); }
-html[dir="rtl"] .fab-cart:hover{ transform: translateX(50%) translateY(-3px) scale(1.04); }
-.fab-cart .cart-count-badge{ top: -8px; inset-inline-start: -8px; background: #fff; color: var(--copper); border: 1px solid color-mix(in srgb, var(--copper) 30%, transparent); }
+
+html[dir="rtl"] 
+
+html[dir="rtl"] 
 
 /* ---------------------------------------------------------------------
    13. CART DRAWER
@@ -467,7 +440,6 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .drawer-body{ flex: 1; overflow-y: auto; padding: var(--space-4) var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); }
 .drawer-footer{ border-top: 1px solid var(--line); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); background: var(--ink-soft); }
 
-.cart-row{ background: var(--ink-soft); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-3); display: flex; gap: var(--space-3); align-items: center; box-shadow: var(--shadow-card); }
 /* قسم اقتراحات "كمّل طلبك" (upsell) */
 .upsell-section{ margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--line); }
 .upsell-title{ font-weight: 800; font-size: 0.92rem; color: var(--parchment); margin-bottom: var(--space-3); }
@@ -478,12 +450,7 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .upsell-name{ font-size: 0.74rem; color: var(--parchment); text-align: center; line-height: 1.3; max-height: 2.6em; overflow: hidden; }
 .upsell-price{ font-size: 0.78rem; font-weight: 700; color: var(--copper-light); }
 .upsell-plus{ position: absolute; top: 6px; inset-inline-end: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--copper); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; line-height: 1; }
-.cart-row img{ width: 66px; height: 66px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0; }
-.cart-row-info{ flex: 1; min-width: 0; }
-.cart-row-name{ font-weight: 800; font-size: 0.9rem; color: var(--parchment); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cart-row-meta{ font-size: 0.74rem; color: var(--brass); margin-top: 2px; }
-.cart-row-price{ color: var(--copper-light); font-size: 0.8rem; font-weight: 800; margin-top: 4px; }
-.cart-row-actions{ display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; align-self: stretch; gap: var(--space-2); }
+
 .cart-remove-btn{ color: var(--brass); transition: color .2s, transform .2s; }
 .cart-remove-btn:hover{ color: var(--danger); transform: scale(1.1); }
 
@@ -593,7 +560,6 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .login-logo-img{ height: 64px; width: auto; object-fit: contain; margin: 0 auto; display: block; }
 @media (max-width: 639px){ .logo-mark-img{ height: 38px; } }
 
-
 .contact-card-call{ border-color: color-mix(in srgb, var(--copper) 50%, transparent); }
 .contact-icon-call{ background: linear-gradient(135deg, var(--copper), var(--copper-light)); color:#fff; }
 .call-hint{ display:inline-block; margin-top:8px; font-size:0.72rem; font-weight:700; color:var(--copper-light); }
@@ -612,7 +578,6 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 }
 .product-unavailable{ color: var(--danger); font-weight: 700; font-size: 0.82rem; margin-top: 4px; }
 
-
 /* ===== زرار احجز الآن ===== */
 .contact-card-book{ background: var(--ink-soft); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-5); text-align: center; box-shadow: var(--shadow-card); display: flex; flex-direction: column; align-items: center; }
 .book-now-btn{ display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 999px; background: linear-gradient(135deg, var(--copper), var(--copper-light)); color: #fff; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 8px 22px color-mix(in srgb, var(--copper) 40%, transparent); transition: transform .18s ease; }
@@ -620,7 +585,6 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .book-now-fab{ position: fixed; inset-inline-start: 20px; bottom: 88px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 999px; background: linear-gradient(135deg, #25D366, #1ebe5b); color: #fff; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 10px 28px rgba(37,211,102,0.45); transition: transform .2s ease; }
 .book-now-fab:hover{ transform: scale(1.05); }
 @media (min-width: 640px){ .book-now-fab{ bottom: 28px; } }
-
 
 .promo-card.promo-card-image{ background: var(--panel) !important; padding: 0 !important; }
 .promo-card.promo-card-image::before{ display: none !important; content: none !important; }
@@ -701,7 +665,7 @@ html[dir="rtl"] .toast-container{ transform: translateX(50%); }
     padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
     box-shadow: 0 -8px 28px -16px rgba(24,24,27,0.20);
   }
-  .fab-cart{ display: none !important; }
+  
   body{ padding-bottom: 66px; }
 }
 .promo-dot{ width: 8px; height: 8px; border-radius: 50%; padding: 0; cursor: pointer; border: none;

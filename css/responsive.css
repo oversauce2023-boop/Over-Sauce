@@ -19,15 +19,15 @@
   .product-grid{ grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   .product-img-wrap{ height: 130px; }
   .product-body{ padding: var(--space-3); gap: 6px; }
-  .btn-add-cart{ font-size: 0.78rem; padding: 9px 10px; }
+  
 
   .drawer{ max-width: 100%; }
   .modal-panel{ border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 
   .stats-grid{ grid-template-columns: repeat(2, 1fr); }
-  .fab-cart span.fab-label{ display: none; }
-  .fab-cart{ padding: 14px; gap: 0; }
-  .fab-cart .cart-icon-wrap{ margin: 0; }
+  
+  
+  
 
   .qr-card{ flex-direction: column; text-align: center; }
 }
@@ -35,7 +35,7 @@
 /* ---------------- Tablets (640px–1023px) ---------------- */
 @media (min-width: 640px){
   .product-grid{ grid-template-columns: repeat(2, 1fr); }
-  .fab-cart span.fab-label{ display: inline; }
+  
 }
 
 @media (min-width: 768px){
@@ -60,15 +60,14 @@
 @media (pointer: coarse){
   .qty-btn{ min-width: 44px; min-height: 44px; width: 44px; height: 44px; }
   .icon-btn{ min-width: 44px; min-height: 44px; }
-  .fav-btn{ width: 44px; height: 44px; }
+  
   .btn-xs{ padding: 8px 14px; }
   .stamp-pill, .cat-pill{ min-height: 40px; }
 }
 
 /* ---------------- Print (menu can be printed for in-store use) ---------------- */
 @media print{
-  .site-header, .fab-cart, .drawer, .scrim, .toast-container,
-  .install-banner, .dust-field{ display: none !important; }
+  .site-header, 
   body{ background: #fff; color: #111; }
   .product-card{ break-inside: avoid; border: 1px solid #ccc; }
 }
