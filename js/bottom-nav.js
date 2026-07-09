@@ -55,9 +55,6 @@
       if (!btn) return;
       var action = btn.getAttribute("data-nav");
 
-      // Any tab other than favourites clears the favourites filter.
-      if (action !== "favorites") document.body.classList.remove("show-favs-only");
-
       switch (action) {
         case "home":
           if(window.OverSauceCore) OverSauceCore.setPageTitle("home"); setActive(btn); toTop();
@@ -68,17 +65,6 @@
         case "offers":
           if(window.OverSauceCore) OverSauceCore.setPageTitle("offers"); setActive(btn); toEl("promoStrip");
           break;
-        case "favorites": {
-          var favCount = document.querySelectorAll(".fav-btn.active").length;
-          if (favCount === 0 && !document.body.classList.contains("show-favs-only")) {
-            hint(isArabic() ? "أضِف أطباقًا للمفضلة أولاً ♥" : "Add items to favourites first ♥");
-            return;
-          }
-          var on = document.body.classList.toggle("show-favs-only");
-          setActive(on ? btn : items[0]);
-          if (on) toEl("menu");
-          break;
-        }
       }
     });
   });

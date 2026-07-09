@@ -48,37 +48,6 @@
   }
 
   /* =================================================================
-     FAVORITES (persisted)
-     ================================================================= */
-  function loadFavorites(){
-    const stored = storageGetJSON("favorites", []);
-    M.favorites = new Set(stored);
-  }
-  function saveFavorites(){
-    storageSetJSON("favorites", [...M.favorites]);
-  }
-  function toggleFavorite(productId, btnEl){
-    if(M.favorites.has(productId)){
-      M.favorites.delete(productId);
-      showToast("toastFavRemoved", "💔");
-    } else {
-      M.favorites.add(productId);
-      showToast("toastFavAdded", "❤️");
-    }
-    saveFavorites();
-    document.querySelectorAll(`[data-fav-id="${productId}"]`).forEach(el => {
-      const active = M.favorites.has(productId);
-      el.classList.toggle("active", active);
-      el.textContent = active ? "♥" : "♡";
-      el.setAttribute("aria-label", t(active ? "favoriteRemove" : "favoriteAdd"));
-    });
-    if(btnEl){
-      btnEl.classList.add("just-added");
-      setTimeout(() => btnEl.classList.remove("just-added"), 400);
-    }
-  }
-
-  /* =================================================================
      RECENTLY VIEWED (persisted, capped)
      ================================================================= */
   function loadRecentlyViewed(){
@@ -205,14 +174,12 @@
      PRODUCT CARD MARKUP
      ================================================================= */
   function productCardHTML(product){
-    const isFav = M.favorites.has(product.id);
     const oldPriceHTML = product.oldPrice ? `<span class="product-old-price">${formatPrice(product.oldPrice)}</span>` : "";
     return `
     <article class="product-card reveal in" data-product-id="${product.id}" data-name="${escapeHTML(localized(product.name))}">
       <div class="product-img-wrap">
         <div class="shimmer" style="position:absolute; inset:0;" data-skeleton></div>
         <img class="product-img" src="${product.image}" alt="${escapeHTML(localized(product.name))}" loading="lazy" decoding="async" width="600" height="400">
-        <button class="fav-btn ${isFav ? 'active' : ''}" data-fav-id="${product.id}" aria-label="${t(isFav ? 'favoriteRemove' : 'favoriteAdd')}">${isFav ? '♥' : '♡'}</button>
         ${badgesHTML(product)}
       </div>
       <div class="product-body">
@@ -239,12 +206,6 @@
         img.addEventListener("load", () => { img.classList.add("loaded"); img.previousElementSibling?.remove(); });
         img.addEventListener("error", () => { img.previousElementSibling?.remove(); });
       }
-    });
-    scope.querySelectorAll("[data-fav-id]").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleFavorite(btn.getAttribute("data-fav-id"), btn);
-      });
     });
     scope.querySelectorAll("[data-open-product]").forEach(btn => {
       btn.addEventListener("click", (e) => {
@@ -562,7 +523,6 @@
   }
 
   function init(){
-    loadFavorites();
     loadRecentlyViewed();
     renderMenuSkeleton();
     renderCategoryNav();

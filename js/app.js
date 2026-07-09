@@ -35,7 +35,6 @@ window.OverSauce = {
   sortMode: "default",
   priceFilter: { min: null, max: null },
   cart: {},                    // keyed by cartLineKey -> { product, qty, size, extras }
-  favorites: new Set(),
   recentlyViewed: [],          // array of product ids, most recent first
   appliedCoupon: null,
   orderType: "delivery",       // "delivery" | "pickup"
