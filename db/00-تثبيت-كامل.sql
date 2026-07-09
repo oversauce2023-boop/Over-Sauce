@@ -97,6 +97,7 @@ create table if not exists public.flash_deals (
   subtitle_en      text not null default '',
   discount_percent integer not null default 0,
   ends_in_hours    integer not null default 24,
+  image_url        text not null default '',
   active           boolean not null default true,
   sort_order       integer not null default 1,
   created_at       timestamptz not null default now()

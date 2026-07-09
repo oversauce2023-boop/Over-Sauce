@@ -191,6 +191,7 @@
           </div>
         </div>
         <p class="product-desc">${escapeHTML(localized(product.description))}</p>
+        ${product.calories != null && product.calories > 0 ? `<p class="product-calories">🔥 ${toLocaleDigits(product.calories)} ${M.lang === "ar" ? "سعرة حرارية" : "kcal"}</p>` : ""}
         <p class="product-meta">${ratingHTML(product)}</p>
         ${!product.inStock ? `<p class="product-unavailable">${t("outOfStock")}</p>` : ""}
       </div>

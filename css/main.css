@@ -590,6 +590,9 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .promo-card.promo-card-image::before{ display: none !important; content: none !important; }
 .promo-card-image img{ width:100%; height:auto; display:block; border-radius:inherit; }
 
+
+.product-calories{ color: var(--brass); font-size: 0.8rem; font-weight: 700; margin-top: 2px; }
+
 .footer-bottom{ text-align: center; color: var(--brass); font-size: 0.78rem; padding-bottom: var(--space-6); }
 /* رابط دخول فريق العمل — نقطة باهتة غير لافتة للعملاء، يكبر قليلاً عند المرور */
 .staff-portal-link{ color: var(--brass); opacity: 0.45; padding: 0 6px; font-weight: 900; text-decoration: none; transition: opacity .2s, color .2s; }
