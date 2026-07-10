@@ -590,7 +590,6 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .promo-card.promo-card-image::before{ display: none !important; content: none !important; }
 .promo-card-image img{ width:100%; height:auto; display:block; border-radius:inherit; }
 
-
 .product-calories{ color: var(--brass); font-size: 0.8rem; font-weight: 700; margin-top: 2px; }
 
 .footer-bottom{ text-align: center; color: var(--brass); font-size: 0.78rem; padding-bottom: var(--space-6); }
@@ -615,15 +614,8 @@ html[dir="rtl"] .toast-container{ transform: translateX(50%); }
 /* ---------------------------------------------------------------------
    20. INSTALL / PWA PROMPT
    --------------------------------------------------------------------- */
-.install-banner{
-  position: fixed; bottom: 96px; inset-inline: var(--space-4); z-index: 45;
-  background: var(--ink-soft); border: 1px solid var(--line); border-radius: var(--radius-lg);
-  padding: var(--space-4); display: flex; align-items: center; gap: var(--space-3);
-  box-shadow: var(--shadow-deep); max-width: 430px; margin-inline: auto;
-  transform: translateY(120%); transition: transform .4s cubic-bezier(.16,1,.3,1);
-}
-.install-banner.visible{ transform: translateY(0); }
-@media (min-width: 640px){ .install-banner{ bottom: 24px; } }
+
+@media (min-width: 640px){  }
 
 /* ---------------------------------------------------------------------
    21. CATEGORY CHIP TEXT (name + count)

@@ -282,17 +282,30 @@
   }
 
   async function syncAll(db) {
-    async function tryStep(fn) {
+    // نسجّل أي جدول يفشل بسبب صلاحيات (RLS) بدل تجاهله بصمت،
+    // حتى لا يظهر "تم الحفظ بنجاح" بينما لم يُحفظ شيء فعليًا.
+    var failedTables = [];
+    async function tryStep(label, fn) {
       try { await fn(); }
-      catch (e) { if (!isRlsDenial(e)) throw e; }
+      catch (e) {
+        if (!isRlsDenial(e)) throw e;
+        failedTables.push(label);
+      }
     }
-    await tryStep(() => syncTable("categories", db.categories, fromCategory, "id"));
-    await tryStep(() => syncTable("products", db.products, fromProduct, "id"));
-    await tryStep(() => syncTable("coupons", db.coupons, fromCoupon, "code"));
-    await tryStep(() => syncTable("delivery_zones", db.deliveryZones, fromZone, "id"));
-    await tryStep(() => syncTable("flash_deals", db.flashDeals, fromDeal, "id"));
+    await tryStep("الفئات", () => syncTable("categories", db.categories, fromCategory, "id"));
+    await tryStep("المنتجات", () => syncTable("products", db.products, fromProduct, "id"));
+    await tryStep("الكوبونات", () => syncTable("coupons", db.coupons, fromCoupon, "code"));
+    await tryStep("مناطق التوصيل", () => syncTable("delivery_zones", db.deliveryZones, fromZone, "id"));
+    await tryStep("العروض", () => syncTable("flash_deals", db.flashDeals, fromDeal, "id"));
     if (db.restaurant) {
-      await tryStep(() => saveSettings(db.restaurant, db.minimumOrder, db.currency || null, db.restaurant.ordersPaused));
+      await tryStep("الإعدادات", () => saveSettings(db.restaurant, db.minimumOrder, db.currency || null, db.restaurant.ordersPaused));
+    }
+    // لا نُخفي فشل أي جزء عن المستخدم: إن فشل جدول واحد بسبب الصلاحيات،
+    // نُبلّغ بذلك بوضوح بدل الصمت (حتى لو نجحت باقي الأجزاء).
+    if (failedTables.length) {
+      var err = new Error("تعذّر حفظ: " + failedTables.join("، ") + " — راجع صلاحيات الحساب أو سجّل الدخول من جديد.");
+      err.partialFailure = true;
+      throw err;
     }
   }
 

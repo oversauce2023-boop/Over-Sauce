@@ -577,42 +577,9 @@ async function shareMenuLink(){
 /* =====================================================================
    INSTALL (PWA) PROMPT
    ===================================================================== */
-let deferredInstallPrompt = null;
-function setupInstallPrompt(){
-  const banner = document.getElementById("installBanner");
-  if(!banner) return;
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredInstallPrompt = e;
-    if(storageGet("installDismissed") !== "1"){
-      banner.classList.add("visible");
-    }
-  });
-  const installBtn = document.getElementById("installBtn");
-  const dismissBtn = document.getElementById("installDismissBtn");
-  if(installBtn){
-    installBtn.addEventListener("click", async () => {
-      if(!deferredInstallPrompt) return;
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      banner.classList.remove("visible");
-    });
-  }
-  if(dismissBtn){
-    dismissBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      banner.classList.remove("visible");
-      banner.style.display = "none";
-      deferredInstallPrompt = null;
-      storageSet("installDismissed", "1");
-    });
-  }
-  window.addEventListener("appinstalled", () => {
-    banner.classList.remove("visible");
-  });
-}
+/* بانر تثبيت التطبيق أُزيل — كان يعمل عبر beforeinstallprompt
+   (مدعوم على أندرويد/كروم فقط، وليس آيفون/سفاري)، وكان يتعارض
+   بصريًا مع زر "احجز الآن" العائم. */
 
 /* =====================================================================
    SERVICE WORKER REGISTRATION
@@ -658,7 +625,7 @@ async function initApp(){
   setupHeroImage();
   setupDustField();
   setupStatsCounters();
-  setupInstallPrompt();
+  /* بانر التثبيت أُزيل */
 
   // Safety: a contact/social link whose URL isn't set stays href="#".
   // Stop those from jumping the page to the top when tapped.
