@@ -6,6 +6,7 @@
 const I18N = {
   ar: {
     dir: "rtl",
+    applyFilter: "تطبيق",
     skipLink: "تخطّي إلى المحتوى",
     searchPlaceholder: "ابحث عن طبق...",
     searchLabel: "بحث في قائمة الطعام",
@@ -118,6 +119,7 @@ const I18N = {
   },
   en: {
     dir: "ltr",
+    applyFilter: "Apply",
     skipLink: "Skip to content",
     searchPlaceholder: "Search for a dish...",
     searchLabel: "Search the menu",

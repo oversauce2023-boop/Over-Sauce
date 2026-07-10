@@ -160,14 +160,29 @@
     return result;
   }
 
+  // توحيد الحروف العربية المتشابهة (الهمزات، الألف المقصورة، التاء المربوطة)
+  // حتى يجد البحث "اومليت" عند البحث عن "أومليت" والعكس.
+  function normalizeArabic(str){
+    return (str || "")
+      .toLowerCase()
+      .replace(/[أإآا]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function matchesSearch(product, query){
     if(!query) return true;
-    const q = query.trim().toLowerCase();
+    const q = normalizeArabic(query);
     if(!q) return true;
-    const nameAr = (product.name.ar || "").toLowerCase();
+    const nameAr = normalizeArabic(product.name.ar || "");
     const nameEn = (product.name.en || "").toLowerCase();
-    const descLocalized = localized(product.description).toLowerCase();
-    return nameAr.includes(q) || nameEn.includes(q) || descLocalized.includes(q);
+    const descLocalized = normalizeArabic(localized(product.description));
+    const haystack = `${nameAr} ${nameEn} ${descLocalized}`;
+    // مطابقة كل كلمة على حدة بأي ترتيب، بدل الجملة كاملة كوحدة واحدة.
+    const words = q.split(" ").filter(Boolean);
+    return words.every(w => haystack.includes(w));
   }
 
   /* =================================================================
