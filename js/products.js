@@ -341,24 +341,16 @@
   }
 
   /* =================================================================
-     PRODUCT DETAIL MODAL — size / extras / quantity / add to cart
+     PRODUCT DETAIL MODAL — عرض معلوماتي كامل للطبق (بلا طلب/سلة)
      ================================================================= */
-  function computeModalPrice(product){
-    let price = product.price;
-    if(modalState.size){
-      const sizeObj = (product.sizes || []).find(s => s.id === modalState.size);
-      if(sizeObj) price += sizeObj.priceDiff;
-    }
-    modalState.extras.forEach(extraId => {
-      const extraObj = (product.extras || []).find(ex => ex.id === extraId);
-      if(extraObj) price += extraObj.price;
-    });
-    return price * modalState.qty;
-  }
-
   function renderModalPrice(product){
     const priceEl = document.getElementById("productModalPrice");
-    if(priceEl) priceEl.textContent = formatPrice(computeModalPrice(product));
+    if(priceEl) priceEl.textContent = formatPrice(product.price);
+    const stockEl = document.getElementById("productModalStock");
+    if(stockEl){
+      stockEl.textContent = product.inStock ? t("inStock") : t("outOfStock");
+      stockEl.style.color = product.inStock ? "var(--success, #2e9e5b)" : "var(--danger, #d94b4b)";
+    }
   }
 
   function openProductModal(productId){
@@ -405,18 +397,12 @@
     const sizesSection = document.getElementById("productModalSizesSection");
     if(product.sizes && product.sizes.length){
       sizesSection.classList.remove("hidden");
+      // عرض معلوماتي فقط (بدون اختيار) — يوضح للعميل الأحجام المتاحة وفروق أسعارها.
       sizesWrap.innerHTML = product.sizes.map(s => `
-        <button class="size-pill ${s.id === modalState.size ? 'active' : ''}" data-size="${s.id}">
+        <span class="size-pill">
           ${escapeHTML(localized(s.name))} ${s.priceDiff !== 0 ? `(${s.priceDiff > 0 ? '+' : ''}${formatPrice(s.priceDiff)})` : ''}
-        </button>
+        </span>
       `).join("");
-      sizesWrap.querySelectorAll("[data-size]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          modalState.size = btn.getAttribute("data-size");
-          sizesWrap.querySelectorAll(".size-pill").forEach(p => p.classList.toggle("active", p === btn));
-          renderModalPrice(product);
-        });
-      });
     } else {
       sizesSection.classList.add("hidden");
     }
@@ -425,30 +411,18 @@
     const extrasSection = document.getElementById("productModalExtrasSection");
     if(product.extras && product.extras.length){
       extrasSection.classList.remove("hidden");
+      // عرض معلوماتي فقط (بدون اختيار) — يوضح الإضافات المتاحة وأسعارها.
       extrasWrap.innerHTML = product.extras.map(ex => `
-        <button class="extra-pill" data-extra="${ex.id}">
+        <span class="extra-pill">
           ${escapeHTML(localized(ex.name))} (+${formatPrice(ex.price)})
-        </button>
+        </span>
       `).join("");
-      extrasWrap.querySelectorAll("[data-extra]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-extra");
-          if(modalState.extras.has(id)){ modalState.extras.delete(id); btn.classList.remove("active"); }
-          else { modalState.extras.add(id); btn.classList.add("active"); }
-          renderModalPrice(product);
-        });
-      });
     } else {
       extrasSection.classList.add("hidden");
     }
 
-    document.getElementById("productModalQty").textContent = toLocaleDigits(modalState.qty);
     renderModalPrice(product);
     renderRelated(product);
-
-    const addBtn = document.getElementById("productModalAddBtn");
-    addBtn.disabled = !product.inStock;
-    addBtn.textContent = product.inStock ? t("addWithPrice") : t("outOfStock");
 
     scrim.classList.remove("hidden");
     requestAnimationFrame(() => scrim.classList.add("active"));
@@ -470,19 +444,7 @@
   }
 
   function setupProductModalControls(){
-    document.getElementById("productModalQtyMinus")?.addEventListener("click", () => {
-      if(!activeModalProduct) return;
-      modalState.qty = clamp(modalState.qty - 1, 1, M.config.maxQtyPerItem);
-      document.getElementById("productModalQty").textContent = toLocaleDigits(modalState.qty);
-      renderModalPrice(activeModalProduct);
-    });
-    document.getElementById("productModalQtyPlus")?.addEventListener("click", () => {
-      if(!activeModalProduct) return;
-      modalState.qty = clamp(modalState.qty + 1, 1, M.config.maxQtyPerItem);
-      document.getElementById("productModalQty").textContent = toLocaleDigits(modalState.qty);
-      renderModalPrice(activeModalProduct);
-    });
-    /* زر الإضافة أُزيل — المودال للعرض فقط */
+    /* عداد الكمية وزر الإضافة أُزيلا — المودال للعرض المعلوماتي فقط */
     document.getElementById("productModalCloseBtn")?.addEventListener("click", closeProductModal);
     document.getElementById("productScrim")?.addEventListener("click", (e) => {
       if(e.target.id === "productScrim") closeProductModal();

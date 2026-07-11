@@ -515,7 +515,7 @@ function renderFlashDeals(){
     if(deal.imageUrl){
       return `
     <div class="promo-card promo-card-image reveal">
-      <img src="${deal.imageUrl}" alt="${escapeHTML(localized(deal.title) || t("flashDealsTitle"))}" loading="lazy" decoding="async">
+      <img src="${deal.imageUrl}" alt="${escapeHTML(localized(deal.title) || t("flashDealsTitle"))}" loading="eager" fetchpriority="high" decoding="async">
     </div>`;
     }
     return `

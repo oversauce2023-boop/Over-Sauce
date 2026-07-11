@@ -40,10 +40,10 @@
     }
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
     function start() {
+      // التحريك التلقائي أُوقف عمدًا: الدمج بين scrollBy المبرمج وخاصية
+      // scroll-snap الأصلية يسبب "تعليقًا" معروفًا في Safari على آيفون.
+      // السحب اليدوي والنقاط يعملان بشكل طبيعي وموثوق دون أي تعارض.
       stop();
-      timer = setInterval(function () {
-        if (!paused && document.visibilityState === "visible") go(index + 1);
-      }, 4500);
     }
     function restart() { paused = false; start(); }
 
