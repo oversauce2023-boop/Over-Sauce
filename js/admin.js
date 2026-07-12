@@ -298,7 +298,7 @@
         <button id="catSaveBtn" class="btn btn-primary">حفظ</button>
       </div>
     `, () => {
-      document.getElementById("catSaveBtn").addEventListener("click", () => {
+      document.getElementById("catSaveBtn").addEventListener("click", async () => {
         const nameAr = document.getElementById("catNameAr").value.trim();
         const nameEn = document.getElementById("catNameEn").value.trim();
         if(!nameAr || !nameEn){ showToast("يرجى تعبئة جميع الحقول", "⚠️"); return; }
@@ -308,27 +308,49 @@
           name: { ar: nameAr, en: nameEn },
           order: Number(document.getElementById("catOrder").value) || 1
         };
+        // نحفظ نسخة من الحالة السابقة للتراجع عنها لو فشل الحفظ فعليًا
+        const prevState = cat ? JSON.parse(JSON.stringify(cat)) : null;
         if(cat){
           Object.assign(cat, payload);
         } else {
           db.categories.push(payload);
         }
-        saveDB(); renderCategories(); closeModal();
-        showToast("تم حفظ الفئة بنجاح", "✅");
+
+        // لا نعرض "نجاح" إلا بعد تأكيد الحفظ في قاعدة البيانات فعليًا
+        const saveBtn = document.getElementById("catSaveBtn");
+        if(saveBtn){ saveBtn.disabled = true; saveBtn.textContent = "جارٍ الحفظ..."; }
+        try {
+          await saveDB();
+          renderCategories(); closeModal();
+          showToast("تم حفظ الفئة بنجاح", "✅");
+        } catch(err){
+          // تراجع عن التغيير المحلي حتى لا تظهر فئة غير محفوظة فعليًا
+          if(cat && prevState){ Object.assign(cat, prevState); }
+          else { db.categories = db.categories.filter(c => c.id !== payload.id); }
+          renderCategories();
+          if(saveBtn){ saveBtn.disabled = false; saveBtn.textContent = "حفظ"; }
+        }
       });
     });
   }
 
-  function deleteCategory(categoryId){
+  async function deleteCategory(categoryId){
     const inUse = db.products.some(p => p.category === categoryId);
     if(inUse){
       showToast("لا يمكن حذف فئة تحتوي على أطباق — انقل الأطباق أولًا", "⚠️");
       return;
     }
     if(!confirm("هل أنت متأكد من حذف هذه الفئة؟")) return;
+    const backup = db.categories.slice();
     db.categories = db.categories.filter(c => c.id !== categoryId);
-    saveDB(); renderCategories();
-    showToast("تم حذف الفئة", "🗑️");
+    try {
+      await saveDB();
+      renderCategories();
+      showToast("تم حذف الفئة", "🗑️");
+    } catch(err){
+      db.categories = backup;   // استرجاع الفئة لو فشل الحذف فعليًا
+      renderCategories();
+    }
   }
 
   function populateCategoryFilter(){
@@ -579,11 +601,18 @@
     });
   }
 
-  function deleteProduct(productId){
+  async function deleteProduct(productId){
     if(!confirm("هل أنت متأكد من حذف هذا الطبق؟")) return;
+    const backup = db.products.slice();
     db.products = db.products.filter(p => p.id !== productId);
-    saveDB(); renderProducts(); renderDashboardStats();
-    showToast("تم حذف الطبق", "🗑️");
+    try {
+      await saveDB();
+      renderProducts(); renderDashboardStats();
+      showToast("تم حذف الطبق", "🗑️");
+    } catch(err){
+      db.products = backup;   // استرجاع الطبق لو فشل الحذف فعليًا
+      renderProducts(); renderDashboardStats();
+    }
   }
 
   /* =================================================================
@@ -715,7 +744,7 @@
           } catch(e){ showToast("تعذّر رفع الصورة", "⚠️"); }
         });
       }
-      document.getElementById("dealSaveBtn").addEventListener("click", () => {
+      document.getElementById("dealSaveBtn").addEventListener("click", async () => {
         const titleAr = document.getElementById("dealTitleAr").value.trim();
         const titleEn = document.getElementById("dealTitleEn").value.trim();
         const dealImageUrl = (document.getElementById("dealImageUrl").value || "").trim();
@@ -730,18 +759,37 @@
           imageUrl: dealImageUrl,
           active: true
         };
+        const prevDeal = deal ? JSON.parse(JSON.stringify(deal)) : null;
         if(deal){ Object.assign(deal, payload); } else { db.flashDeals.push(payload); }
-        saveDB(); renderDeals(); closeModal();
-        showToast("تم حفظ العرض بنجاح", "✅");
+
+        const dealSaveBtn = document.getElementById("dealSaveBtn");
+        if(dealSaveBtn){ dealSaveBtn.disabled = true; dealSaveBtn.textContent = "جارٍ الحفظ..."; }
+        try {
+          await saveDB();
+          renderDeals(); closeModal();
+          showToast("تم حفظ العرض بنجاح", "✅");
+        } catch(err){
+          if(deal && prevDeal){ Object.assign(deal, prevDeal); }
+          else { db.flashDeals = db.flashDeals.filter(d => d.id !== payload.id); }
+          renderDeals();
+          if(dealSaveBtn){ dealSaveBtn.disabled = false; dealSaveBtn.textContent = "حفظ العرض"; }
+        }
       });
     });
   }
 
-  function deleteDeal(id){
+  async function deleteDeal(id){
     if(!confirm("هل أنت متأكد من حذف هذا العرض؟")) return;
+    const backup = db.flashDeals.slice();
     db.flashDeals = db.flashDeals.filter(d => d.id !== id);
-    saveDB(); renderDeals();
-    showToast("تم حذف العرض", "🗑️");
+    try {
+      await saveDB();
+      renderDeals();
+      showToast("تم حذف العرض", "🗑️");
+    } catch(err){
+      db.flashDeals = backup;   // استرجاع العرض لو فشل الحذف
+      renderDeals();
+    }
   }
 
   /* =================================================================

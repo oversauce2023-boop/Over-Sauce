@@ -352,55 +352,73 @@
      PRODUCT DETAIL MODAL
      ============================================================ -->
 <div id="productScrim" class="scrim hidden" style="align-items:flex-end; justify-content:center; display:flex;">
-  <div id="productModal" class="modal-panel modal-sheet glass-strong" style="transform:translateY(100%); opacity:0; transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;">
-    <div class="modal-inner">
-      <div class="modal-header">
-        <h2 class="h3" style="font-size:1.3rem;">تفاصيل الطبق</h2>
-        <button id="productModalCloseBtn" class="icon-btn tap-44" aria-label="إغلاق" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
+  <div id="productModal" class="modal-panel modal-sheet glass-strong" style="transform:translateY(100%); opacity:0; transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease; display:flex; flex-direction:column; padding:0;">
 
-      <div style="border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px; position:relative; height:200px;">
+    <div class="modal-header" style="padding: var(--space-5) var(--space-6) var(--space-4); margin-bottom:0; border-bottom:1px solid var(--line); flex-shrink:0;">
+      <h2 class="h3" style="font-size:1.1rem;" data-i18n="productDetailsTitle">تفاصيل الطبق</h2>
+      <button id="productModalCloseBtn" class="icon-btn tap-44" aria-label="إغلاق" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div style="overflow-y:auto; flex:1; padding: var(--space-6);">
+      <div style="border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px; position:relative; height:190px;">
         <img id="productModalImg" src="" alt="" style="width:100%; height:100%; object-fit:cover;" loading="lazy" decoding="async" width="600" height="400">
         <div id="productModalBadges" style="position:absolute; top:10px; inset-inline-end:10px;"></div>
       </div>
 
-      <div class="flex" style="justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px;">
-        <h3 id="productModalName" class="h3" style="font-size:1.2rem;"></h3>
+      <div class="flex" style="justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px;">
+        <h3 id="productModalName" class="h3" style="font-size:1.25rem;"></h3>
         <button id="productModalShareBtn" class="icon-btn tap-44" aria-label="مشاركة الطبق" style="flex-shrink:0;" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 13.5L15.5 17M15.5 7L8.5 10.5M18 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm0 14a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM10 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
         </button>
       </div>
-      <p id="productModalRating" class="muted" style="font-size:0.85rem; margin-bottom:10px;"></p>
-      <p id="productModalDesc" class="muted" style="line-height:1.7; margin-bottom:20px;"></p>
+      <p id="productModalRating" class="muted" style="font-size:0.85rem; margin-bottom:16px;"></p>
 
-      <div id="productModalNutrition" class="modal-nutrition hidden">
-        <span id="productModalCalories" class="cal-pill hidden"></span>
-        <div id="productModalAllergens" class="allergens-block hidden"></div>
+      <!-- بطاقة معلومات منظمة بصفوف واضحة (بدل نص متفرق) -->
+      <div class="info-rows-card">
+        <div class="info-row" id="productModalDescRow">
+          <span class="info-row-label" data-i18n="descriptionLabel">الوصف</span>
+          <p id="productModalDesc" class="info-row-value"></p>
+        </div>
+        <div class="info-row" id="productModalSizesSection">
+          <span class="info-row-label" data-i18n="availableSizes">الأحجام المتاحة</span>
+          <div class="size-options" id="productModalSizes"></div>
+        </div>
+        <div class="info-row" id="productModalExtrasSection">
+          <span class="info-row-label" data-i18n="availableExtras">إضافات متاحة</span>
+          <div class="extras-options" id="productModalExtras"></div>
+        </div>
+        <div class="info-row" id="productModalCaloriesRow">
+          <span class="info-row-label" data-i18n="caloriesLabel">السعرات</span>
+          <span id="productModalCalories" class="info-row-value"></span>
+        </div>
+        <div class="info-row" id="productModalAllergensRow">
+          <span class="info-row-label" data-i18n="allergensLabel">مسببات الحساسية</span>
+          <div id="productModalAllergens" class="allergens-block"></div>
+        </div>
+        <div class="info-row" id="productModalStockRow" style="border-bottom:none;">
+          <span class="info-row-label" data-i18n="statusLabel">الحالة</span>
+          <span id="productModalStock" class="info-row-value" style="font-weight:700;"></span>
+        </div>
       </div>
 
-      <div id="productModalSizesSection" style="margin-bottom:20px;">
-        <p class="field-label" data-i18n="availableSizes">الأحجام المتاحة</p>
-        <div class="size-options" id="productModalSizes"></div>
-      </div>
-
-      <div id="productModalExtrasSection" style="margin-bottom:24px;">
-        <p class="field-label" data-i18n="availableExtras">إضافات متاحة</p>
-        <div class="extras-options" id="productModalExtras"></div>
-      </div>
-
-      <div class="flex" style="align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px;">
-        <p class="font-display" id="productModalPrice" style="font-size:1.6rem; color:var(--copper-light);">٠ ر.س</p>
-        <p id="productModalStock" class="muted" style="font-size:0.85rem; font-weight:700;"></p>
-      </div>
-
-      
-
-      <div id="relatedSection" style="margin-top:32px;">
+      <div id="relatedSection" style="margin-top:28px;">
         <p class="text-eyebrow" data-i18n="relatedTitle" style="margin-bottom:14px;">قد يعجبك أيضًا</p>
         <div class="scroller-grid no-scrollbar" id="relatedGrid"></div>
       </div>
+    </div>
+
+    <!-- شريط سعر وحجز ثابت أسفل الشاشة (لا يتحرك مع المحتوى) -->
+    <div style="flex-shrink:0; padding: var(--space-4) var(--space-6); border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:14px; background:var(--ink);">
+      <div>
+        <p class="muted" style="font-size:0.72rem; margin-bottom:2px;" data-i18n="priceLabel">السعر</p>
+        <p class="font-display" id="productModalPrice" style="font-size:1.5rem; color:var(--copper-light); line-height:1;">٠ ر.س</p>
+      </div>
+      <a class="book-now-btn" data-bind="bookNow" href="#" target="_blank" rel="noopener noreferrer" style="flex:1; max-width:200px; justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Z"/></svg>
+        <span data-i18n="bookNowLabel">احجز الآن</span>
+      </a>
     </div>
   </div>
 </div>

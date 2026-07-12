@@ -367,31 +367,34 @@
     document.getElementById("productModalImg").src = product.image;
     document.getElementById("productModalImg").alt = localized(product.name);
     document.getElementById("productModalName").textContent = localized(product.name);
-    document.getElementById("productModalDesc").textContent = localized(product.description);
     document.getElementById("productModalRating").innerHTML = ratingHTML(product);
     document.getElementById("productModalBadges").innerHTML = badgesHTML(product);
 
-    // Calories + allergens (hidden when not provided for a dish)
-    const nutritionWrap = document.getElementById("productModalNutrition");
+    // صف الوصف — يُخفى بالكامل لو المنتج بلا وصف
+    const descRow = document.getElementById("productModalDescRow");
+    const desc = localized(product.description);
+    if(desc && desc.trim()){
+      document.getElementById("productModalDesc").textContent = desc;
+      descRow.classList.remove("hidden");
+    } else {
+      descRow.classList.add("hidden");
+    }
+
+    // صفوف السعرات ومسببات الحساسية — كل صف يُخفى لو لا توجد بيانات له
+    const calRow = document.getElementById("productModalCaloriesRow");
+    const allergRow = document.getElementById("productModalAllergensRow");
     const calEl = document.getElementById("productModalCalories");
     const allergEl = document.getElementById("productModalAllergens");
     const hasCal = product.calories != null && product.calories > 0;
     const hasAllerg = !!(product.allergens && product.allergens.length);
-    if(calEl){
-      if(hasCal){
-        calEl.textContent = `🔥 ${toLocaleDigits(product.calories)} ${M.lang === "ar" ? "سعرة حرارية" : "kcal"}`;
-        calEl.classList.remove("hidden");
-      } else { calEl.classList.add("hidden"); }
-    }
-    if(allergEl){
-      if(hasAllerg){
-        const label = M.lang === "ar" ? "يحتوي على:" : "Contains:";
-        allergEl.innerHTML = `<span class="allergens-label">⚠️ ${label}</span>` +
-          product.allergens.map(a => `<span class="allergen-chip">${escapeHTML(a)}</span>`).join("");
-        allergEl.classList.remove("hidden");
-      } else { allergEl.classList.add("hidden"); }
-    }
-    if(nutritionWrap) nutritionWrap.classList.toggle("hidden", !(hasCal || hasAllerg));
+    if(hasCal){
+      calEl.textContent = `🔥 ${toLocaleDigits(product.calories)} ${M.lang === "ar" ? "سعرة حرارية" : "kcal"}`;
+      calRow.classList.remove("hidden");
+    } else { calRow.classList.add("hidden"); }
+    if(hasAllerg){
+      allergEl.innerHTML = product.allergens.map(a => `<span class="allergen-chip">${escapeHTML(a)}</span>`).join("");
+      allergRow.classList.remove("hidden");
+    } else { allergRow.classList.add("hidden"); }
 
     const sizesWrap = document.getElementById("productModalSizes");
     const sizesSection = document.getElementById("productModalSizesSection");
