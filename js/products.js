@@ -428,7 +428,7 @@
     requestAnimationFrame(() => scrim.classList.add("active"));
     modal.classList.remove("translate-y-full");
     requestAnimationFrame(() => { modal.style.transform = "translateY(0)"; modal.style.opacity = "1"; });
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
   }
 
   function closeProductModal(){
@@ -439,7 +439,7 @@
     modal.style.transform = "";
     modal.style.opacity = "";
     setTimeout(() => scrim.classList.add("hidden"), 350);
-    document.body.style.overflow = "";
+    unlockBodyScroll();
     activeModalProduct = null;
   }
 

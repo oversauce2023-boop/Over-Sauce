@@ -110,6 +110,20 @@ function sanitizeLine(str){
   return String(str).replace(/[\r\n]+/g, ' ').trim();
 }
 function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+/* قفل حركة الصفحة بعدّاد مشترك: يُستخدم من أي مودال/شاشة (تفاصيل المنتج،
+   تكبير الصورة، إلخ). القفل لا يُفكّ إلا بعد إغلاق كل الشاشات المفتوحة —
+   يمنع تعارضًا كان يحصل عند إغلاق شاشة داخلية (مثل تكبير الصورة) بينما
+   شاشة أخرى (مودال المنتج) لا تزال مفتوحة خلفها، فيفلت السكرول بالخطأ. */
+let _scrollLockCount = 0;
+function lockBodyScroll(){
+  _scrollLockCount++;
+  document.body.style.overflow = "hidden";
+}
+function unlockBodyScroll(){
+  _scrollLockCount = Math.max(0, _scrollLockCount - 1);
+  if(_scrollLockCount === 0) document.body.style.overflow = "";
+}
 function debounce(fn, wait){
   let timer;
   return (...args) => {

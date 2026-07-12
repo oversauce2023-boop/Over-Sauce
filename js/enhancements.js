@@ -95,61 +95,6 @@
     if (strip.querySelector(".promo-card")) { build(); mo.disconnect(); }
   });
 
-  /* =================================================================
-     2) PRODUCT IMAGE — tap-to-zoom lightbox
-     ================================================================= */
-  ready(function () {
-    var box = null, imgEl = null;
-
-    function ensure() {
-      if (box) return;
-      box = document.createElement("div");
-      box.className = "img-lightbox";
-      box.innerHTML = '<button class="img-lightbox-close" type="button" aria-label="إغلاق">&times;</button><img alt="">';
-      imgEl = box.querySelector("img");
-      document.body.appendChild(box);
-
-      function close() {
-        box.classList.remove("open");
-        imgEl.classList.remove("zoomed");
-        imgEl.style.transformOrigin = "center";
-        document.body.style.overflow = "";
-      }
-      box.addEventListener("click", function (e) {
-        if (e.target === box || e.target.classList.contains("img-lightbox-close")) close();
-      });
-      imgEl.addEventListener("click", function (e) {
-        e.stopPropagation();
-        var z = imgEl.classList.toggle("zoomed");
-        if (z) {
-          var r = imgEl.getBoundingClientRect();
-          var ox = ((e.clientX - r.left) / r.width) * 100;
-          var oy = ((e.clientY - r.top) / r.height) * 100;
-          imgEl.style.transformOrigin = ox + "% " + oy + "%";
-        } else {
-          imgEl.style.transformOrigin = "center";
-        }
-      });
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && box.classList.contains("open")) close();
-      });
-    }
-
-    function open(src, alt) {
-      ensure();
-      imgEl.src = src;
-      imgEl.alt = alt || "";
-      imgEl.classList.remove("zoomed");
-      imgEl.style.transformOrigin = "center";
-      box.classList.add("open");
-      document.body.style.overflow = "hidden";
-    }
-
-    document.addEventListener("click", function (e) {
-      var t = e.target.closest("#productModalImg");
-      if (!t) return;
-      var src = t.getAttribute("src") || t.src;
-      if (src) open(src, t.getAttribute("alt"));
-    });
-  });
+  /* خاصية تكبير صورة المنتج (tap-to-zoom) أُزيلت بطلب صاحب المطعم —
+     يكفي عرض المعلومات في شاشة تفاصيل المنتج مباشرة دون تكبير إضافي. */
 })();
