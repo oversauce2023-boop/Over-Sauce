@@ -13,7 +13,7 @@
  * ---------------------------------------------------------------------
  */
 
-const VERSION = "oversauce-v4.1.0-catalog";
+const VERSION = "oversauce-v4.2.0-catalog";
 const SHELL_CACHE = `${VERSION}-shell`;
 const DATA_CACHE = `${VERSION}-data`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -29,9 +29,7 @@ const SHELL_ASSETS = [
   "./js/i18n.js",
   "./js/app.js",
   "./js/products.js",
-  "./js/cart.js",
   "./js/search.js",
-  "./js/whatsapp.js",
   "./js/config.js",
   "./js/supabase.js",
   "./js/bottom-nav.js",
@@ -52,7 +50,13 @@ const SHELL_ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
+      // نخزّن كل ملف على حدة: فشل ملف واحد (محذوف/غير متاح) لا يُفشل
+      // التثبيت بالكامل — كان هذا يمنع عمل الـ service worker كليًا.
+      .then((cache) => Promise.all(
+        SHELL_ASSETS.map((asset) =>
+          cache.add(asset).catch(() => null)
+        )
+      ))
       .then(() => self.skipWaiting())
   );
 });
@@ -109,7 +113,9 @@ async function cacheFirstThenNetwork(request, cacheName, maxEntries){
     }
     return response;
   } catch(err){
-    return cached || Response.error();
+    // لو فشل الجلب (حجب CSP، انقطاع شبكة...) نمرّر الطلب للمتصفح ليتولّاه
+    // بشكل طبيعي بدل إرجاع خطأ يتكرر ويُبطئ الصفحة.
+    return cached || fetch(request).catch(() => Response.error());
   }
 }
 
@@ -150,11 +156,9 @@ self.addEventListener("fetch", (event) => {
       event.respondWith(cacheFirstThenNetwork(request, IMAGE_CACHE, MAX_IMAGE_CACHE_ENTRIES));
       return;
     }
-    // 5. Remote fonts — cache-first, no cap (small, finite set)
-    if(url.hostname.includes("fonts.g")){
-      event.respondWith(cacheFirstThenNetwork(request, SHELL_CACHE));
-      return;
-    }
+    // 5. خطوط جوجل: لا نعترضها إطلاقًا — المتصفح يخزّنها بكفاءة بنفسه،
+    //    واعتراضها هنا كان يسبب فشل جلب متكرر (تعارض مع سياسة CSP)
+    //    يُبطئ الصفحة ويُغرق الـ console بالأخطاء.
   }
 
   // 6. Everything else — just go to the network (e.g. wa.me order links)
