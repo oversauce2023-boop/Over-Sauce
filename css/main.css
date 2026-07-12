@@ -207,6 +207,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   -webkit-backdrop-filter: blur(22px) saturate(140%);
   border-bottom: 1px solid transparent;
   transition: box-shadow .3s ease, border-color .3s ease, background .3s ease;
+  /* يمنع تعارض معروف بين position:sticky وbackdrop-filter على Safari/آيفون
+     يسبب عدم ثبات الهيدر أثناء التمرير. */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
 }
 .site-header.scrolled{
   box-shadow: var(--shadow-card);
@@ -278,6 +283,9 @@ html[dir="rtl"].light .theme-knob{ transform: translateX(-20px); }
   max-width: 1200px; margin-inline: auto; padding: var(--space-3) var(--space-5);
   display: flex; gap: var(--space-3); overflow-x: auto;
   scroll-snap-type: x proximity;
+  /* يمنع التباس المتصفح بين السحب الأفقي (تصفّح الأقسام) والسكرول
+     الرأسي للصفحة أثناء اللمس على الموبايل — يضمن سحب أفقي فقط. */
+  touch-action: pan-x;
 }
 .stamp-pill{
   position: relative; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-2);
@@ -380,7 +388,7 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 .product-card:hover .product-img{ transform: scale(1.07); }
 
 .product-badges{ position: absolute; top: 12px; inset-inline-end: 12px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; max-width: 75%; }
-.badge{ font-weight: 800; font-size: 11px; letter-spacing: 0.02em; padding: 5px 11px; border-radius: var(--radius-full); box-shadow: 0 4px 12px -3px rgba(0,0,0,0.25); backdrop-filter: blur(4px); }
+.badge{ font-weight: 800; font-size: 11px; letter-spacing: 0.02em; padding: 5px 11px; border-radius: var(--radius-full); box-shadow: 0 4px 12px -3px rgba(0,0,0,0.25); }
 .badge-new{ background: linear-gradient(135deg,#34A06A,#1F7A4A); color:#fff; }
 .badge-best{ background: linear-gradient(135deg,var(--copper-light),var(--copper)); color:#FFF7EC; }
 .badge-spicy{ background: linear-gradient(135deg,#E25B43,#B83A24); color:#fff; }

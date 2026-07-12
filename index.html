@@ -17,7 +17,6 @@
 <meta name="theme-color" content="#B06A3B" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="/assets/brand/logo-96.png">
-<link rel="icon" type="image/png" href="/assets/brand/logo-96.png">
 <link rel="apple-touch-icon" href="/assets/brand/logo-192.png">
 
 <!-- Open Graph / Twitter Card -->
@@ -113,8 +112,11 @@
   <section id="hero" class="hero">
     <div class="hero-media">
       <div class="shimmer" id="heroSkeleton" style="position:absolute; inset:0;"></div>
-      <img id="heroImg" class="img-fade" alt="Over Sauce Lounge — أجواء المطعم" src="/assets/images/pizza-veg.jpg"
-           alt="بيتزا خضار طازجة من Over Sauce Lounge" width="1000" height="1000" fetchpriority="high" style="position:absolute; inset:0;">
+      <picture>
+        <source srcset="/assets/images/pizza-veg.webp" type="image/webp">
+        <img id="heroImg" class="img-fade" src="/assets/images/pizza-veg.jpg"
+             alt="بيتزا خضار طازجة من Over Sauce Lounge" width="1000" height="1000" fetchpriority="high" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+      </picture>
       <div class="hero-scrim-1"></div>
       <div class="hero-scrim-2"></div>
     </div>

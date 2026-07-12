@@ -335,7 +335,8 @@ function spawnDust(){
   setTimeout(() => dust.remove(), 13000);
 }
 function setupDustField(){
-  setInterval(spawnDust, 700);
+  // تأثير خفيف عند فتح الصفحة فقط (بدل تايمر مستمر بلا توقف)،
+  // لتقليل الحمل المستمر على المعالج خصوصًا على الأجهزة المتوسطة.
   for(let i = 0; i < 6; i++) setTimeout(spawnDust, i * 200);
   document.addEventListener("visibilitychange", () => {
     dustEnabled = !document.hidden;
@@ -634,10 +635,11 @@ async function initApp(){
     if(a) e.preventDefault();
   });
 
-  // Live updates: when the owner changes data in Supabase, re-fetch and re-render.
-  if(window.OSDB && OSDB.isConfigured()){
-    OSDB.subscribe(debounce(refreshData, 1200));
-  }
+  /* التحديث اللحظي المستمر أُزيل من صفحة العميل: كان يفتح اتصالًا دائمًا
+     بقاعدة البيانات يراقب أي تغيير في أي جدول، ويعيد تحميل الموقع بالكامل
+     حتى لو التغيير غير متعلق بالمنتجات — عبء مستمر بلا داعٍ في كتالوج
+     عرض (لا طلبات حية تحتاج تزامنًا فوريًا). تحديث الصفحة يعرض أحدث
+     البيانات دائمًا بشكل طبيعي. */
 
   const shareBtn = document.getElementById("shareMenuBtn");
   if(shareBtn) shareBtn.addEventListener("click", shareMenuLink);

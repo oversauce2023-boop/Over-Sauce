@@ -17,7 +17,6 @@
   .hero{ min-height: 88vh; padding-top: 6.5rem; }
   .hero-content{ padding-bottom: var(--space-12); }
   .product-grid{ grid-template-columns: 1fr 1fr; gap: var(--space-3); }
-  .product-img-wrap{ height: 130px; }
   .product-body{ padding: var(--space-3); gap: 6px; }
   
 
