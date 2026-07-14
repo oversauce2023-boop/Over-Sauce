@@ -209,6 +209,10 @@
         ${product.calories != null && product.calories > 0 ? `<p class="product-calories">🔥 ${toLocaleDigits(product.calories)} ${M.lang === "ar" ? "سعرة حرارية" : "kcal"}</p>` : ""}
         <p class="product-meta">${ratingHTML(product)}</p>
         ${!product.inStock ? `<p class="product-unavailable">${t("outOfStock")}</p>` : ""}
+        <button class="product-details-btn" type="button" data-open-product="${product.id}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 11v5M12 8h.01"/></svg>
+          <span data-i18n="detailsBtn">التفاصيل</span>
+        </button>
       </div>
     </article>`;
   }
