@@ -448,8 +448,8 @@
     const modal = document.getElementById("productModal");
     if(!scrim || !modal) return;
     scrim.classList.remove("active");
-    modal.style.transform = "";
-    modal.style.opacity = "";
+    modal.style.transform = "translateY(100%)";
+    modal.style.opacity = "0";
     setTimeout(() => scrim.classList.add("hidden"), 350);
     unlockBodyScroll();
     activeModalProduct = null;

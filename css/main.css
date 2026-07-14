@@ -449,8 +449,11 @@ html[dir="rtl"]
 /* ---------------------------------------------------------------------
    13. CART DRAWER
    --------------------------------------------------------------------- */
-.scrim{ position: fixed; inset: 0; z-index: 60; opacity: 0; pointer-events: none; background: var(--overlay-scrim); transition: opacity .4s ease, backdrop-filter .4s ease; }
-.scrim.active{ opacity: 1; pointer-events: auto; backdrop-filter: blur(4px); }
+.scrim{ position: fixed; inset: 0; z-index: 60; opacity: 0; pointer-events: none; background: var(--overlay-scrim); transition: opacity .4s ease, backdrop-filter .4s ease; display: flex; align-items: flex-end; justify-content: center; }
+.scrim.hidden{ display: none !important; }
+/* الحالة النشطة تضمن الظهور دائمًا — كان الاعتماد على display المكتوب inline
+   في HTML فقط، وأي تعارض معه كان يترك المودال مخفيًا رغم تنفيذ الكود. */
+.scrim.active{ opacity: 1; pointer-events: auto; backdrop-filter: blur(4px); display: flex !important; }
 
 .drawer{
   position: fixed; top: 0; inset-inline-start: 0; height: 100%; width: 100%; max-width: 430px; z-index: 70;
@@ -526,6 +529,9 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
   transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;
 }
 .modal-panel.modal-sheet{ border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+/* عند نشاط الخلفية، تُعرض لوحة المودال دائمًا في مكانها — ضمان قاطع
+   لا يعتمد على أنماط inline قد تُمسح أو تتعارض. */
+.scrim.active .modal-panel{ transform: translateY(0) !important; opacity: 1 !important; }
 @media (min-width: 640px){
   .modal-panel{ max-width: 500px; border-radius: var(--radius-xl); }
 }
