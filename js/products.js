@@ -349,7 +349,16 @@
      ================================================================= */
   function renderModalPrice(product){
     const priceEl = document.getElementById("productModalPrice");
+    const oldPriceEl = document.getElementById("productModalOldPrice");
     if(priceEl) priceEl.textContent = formatPrice(product.price);
+    if(oldPriceEl){
+      if(product.oldPrice && product.oldPrice > product.price){
+        oldPriceEl.textContent = formatPrice(product.oldPrice);
+        oldPriceEl.classList.remove("hidden");
+      } else {
+        oldPriceEl.classList.add("hidden");
+      }
+    }
     const stockEl = document.getElementById("productModalStock");
     if(stockEl){
       stockEl.textContent = product.inStock ? t("inStock") : t("outOfStock");

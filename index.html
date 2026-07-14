@@ -362,9 +362,13 @@
     </div>
 
     <div style="overflow-y:auto; flex:1; padding: var(--space-6);">
-      <div style="border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px; position:relative; height:190px;">
-        <img id="productModalImg" src="" alt="" style="width:100%; height:100%; object-fit:cover;" loading="lazy" decoding="async" width="600" height="400">
+      <div class="product-modal-img-wrap" style="border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px; position:relative; height:260px;">
+        <img id="productModalImg" src="" alt="" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in;" loading="lazy" decoding="async" width="600" height="400">
         <div id="productModalBadges" style="position:absolute; top:10px; inset-inline-end:10px;"></div>
+        <div style="position:absolute; bottom:10px; inset-inline-start:10px; background:rgba(0,0,0,0.55); color:#fff; font-size:11px; padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:4px; pointer-events:none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M21 21l-4-4M11 8v6M8 11h6"/></svg>
+          <span data-i18n="tapToZoom">اضغط للتكبير</span>
+        </div>
       </div>
 
       <div class="flex" style="justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px;">
@@ -413,7 +417,10 @@
     <div style="flex-shrink:0; padding: var(--space-4) var(--space-6); border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:14px; background:var(--ink);">
       <div>
         <p class="muted" style="font-size:0.72rem; margin-bottom:2px;" data-i18n="priceLabel">السعر</p>
-        <p class="font-display" id="productModalPrice" style="font-size:1.5rem; color:var(--copper-light); line-height:1;">٠ ر.س</p>
+        <p class="font-display" style="display:flex; align-items:baseline; gap:8px; line-height:1;">
+          <span id="productModalPrice" style="font-size:1.5rem; color:var(--copper-light);">٠ ر.س</span>
+          <span id="productModalOldPrice" class="hidden" style="font-size:0.85rem; color:var(--parchment-dim); text-decoration:line-through; font-weight:400;"></span>
+        </p>
       </div>
       <a class="book-now-btn" data-bind="bookNow" href="#" target="_blank" rel="noopener noreferrer" style="flex:1; max-width:200px; justify-content:center;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Z"/></svg>

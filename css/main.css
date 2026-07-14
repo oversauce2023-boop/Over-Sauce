@@ -454,6 +454,18 @@ html[dir="rtl"]
 /* الحالة النشطة تضمن الظهور دائمًا — كان الاعتماد على display المكتوب inline
    في HTML فقط، وأي تعارض معه كان يترك المودال مخفيًا رغم تنفيذ الكود. */
 .scrim.active{ opacity: 1; pointer-events: auto; backdrop-filter: blur(4px); display: flex !important; }
+/* إصلاح مؤكَّد بالاختبار الفعلي على متصفح حقيقي: بعض المتصفحات/الإضافات
+   كانت لا تُطبّق position:fixed على .scrim بشكل موثوق، فيظهر المودال خارج
+   حدود الشاشة. نفرضها بقوة قاطعة لضمان الظهور دائمًا فوق كل المحتوى. */
+#productScrim.active{
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+}
+@media (min-width: 640px){
+  #productScrim.active{ align-items: center !important; }
+  .product-modal-img-wrap{ height: 320px !important; }
+}
 
 .drawer{
   position: fixed; top: 0; inset-inline-start: 0; height: 100%; width: 100%; max-width: 430px; z-index: 70;
@@ -703,8 +715,25 @@ html[dir="rtl"] .toast-container{ transform: translateX(50%); }
 .promo-dot.active{ width: 24px; border-radius: var(--radius-full); background: var(--copper); }
 
 /* ---------------------------------------------------------------------
-   25. (خاصية تكبير الصورة أُزيلت — لم تعد مطلوبة)
+   25. PRODUCT IMAGE LIGHTBOX (تكبير صورة المنتج داخل شاشة التفاصيل)
    --------------------------------------------------------------------- */
+.img-lightbox{
+  position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;
+  padding: var(--space-5); background: rgba(8,8,10,0.95); opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.img-lightbox.open{ opacity: 1; pointer-events: auto; }
+.img-lightbox img{
+  max-width: 100%; max-height: 100%; border-radius: var(--radius-lg); object-fit: contain;
+  box-shadow: var(--shadow-deep);
+}
+.img-lightbox-close{
+  position: absolute; top: calc(var(--space-4) + env(safe-area-inset-top, 0px)); inset-inline-end: var(--space-4);
+  width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.14); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 1.6rem; line-height: 1;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: none; cursor: pointer;
+}
+.img-lightbox-close:hover{ background: rgba(255,255,255,0.24); }
 
 /* ---------------------------------------------------------------------
    26. PAYMENT METHOD SELECTOR (checkout)

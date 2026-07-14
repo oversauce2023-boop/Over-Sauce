@@ -95,6 +95,43 @@
     if (strip.querySelector(".promo-card")) { build(); mo.disconnect(); }
   });
 
-  /* خاصية تكبير صورة المنتج (tap-to-zoom) أُزيلت بطلب صاحب المطعم —
-     يكفي عرض المعلومات في شاشة تفاصيل المنتج مباشرة دون تكبير إضافي. */
+  /* =================================================================
+     2) تكبير صورة المنتج داخل شاشة التفاصيل — بقفل سكرول موحّد
+     يمنع أي تضارب مع شاشة التفاصيل نفسها عند الإغلاق.
+     ================================================================= */
+  ready(function () {
+    var box = null, imgEl = null;
+
+    function ensure() {
+      if (box) return;
+      box = document.createElement("div");
+      box.className = "img-lightbox";
+      box.innerHTML = '<button class="img-lightbox-close" type="button" aria-label="إغلاق">&times;</button><img alt="">';
+      imgEl = box.querySelector("img");
+      document.body.appendChild(box);
+
+      function close() {
+        box.classList.remove("open");
+        if (window.unlockBodyScroll) window.unlockBodyScroll();
+      }
+      box.addEventListener("click", function (e) {
+        if (e.target === box || e.target.classList.contains("img-lightbox-close")) close();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && box.classList.contains("open")) close();
+      });
+    }
+
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest("#productModalImg");
+      if (!t) return;
+      var src = t.getAttribute("src") || t.src;
+      if (!src) return;
+      ensure();
+      imgEl.src = src;
+      imgEl.alt = t.getAttribute("alt") || "";
+      box.classList.add("open");
+      if (window.lockBodyScroll) window.lockBodyScroll();
+    });
+  });
 })();
