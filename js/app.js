@@ -132,7 +132,12 @@ function debounce(fn, wait){
   };
 }
 function findProduct(id){
-  return M.products.find(p => p.id === id) || null;
+  if(id == null) return null;
+  const key = String(id).trim();
+  // مقارنة مرنة: قاعدة البيانات قد تُعيد المعرّف كرقم أو بمسافات زائدة،
+  // بينما يأتي من DOM كنص دائمًا — المقارنة الصارمة كانت تفشل بصمت
+  // فلا تفتح شاشة تفاصيل المنتج ولا يظهر أي خطأ.
+  return M.products.find(p => String(p.id).trim() === key) || null;
 }
 function findCategory(id){
   return M.categories.find(c => c.id === id) || null;

@@ -355,7 +355,12 @@
 
   function openProductModal(productId){
     const product = findProduct(productId);
-    if(!product) return;
+    if(!product){
+      // لا نخرج بصمت: نوضّح السبب حتى يظهر فورًا بدل شاشة لا تفتح بلا تفسير
+      console.warn("[OverSauce] تعذّر فتح تفاصيل الطبق: لم يُعثر على منتج بالمعرّف", productId,
+                   "| المعرّفات المتاحة:", (M.products || []).map(p => p.id));
+      return;
+    }
     activeModalProduct = product;
     modalState = { size: product.sizes?.[0]?.id ?? null, extras: new Set(), qty: 1 };
     pushRecentlyViewed(productId);
