@@ -254,6 +254,16 @@ html[dir="ltr"] .header-search svg{ right: 14px; }
 }
 .icon-btn:hover{ border-color: color-mix(in srgb, var(--copper) 40%, transparent); transform: translateY(-1px); background: var(--ink-soft); }
 
+/* زر إغلاق الشاشات (مودال المنتج + لوحة التحكم): يجب أن يكون واضحًا
+   بلا أي لبس أن هذا هو "خروج/إلغاء" — خلفية داكنة صريحة وأيقونة أوضح. */
+.modal-header .icon-btn{
+  background: color-mix(in srgb, var(--ink) 85%, black 15%);
+  border: 1px solid color-mix(in srgb, var(--parchment) 18%, transparent);
+  width: 38px; height: 38px;
+}
+.modal-header .icon-btn svg{ width: 18px; height: 18px; }
+.modal-header .icon-btn:hover{ background: var(--copper); border-color: var(--copper); color: #fff; }
+
 .cart-count-badge{
   position: absolute; top: -4px; inset-inline-start: -4px;
   background: var(--copper); color: #fff; font-size: 11px; font-weight: 800;
@@ -455,15 +465,17 @@ html[dir="rtl"]
    في HTML فقط، وأي تعارض معه كان يترك المودال مخفيًا رغم تنفيذ الكود. */
 .scrim.active{ opacity: 1; pointer-events: auto; backdrop-filter: blur(4px); display: flex !important; }
 /* إصلاح مؤكَّد بالاختبار الفعلي على متصفح حقيقي: بعض المتصفحات/الإضافات
-   كانت لا تُطبّق position:fixed على .scrim بشكل موثوق، فيظهر المودال خارج
-   حدود الشاشة. نفرضها بقوة قاطعة لضمان الظهور دائمًا فوق كل المحتوى. */
-#productScrim.active{
+   كانت لا تُطبّق position:fixed على .scrim بشكل موثوق، فتظهر الشاشة خارج
+   حدود العرض. نفرضها بقوة قاطعة — يشمل هذا كل شاشات الموقع ولوحة
+   التحكم معًا (كان مقتصرًا على شاشة تفاصيل المنتج فقط سابقًا، فبقيت كل
+   نوافذ الأدمن — إضافة فئة، طبق، عرض... إلخ — تعاني من نفس العطل). */
+.scrim.active{
   position: fixed !important;
   inset: 0 !important;
   z-index: 9999 !important;
 }
 @media (min-width: 640px){
-  #productScrim.active{ align-items: center !important; }
+  .scrim.active{ align-items: center !important; }
   .product-modal-img-wrap{ height: 320px !important; }
 }
 

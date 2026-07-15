@@ -13,7 +13,7 @@
  * ---------------------------------------------------------------------
  */
 
-const VERSION = "oversauce-v4.6.0-catalog";
+const VERSION = "oversauce-v5.1.0-catalog";
 const SHELL_CACHE = `${VERSION}-shell`;
 const DATA_CACHE = `${VERSION}-data`;
 const IMAGE_CACHE = `${VERSION}-images`;

@@ -19,7 +19,7 @@
     var strip = document.getElementById("promoStrip");
     if (!strip) return;
 
-    var dotsWrap = null, cards = [], index = 0, timer = null, paused = false, io = null;
+    var dotsWrap = null, cards = [], index = 0, timer = null, paused = false, io = null, scrolling = false;
 
     function updateDots() {
       if (!dotsWrap) return;
@@ -28,22 +28,27 @@
       });
     }
     function go(i) {
-      if (!cards.length) return;
+      if (!cards.length || scrolling) return;
       index = (i + cards.length) % cards.length;
       // Scroll ONLY the strip horizontally (never the page) using a visual delta.
       var card = cards[index];
       var sRect = strip.getBoundingClientRect();
       var cRect = card.getBoundingClientRect();
       var delta = (cRect.left + cRect.width / 2) - (sRect.left + sRect.width / 2);
+      scrolling = true;
       strip.scrollBy({ left: delta, behavior: "smooth" });
+      // نمنع أي استدعاء جديد لحد ما الحركة الحالية تخلص فعليًا — هذا القفل
+      // هو ما كان ناقصًا ويمنع تعارض الحركة المبرمجة مع الالتصاق الأصلي.
+      clearTimeout(go._lock);
+      go._lock = setTimeout(function () { scrolling = false; }, 500);
       updateDots();
     }
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
     function start() {
-      // التحريك التلقائي أُوقف عمدًا: الدمج بين scrollBy المبرمج وخاصية
-      // scroll-snap الأصلية يسبب "تعليقًا" معروفًا في Safari على آيفون.
-      // السحب اليدوي والنقاط يعملان بشكل طبيعي وموثوق دون أي تعارض.
       stop();
+      timer = setInterval(function () {
+        if (!paused && !scrolling && document.visibilityState === "visible") go(index + 1);
+      }, 4500);
     }
     function restart() { paused = false; start(); }
 

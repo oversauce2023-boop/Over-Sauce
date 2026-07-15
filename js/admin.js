@@ -656,7 +656,7 @@
         <button id="coupSaveBtn" class="btn btn-primary">حفظ الكوبون</button>
       </div>
     `, () => {
-      document.getElementById("coupSaveBtn").addEventListener("click", () => {
+      document.getElementById("coupSaveBtn").addEventListener("click", async () => {
         const codeVal = document.getElementById("coupCode").value.trim().toUpperCase();
         if(!codeVal){ showToast("يرجى إدخال كود الكوبون", "⚠️"); return; }
         if(!coupon && db.coupons.some(c => c.code === codeVal)){ showToast("هذا الكود مستخدم بالفعل", "⚠️"); return; }
@@ -669,22 +669,37 @@
           label: { ar: document.getElementById("coupLabelAr").value.trim(), en: document.getElementById("coupLabelEn").value.trim() },
           active: document.getElementById("coupActive").checked
         };
+        const prevCoup = coupon ? JSON.parse(JSON.stringify(coupon)) : null;
         if(coupon){
           Object.assign(coupon, payload);
         } else {
           db.coupons.push(payload);
         }
-        saveDB(); renderCoupons(); renderDashboardStats(); closeModal();
-        showToast("تم حفظ الكوبون بنجاح", "✅");
+        try {
+          await saveDB();
+          renderCoupons(); renderDashboardStats(); closeModal();
+          showToast("تم حفظ الكوبون بنجاح", "✅");
+        } catch(err){
+          if(coupon && prevCoup){ Object.assign(coupon, prevCoup); }
+          else { db.coupons = db.coupons.filter(c => c.code !== payload.code); }
+          renderCoupons();
+        }
       });
     });
   }
 
-  function deleteCoupon(code){
+  async function deleteCoupon(code){
     if(!confirm("هل أنت متأكد من حذف هذا الكوبون؟")) return;
+    const backup = db.coupons.slice();
     db.coupons = db.coupons.filter(c => c.code !== code);
-    saveDB(); renderCoupons(); renderDashboardStats();
-    showToast("تم حذف الكوبون", "🗑️");
+    try {
+      await saveDB();
+      renderCoupons(); renderDashboardStats();
+      showToast("تم حذف الكوبون", "🗑️");
+    } catch(err){
+      db.coupons = backup;
+      renderCoupons();
+    }
   }
 
   /* =================================================================
@@ -825,7 +840,7 @@
         <button id="zoneSaveBtn" class="btn btn-primary">حفظ المنطقة</button>
       </div>
     `, () => {
-      document.getElementById("zoneSaveBtn").addEventListener("click", () => {
+      document.getElementById("zoneSaveBtn").addEventListener("click", async () => {
         const nameAr = document.getElementById("zoneNameAr").value.trim();
         const nameEn = document.getElementById("zoneNameEn").value.trim();
         if(!nameAr || !nameEn){ showToast("يرجى تعبئة جميع الحقول", "⚠️"); return; }
@@ -835,18 +850,33 @@
           fee: Number(document.getElementById("zoneFee").value) || 0,
           etaMinutes: Number(document.getElementById("zoneEta").value) || 30
         };
+        const prevZone = zone ? JSON.parse(JSON.stringify(zone)) : null;
         if(zone){ Object.assign(zone, payload); } else { db.deliveryZones.push(payload); }
-        saveDB(); renderZones(); closeModal();
-        showToast("تم حفظ المنطقة بنجاح", "✅");
+        try {
+          await saveDB();
+          renderZones(); closeModal();
+          showToast("تم حفظ المنطقة بنجاح", "✅");
+        } catch(err){
+          if(zone && prevZone){ Object.assign(zone, prevZone); }
+          else { db.deliveryZones = db.deliveryZones.filter(z => z.id !== payload.id); }
+          renderZones();
+        }
       });
     });
   }
 
-  function deleteZone(zoneId){
+  async function deleteZone(zoneId){
     if(!confirm("هل أنت متأكد من حذف هذه المنطقة؟")) return;
+    const backup = db.deliveryZones.slice();
     db.deliveryZones = db.deliveryZones.filter(z => z.id !== zoneId);
-    saveDB(); renderZones();
-    showToast("تم حذف المنطقة", "🗑️");
+    try {
+      await saveDB();
+      renderZones();
+      showToast("تم حذف المنطقة", "🗑️");
+    } catch(err){
+      db.deliveryZones = backup;
+      renderZones();
+    }
   }
 
   /* =================================================================
@@ -878,7 +908,7 @@
   }
 
   function initSettingsSave(){
-    document.getElementById("saveSettingsBtn").addEventListener("click", () => {
+    document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
       const whatsappDigits = document.getElementById("settingWhatsapp").value.replace(/\D/g, "");
       if(whatsappDigits.length < 8){
         showToast("يرجى إدخال رقم واتساب صحيح (أرقام فقط، مع رمز الدولة)", "⚠️");
@@ -910,8 +940,17 @@
         storageSet(PIN_KEY, newPin);
       }
 
-      saveDB();
-      showToast("تم حفظ الإعدادات بنجاح", "✅");
+      const settingsBtn = document.getElementById("saveSettingsBtn");
+      const originalText = settingsBtn ? settingsBtn.textContent : "";
+      if(settingsBtn){ settingsBtn.disabled = true; settingsBtn.textContent = "جارٍ الحفظ..."; }
+      try {
+        await saveDB();
+        showToast("تم حفظ الإعدادات بنجاح", "✅");
+      } catch(err){
+        // الرسالة التفصيلية تظهر من saveDB نفسها؛ لا نُظهر "نجاح" كاذبًا
+      } finally {
+        if(settingsBtn){ settingsBtn.disabled = false; settingsBtn.textContent = originalText; }
+      }
     });
   }
 
@@ -1014,7 +1053,7 @@
         if(parsed.minimumOrder != null) db.minimumOrder = parsed.minimumOrder;
         if(parsed.restaurant) db.restaurant = parsed.restaurant;
 
-        saveDB();
+        await saveDB();
         renderAll();
         statusEl.textContent = "تم الاستيراد بنجاح ✅";
         statusEl.style.color = "var(--success)";
@@ -1060,10 +1099,17 @@
       </label>`;
     }).join("");
     wrap.querySelectorAll("input[data-feature]").forEach(inp => {
-      inp.addEventListener("change", () => {
-        db.restaurant.features[inp.getAttribute("data-feature")] = inp.checked;
-        saveDB();
-        showToast(inp.checked ? "تم تفعيل الميزة" : "تم إيقاف الميزة", inp.checked ? "✅" : "🚫");
+      inp.addEventListener("change", async () => {
+        const key = inp.getAttribute("data-feature");
+        const prev = !inp.checked;
+        db.restaurant.features[key] = inp.checked;
+        try {
+          await saveDB();
+          showToast(inp.checked ? "تم تفعيل الميزة" : "تم إيقاف الميزة", inp.checked ? "✅" : "🚫");
+        } catch(err){
+          db.restaurant.features[key] = prev;
+          inp.checked = prev;
+        }
       });
     });
   }
@@ -1742,7 +1788,17 @@ ${o.discount ? `<tr><td>الخصم</td><td style="text-align:left;">−${money(o
     initSettingsSave();
     initOrdersControls();
 
-    await loadDB();
+    // حد أقصى زمني للتحميل الأولي: لو الاتصال تعطّل أو الطلب "علّق" (لا
+    // ينجح ولا يفشل)، لا نترك لوحة التحكم بأكملها مجمّدة بلا أي استجابة —
+    // نكمل بأي بيانات متاحة محليًا حتى تُربط كل الأزرار دائمًا.
+    let loadedInTime = false;
+    await Promise.race([
+      loadDB().then(() => { loadedInTime = true; }),
+      new Promise((resolve) => setTimeout(resolve, 8000))
+    ]);
+    if(!loadedInTime){
+      showToast("التحميل يستغرق وقتًا أطول من المعتاد — تحقق من الاتصال", "⚠️");
+    }
     initLogin();
 
     document.getElementById("addCategoryBtn").addEventListener("click", () => openCategoryForm(null));
@@ -1753,21 +1809,34 @@ ${o.discount ? `<tr><td>الخصم</td><td style="text-align:left;">−${money(o
     document.getElementById("addEmployeeBtn")?.addEventListener("click", () => openEmployeeForm(null));
     document.getElementById("addRoleBtn")?.addEventListener("click", () => openRoleForm(null));
     document.getElementById("productCategoryFilter").addEventListener("change", renderProducts);
-    document.getElementById("minimumOrderInput").addEventListener("change", (e) => {
+    document.getElementById("minimumOrderInput").addEventListener("change", async (e) => {
+      const prev = db.minimumOrder;
       db.minimumOrder = Number(e.target.value) || 0;
-      saveDB();
-      showToast("تم تحديث الحد الأدنى للطلب", "✅");
+      try {
+        await saveDB();
+        showToast("تم تحديث الحد الأدنى للطلب", "✅");
+      } catch(err){
+        db.minimumOrder = prev;
+        e.target.value = prev;
+      }
     });
 
     const ordersToggle = document.getElementById("ordersPausedToggle");
     if(ordersToggle){
-      ordersToggle.addEventListener("change", () => {
+      ordersToggle.addEventListener("change", async () => {
         if(!db.restaurant) return;
+        const prevState = ordersToggle.checked ? false : true; // الحالة قبل التبديل
         db.restaurant.ordersPaused = ordersToggle.checked;
         const hint = document.getElementById("ordersStatusHint");
         if(hint) hint.textContent = ordersToggle.checked ? "⛔ الطلبات متوقفة حاليًا" : "✅ الطلبات تعمل بشكل طبيعي";
-        saveDB();
-        showToast(ordersToggle.checked ? "تم إيقاف استقبال الطلبات" : "تم تشغيل استقبال الطلبات", ordersToggle.checked ? "⛔" : "✅");
+        try {
+          await saveDB();
+          showToast(ordersToggle.checked ? "تم إيقاف استقبال الطلبات" : "تم تشغيل استقبال الطلبات", ordersToggle.checked ? "⛔" : "✅");
+        } catch(err){
+          db.restaurant.ordersPaused = prevState;
+          ordersToggle.checked = prevState;
+          if(hint) hint.textContent = prevState ? "⛔ الطلبات متوقفة حاليًا" : "✅ الطلبات تعمل بشكل طبيعي";
+        }
       });
     }
   });

@@ -376,7 +376,8 @@
     }
     activeModalProduct = product;
     modalState = { size: product.sizes?.[0]?.id ?? null, extras: new Set(), qty: 1 };
-    pushRecentlyViewed(productId);
+    // نؤجّل تحديث "المُشاهَد مؤخرًا" (إعادة رسم قسم كامل) لما بعد فتح الشاشة
+    // مباشرة — كان يحصل قبل الفتح فيُبطئ اللحظة التي يجب أن تكون فورية.
 
     const scrim = document.getElementById("productScrim");
     const modal = document.getElementById("productModal");
@@ -443,11 +444,17 @@
     }
 
     renderModalPrice(product);
-    renderRelated(product);
 
     scrim.classList.remove("hidden");
     requestAnimationFrame(() => scrim.classList.add("active"));
     modal.classList.remove("translate-y-full");
+
+    // العمليتان المكلفتان (إعادة رسم قسمين كاملين + ربط أحداثهما) تُنفَّذان
+    // بعد بدء ظهور الشاشة مباشرة، لا قبله — يبقى مسار فتح الشاشة نفسه فوريًا.
+    requestAnimationFrame(() => {
+      renderRelated(product);
+      pushRecentlyViewed(productId);
+    });
     requestAnimationFrame(() => { modal.style.transform = "translateY(0)"; modal.style.opacity = "1"; });
     lockBodyScroll();
   }
