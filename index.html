@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- وضع التطبيق: عند إضافة الموقع لشاشة الموبايل يفتح ملء الشاشة بلا شريط المتصفح -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Over Sauce Lounge">
 <script>
   /* Anti-FOUC: apply saved theme (premium light by default) before first paint */
   try { if (localStorage.getItem('oversauce_theme') !== 'dark') document.documentElement.classList.add('light'); }
@@ -242,6 +247,7 @@
       <button id="clearSearchBtn" class="btn-ghost" data-i18n="clearSearch" type="button">مسح البحث</button>
     </div>
 
+    <p id="menuNotice" class="menu-notice hidden"></p>
     <div id="menuContainer" class="hidden"></div>
   </section>
 
@@ -468,6 +474,9 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Z"/></svg>
     <span>احجز الآن</span>
   </a>
+  <button id="backToTopBtn" class="back-to-top" type="button" aria-label="العودة لأعلى">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
 <script src="js/enhancements.js"></script>
 </body>
 </html>

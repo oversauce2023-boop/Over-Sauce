@@ -36,19 +36,34 @@
       var cRect = card.getBoundingClientRect();
       var delta = (cRect.left + cRect.width / 2) - (sRect.left + sRect.width / 2);
       scrolling = true;
-      strip.scrollBy({ left: delta, behavior: "smooth" });
+      // بديل آمن: بعض المتصفحات القديمة لا تدعم scrollBy بخيارات — نتراجع
+      // إلى تعديل scrollLeft مباشرة بدل رمي خطأ يوقف تنفيذ باقي الكود.
+      try {
+        if (typeof strip.scrollBy === "function") {
+          strip.scrollBy({ left: delta, behavior: "smooth" });
+        } else {
+          strip.scrollLeft += delta;
+        }
+      } catch (err) {
+        try { strip.scrollLeft += delta; } catch (e) { /* تجاهل بأمان */ }
+      }
       // نمنع أي استدعاء جديد لحد ما الحركة الحالية تخلص فعليًا — هذا القفل
       // هو ما كان ناقصًا ويمنع تعارض الحركة المبرمجة مع الالتصاق الأصلي.
       clearTimeout(go._lock);
       go._lock = setTimeout(function () { scrolling = false; }, 500);
       updateDots();
     }
-    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } clearTimeout(start._first); }
     function start() {
       stop();
+      // تقليبة أولى سريعة (1.2 ثانية) ليلاحظ العميل فور دخوله أن هناك
+      // أكثر من عرض، ثم يستمر التقليب بإيقاع منتظم بعدها.
+      start._first = setTimeout(function () {
+        if (!paused && !scrolling && document.visibilityState === "visible") go(index + 1);
+      }, 1200);
       timer = setInterval(function () {
         if (!paused && !scrolling && document.visibilityState === "visible") go(index + 1);
-      }, 4500);
+      }, 2600);
     }
     function restart() { paused = false; start(); }
 

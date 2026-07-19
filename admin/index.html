@@ -353,6 +353,20 @@
           <label class="field-label">الشعار / الوصف (إنجليزي)</label>
           <input id="settingTaglineEn" class="field">
         </div>
+        <div style="grid-column:1/-1;">
+          <label class="field-label">ملاحظة أعلى المنيو (عربي)</label>
+          <input id="settingNoticeAr" class="field" placeholder="مثال: جميع الأسعار شاملة ضريبة القيمة المضافة">
+          <label class="field-label" style="margin-top:10px;">ملاحظة أعلى المنيو (إنجليزي)</label>
+          <input id="settingNoticeEn" class="field" placeholder="e.g. All prices include VAT">
+          <p class="muted" style="font-size:0.78rem; margin-top:6px;">تظهر كسطر صغير أعلى قائمة الأطباق. اتركها فارغة لإخفائها.</p>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label class="field-label">صورة الغلاف الرئيسية (أعلى الصفحة)</label>
+          <input id="settingHeroFile" type="file" accept="image/*" class="field">
+          <input id="settingHeroUrl" class="field" style="margin-top:8px;" placeholder="أو الصق رابط صورة مباشرة">
+          <div id="settingHeroPreview" style="margin-top:10px;"></div>
+          <p class="muted" style="font-size:0.78rem; margin-top:6px;">يُفضَّل صورة أفقية واضحة (1200×800 أو أكبر). اتركه فارغًا لاستخدام الصورة الافتراضية.</p>
+        </div>
         <div>
           <label class="field-label">سنوات الخبرة (إحصائيات)</label>
           <input id="settingYears" class="field" inputmode="numeric">

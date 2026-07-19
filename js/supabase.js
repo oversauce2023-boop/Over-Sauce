@@ -84,6 +84,8 @@
         menuItems: r.menu_items_count || 0, averageRating: Number(r.average_rating || 0)
       },
       ordersPaused: !!r.orders_paused,
+      heroImage: r.hero_image_url || "",
+      menuNotice: { ar: r.menu_notice_ar || "", en: r.menu_notice_en || "" },
       features: r.feature_flags || {}
     };
   }
@@ -234,10 +236,29 @@
       row.average_rating = restaurant.stats.averageRating || 4.5;
     }
     if (currency) row.currency = currency;
+    if (typeof restaurant.heroImage === "string") row.hero_image_url = restaurant.heroImage;
+    if (restaurant.menuNotice) {
+      row.menu_notice_ar = restaurant.menuNotice.ar || "";
+      row.menu_notice_en = restaurant.menuNotice.en || "";
+    }
     if (typeof ordersPaused === "boolean") row.orders_paused = ordersPaused;
     if (restaurant.features) row.feature_flags = restaurant.features;
     var res = await client().from("restaurant_settings").update(row).eq("id", 1);
-    if (res.error) throw res.error;
+    if (res.error) {
+      // الأعمدة الجديدة (صورة الغلاف/ملاحظة المنيو) قد لا تكون مضافة بعد في
+      // قاعدة البيانات. في هذه الحالة نعيد الحفظ بدونها بدل إفشال حفظ كل
+      // الإعدادات — فتبقى بقية البيانات تُحفظ بشكل طبيعي.
+      var msg = String(res.error.message || "");
+      var optionalCols = ["hero_image_url", "menu_notice_ar", "menu_notice_en"];
+      var mentionsOptional = optionalCols.some(function (c) { return msg.indexOf(c) !== -1; });
+      if (mentionsOptional) {
+        optionalCols.forEach(function (c) { delete row[c]; });
+        var retry = await client().from("restaurant_settings").update(row).eq("id", 1);
+        if (retry.error) throw retry.error;
+        return true;
+      }
+      throw res.error;
+    }
     return true;
   }
 

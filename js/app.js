@@ -328,8 +328,16 @@ function setupRevealObserver(){
 function setupHeaderShadow(){
   const header = document.getElementById("siteHeader");
   if(!header) return;
+  const backBtn = document.getElementById("backToTopBtn");
+  if(backBtn){
+    backBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
   window.addEventListener("scroll", () => {
     header.classList.toggle("scrolled", window.scrollY > 40);
+    // زر العودة لأعلى يظهر بعد تمرير كافٍ فقط (ضمن نفس المستمع لتفادي حمل إضافي)
+    if(backBtn) backBtn.classList.toggle("show", window.scrollY > 600);
   }, { passive: true });
 }
 
@@ -452,6 +460,32 @@ function bindRestaurantInfo(){
   if(!M.restaurant) return;
   setPageTitle("home");
   applyFeatureFlags();
+
+  // ملاحظة أعلى المنيو (يحدّدها صاحب المطعم من الإعدادات — تختفي لو فارغة)
+  const noticeEl = document.getElementById("menuNotice");
+  if(noticeEl){
+    const noticeText = localized(M.restaurant.menuNotice || {});
+    if(noticeText && noticeText.trim()){
+      noticeEl.textContent = noticeText;
+      noticeEl.classList.remove("hidden");
+    } else {
+      noticeEl.classList.add("hidden");
+    }
+  }
+
+  // صورة الغلاف: تُستخدم صورة صاحب المطعم المرفوعة من لوحة التحكم إن وُجدت،
+  // وإلا تبقى الصورة الافتراضية المضمّنة في الصفحة.
+  if(M.restaurant.heroImage){
+    const heroEl = document.getElementById("heroImg");
+    if(heroEl){
+      const picture = heroEl.closest("picture");
+      if(picture){
+        const src = picture.querySelector("source");
+        if(src) src.remove();   // نزيل نسخة WebP الافتراضية حتى لا تتقدّم على الصورة الجديدة
+      }
+      heroEl.src = M.restaurant.heroImage;
+    }
+  }
   document.querySelectorAll("[data-bind='restaurantName']").forEach(el => el.textContent = localized(M.restaurant.name));
   document.querySelectorAll("[data-bind='restaurantTagline']").forEach(el => el.textContent = localized(M.restaurant.tagline));
   document.querySelectorAll("[data-bind='restaurantAddress']").forEach(el => el.textContent = localized(M.restaurant.address));

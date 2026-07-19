@@ -15,7 +15,8 @@
   .logo-text{ display: none; }
   .container{ padding-inline: var(--space-4); }
   .hero{ min-height: 88vh; padding-top: 6.5rem; }
-  .hero-content{ padding-bottom: var(--space-12); }
+  /* مساحة سفلية كافية حتى لا يغطي زر "احجز الآن" العائم اسم المطعم */
+  .hero-content{ padding-bottom: 150px; }
   .product-grid{ grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   .product-body{ padding: var(--space-3); gap: 6px; }
   

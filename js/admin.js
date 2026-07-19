@@ -905,9 +905,58 @@
       document.getElementById("settingMenuItems").value = db.restaurant.stats.menuItems;
     }
     document.getElementById("settingPin").value = getStoredPin();
+
+    // صورة الغلاف الرئيسية
+    const heroUrlInput = document.getElementById("settingHeroUrl");
+    if(heroUrlInput){
+      heroUrlInput.value = db.restaurant.heroImage || "";
+      renderHeroPreview(db.restaurant.heroImage || "");
+    }
+
+    // ملاحظة أعلى المنيو (اختيارية)
+    const noticeAr = document.getElementById("settingNoticeAr");
+    const noticeEn = document.getElementById("settingNoticeEn");
+    if(noticeAr) noticeAr.value = (db.restaurant.menuNotice && db.restaurant.menuNotice.ar) || "";
+    if(noticeEn) noticeEn.value = (db.restaurant.menuNotice && db.restaurant.menuNotice.en) || "";
+  }
+
+  function renderHeroPreview(url){
+    const box = document.getElementById("settingHeroPreview");
+    if(!box) return;
+    box.innerHTML = url
+      ? `<img src="${url}" alt="معاينة صورة الغلاف" style="width:100%; max-width:340px; height:150px; object-fit:cover; border-radius:10px; border:1px solid var(--line);">`
+      : `<p class="muted" style="font-size:0.78rem;">لا توجد صورة مخصّصة — سيتم استخدام الصورة الافتراضية.</p>`;
   }
 
   function initSettingsSave(){
+    // رفع صورة الغلاف — بنفس آلية ضغط ورفع صور المنتجات
+    const heroFileInput = document.getElementById("settingHeroFile");
+    if(heroFileInput){
+      heroFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        let toUpload = file;
+        try {
+          showToast("جارٍ معالجة الصورة...", "🖼️");
+          toUpload = await compressImage(file, 1600, 0.84);
+        } catch(err){ toUpload = file; }
+        let url;
+        if(window.OSDB && OSDB.isConfigured()){
+          try { url = await OSDB.uploadProductImage(toUpload); }
+          catch(err){ showToast(err.message || "فشل رفع الصورة", "⚠️"); return; }
+        } else {
+          url = await readFileAsDataURL(toUpload);
+        }
+        document.getElementById("settingHeroUrl").value = url;
+        renderHeroPreview(url);
+        showToast("تم رفع صورة الغلاف — اضغط حفظ الإعدادات", "✅");
+      });
+    }
+    const heroUrlManual = document.getElementById("settingHeroUrl");
+    if(heroUrlManual){
+      heroUrlManual.addEventListener("change", () => renderHeroPreview(heroUrlManual.value.trim()));
+    }
+
     document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
       const whatsappDigits = document.getElementById("settingWhatsapp").value.replace(/\D/g, "");
       if(whatsappDigits.length < 8){
@@ -931,6 +980,10 @@
       if(!db.restaurant.tagline) db.restaurant.tagline = {};
       db.restaurant.tagline.ar = document.getElementById("settingTaglineAr").value.trim();
       db.restaurant.tagline.en = document.getElementById("settingTaglineEn").value.trim();
+      db.restaurant.heroImage = document.getElementById("settingHeroUrl").value.trim();
+      if(!db.restaurant.menuNotice) db.restaurant.menuNotice = {};
+      db.restaurant.menuNotice.ar = document.getElementById("settingNoticeAr").value.trim();
+      db.restaurant.menuNotice.en = document.getElementById("settingNoticeEn").value.trim();
       if(!db.restaurant.stats) db.restaurant.stats = {};
       db.restaurant.stats.yearsOfExperience = Number(document.getElementById("settingYears").value) || 0;
       db.restaurant.stats.menuItems = Number(document.getElementById("settingMenuItems").value) || 0;
