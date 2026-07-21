@@ -423,6 +423,7 @@
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <label class="badge-toggle"><input type="checkbox" id="badgeNew" ${product && product.badges?.includes('new') ? 'checked' : ''}> جديد</label>
             <label class="badge-toggle"><input type="checkbox" id="badgeBest" ${product && product.badges?.includes('best') ? 'checked' : ''}> الأكثر طلبًا</label>
+            <label class="badge-toggle"><input type="checkbox" id="badgeTop" ${product && product.badges?.includes('top') ? 'checked' : ''}> الأفضل مبيعًا</label>
             <label class="badge-toggle"><input type="checkbox" id="badgeSpicy" ${product && product.badges?.includes('spicy') ? 'checked' : ''}> حار</label>
           </div>
         </div>
@@ -535,6 +536,7 @@
         const badges = [];
         if(document.getElementById("badgeNew").checked) badges.push("new");
         if(document.getElementById("badgeBest").checked) badges.push("best");
+        if(document.getElementById("badgeTop").checked) badges.push("top");
         if(document.getElementById("badgeSpicy").checked) badges.push("spicy");
 
         const oldPriceVal = Number(document.getElementById("prodOldPrice").value) || null;

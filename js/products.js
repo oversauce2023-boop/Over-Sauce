@@ -19,10 +19,11 @@
   /* =================================================================
      BADGE / RATING HELPERS
      ================================================================= */
-  const BADGE_CLASS = { new: "badge-new", best: "badge-best", spicy: "badge-spicy" };
+  const BADGE_CLASS = { new: "badge-new", best: "badge-best", top: "badge-top", spicy: "badge-spicy" };
   function badgeLabel(b){
     if(b === "new") return t("badgeNew");
     if(b === "best") return t("badgeBest");
+    if(b === "top") return t("badgeTop");
     if(b === "spicy") return t("badgeSpicy");
     return b;
   }
@@ -321,13 +322,51 @@
     wrap.innerHTML = items.map(productCardHTML).join("");
     bindCardEvents(wrap);
   }
+
+  /* عرض أقسام الصفحة الرئيسية.
+     المبدأ: كل قسم يعرض منتجات مختلفة فعليًا (بلا تكرار بين الأقسام)،
+     وأي قسم بلا محتوى يختفي بالكامل بدل أن يُملأ بمنتجات مكرّرة —
+     كان هذا سبب ظهور الأقسام الثلاثة بنفس الأطباق.
+     كذلك: شارة "الأكثر طلبًا" في لوحة التحكم تُظهر الطبق في القسم
+     الذي يحمل نفس الاسم تمامًا (كانت تُظهره في "الأفضل مبيعًا"). */
   function renderHomeRails(){
-    const featured = M.products.filter(p => p.badges?.includes("new") && p.inStock).slice(0, 8);
-    const mostOrdered = [...M.products].sort((a,b) => b.orders - a.orders).slice(0, 8);
-    const bestSellers = M.products.filter(p => p.badges?.includes("best") && p.inStock).slice(0, 8);
-    renderRail("featuredGrid", featured.length ? featured : M.products.slice(0, 8));
+    const used = new Set();
+    const take = (list, n) => {
+      const out = [];
+      for(const p of list){
+        if(out.length >= n) break;
+        if(used.has(p.id)) continue;
+        out.push(p); used.add(p.id);
+      }
+      return out;
+    };
+    const showSection = (sectionId, items) => {
+      const sec = document.getElementById(sectionId);
+      if(sec) sec.classList.toggle("hidden", items.length === 0);
+    };
+
+    // 1) "الأكثر طلبًا" — يحدّده صاحب المطعم بشارة تحمل نفس الاسم
+    const mostOrdered = take(
+      M.products.filter(p => p.badges?.includes("best") && p.inStock), 8
+    );
     renderRail("mostOrderedGrid", mostOrdered);
-    renderRail("bestSellersGrid", bestSellers.length ? bestSellers : mostOrdered);
+    showSection("mostOrderedSection", mostOrdered);
+
+    // 2) "أطباق مختارة لك" — الأطباق الجديدة
+    const featured = take(
+      M.products.filter(p => p.badges?.includes("new") && p.inStock), 8
+    );
+    renderRail("featuredGrid", featured);
+    showSection("featuredSection", featured);
+
+    // 3) "الأفضل مبيعًا" — يحدّده صاحب المطعم بشارة تحمل نفس الاسم.
+    //    كان يُحسب تلقائيًا من عدد الطلبات، لكن الموقع كتالوج عرض بلا
+    //    طلبات فعلية، فكانت القيم كلها أصفارًا والترتيب أبجديًا مضلّلًا.
+    const bestSellers = take(
+      M.products.filter(p => p.badges?.includes("top") && p.inStock), 8
+    );
+    renderRail("bestSellersGrid", bestSellers);
+    showSection("bestSellersSection", bestSellers);
   }
 
   /* =================================================================

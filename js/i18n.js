@@ -125,6 +125,7 @@ const I18N = {
     getDirections: "احصل على الاتجاهات",
     badgeNew: "جديد",
     badgeBest: "الأكثر طلبًا",
+    badgeTop: "الأفضل مبيعًا",
     badgeSpicy: "حار 🌶️",
     badgeDiscount: "خصم"
   },
@@ -249,6 +250,7 @@ const I18N = {
     getDirections: "Get directions",
     badgeNew: "New",
     badgeBest: "Best Seller",
+    badgeTop: "Top Rated",
     badgeSpicy: "Spicy 🌶️",
     badgeDiscount: "Sale"
   }
