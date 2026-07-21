@@ -331,7 +331,11 @@ function setupHeaderShadow(){
   const backBtn = document.getElementById("backToTopBtn");
   if(backBtn){
     backBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        if(typeof window.scrollTo === "function"){
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      } catch(err){ /* تجاهل بأمان */ }
     });
   }
   window.addEventListener("scroll", () => {

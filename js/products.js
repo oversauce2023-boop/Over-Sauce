@@ -92,6 +92,56 @@
     nav.querySelectorAll("[data-cat]").forEach(btn => {
       btn.addEventListener("click", () => scrollToCategory(btn.getAttribute("data-cat")));
     });
+    renderAllCategoriesPanel();
+  }
+
+  /* لوحة "كل الأقسام": تعرض كل الفئات دفعة واحدة — تحل مشكلة عدم
+     انتباه العميل للأقسام الموجودة خارج حدود الشريط الأفقي. */
+  function renderAllCategoriesPanel(){
+    const list = document.getElementById("allCatsList");
+    if(!list) return;
+    const itemsWord = M.lang === "ar" ? "صنف" : "items";
+    list.innerHTML = M.categories.map(cat => {
+      const count = M.products.filter(p => p.category === cat.id).length;
+      return `<button class="all-cats-item" type="button" data-goto="${cat.id}">
+        <span aria-hidden="true">${cat.icon}</span>
+        <span>${escapeHTML(localized(cat.name))}</span>
+        <span class="cat-count">${toLocaleDigits(count)} ${itemsWord}</span>
+      </button>`;
+    }).join("");
+    list.querySelectorAll("[data-goto]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        closeAllCats();
+        scrollToCategory(btn.getAttribute("data-goto"));
+      });
+    });
+  }
+
+  function openAllCats(){
+    const scrim = document.getElementById("allCatsScrim");
+    const btn = document.getElementById("allCategoriesBtn");
+    if(!scrim) return;
+    scrim.classList.remove("hidden");
+    if(btn) btn.setAttribute("aria-expanded", "true");
+    if(window.lockBodyScroll) window.lockBodyScroll();
+  }
+  function closeAllCats(){
+    const scrim = document.getElementById("allCatsScrim");
+    const btn = document.getElementById("allCategoriesBtn");
+    if(!scrim || scrim.classList.contains("hidden")) return;
+    scrim.classList.add("hidden");
+    if(btn) btn.setAttribute("aria-expanded", "false");
+    if(window.unlockBodyScroll) window.unlockBodyScroll();
+  }
+  function setupAllCatsControls(){
+    document.getElementById("allCategoriesBtn")?.addEventListener("click", openAllCats);
+    document.getElementById("allCatsCloseBtn")?.addEventListener("click", closeAllCats);
+    document.getElementById("allCatsScrim")?.addEventListener("click", (e) => {
+      if(e.target.id === "allCatsScrim") closeAllCats();
+    });
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") closeAllCats();
+    });
   }
   // Scroll the horizontal category strip ONLY (never the page) to center a chip.
   function centerNavChip(catId){
@@ -102,7 +152,17 @@
     const navRect = nav.getBoundingClientRect();
     const chipRect = chip.getBoundingClientRect();
     const left = nav.scrollLeft + (chipRect.left - navRect.left) - (nav.clientWidth - chip.clientWidth) / 2;
-    nav.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+    // بديل آمن: لو المتصفح لا يدعم scrollTo بخيارات، نعدّل الموضع مباشرة
+    // بدل رمي خطأ يوقف تنفيذ باقي الكود (مثل تحديث القسم النشط).
+    try {
+      if(typeof nav.scrollTo === "function"){
+        nav.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+      } else {
+        nav.scrollLeft = Math.max(0, left);
+      }
+    } catch(err){
+      try { nav.scrollLeft = Math.max(0, left); } catch(e){ /* تجاهل بأمان */ }
+    }
   }
   // Update active chip in place (no DOM rebuild) + center it horizontally.
   function setActiveNavChip(catId){
@@ -123,7 +183,11 @@
     const header = document.getElementById("siteHeader");
     const offset = (header ? header.offsetHeight : 0) + 12;
     const y = target.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    try {
+      if(typeof window.scrollTo === "function"){
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+      }
+    } catch(err){ /* تجاهل بأمان — لا نوقف تنفيذ باقي الكود */ }
   }
   function setupScrollSpy(){
     if(scrollSpyObserver) scrollSpyObserver.disconnect();
@@ -573,6 +637,7 @@
     renderCategoryNav();
     renderAll();
     setupProductModalControls();
+    setupAllCatsControls();
     setupSortFilterUI();
   }
 

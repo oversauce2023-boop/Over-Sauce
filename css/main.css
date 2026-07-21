@@ -292,9 +292,70 @@ html[dir="rtl"].light .theme-knob{ transform: translateX(-20px); }
 .lang-btn:hover{ border-color: color-mix(in srgb, var(--copper) 40%, transparent); background: var(--ink-soft); }
 
 /* Category nav — premium scroller with circular icon chips */
-.category-nav{ border-top: 1px solid var(--line); }
+.category-nav{
+  border-top: 1px solid var(--line);
+  display: flex; align-items: center; gap: 0;
+  position: relative;
+}
+/* المحتوى يتوسّط على الشاشات العريضة، بينما يبقى الخط الفاصل ممتدًا
+   بعرض الهيدر كاملًا (وضع العرض الأقصى على العنصر نفسه كان يقطع الخط). */
+@media (min-width: 1240px){
+  .category-nav{ padding-inline: calc((100% - 1200px) / 2); }
+}
+
+/* زر "كل الأقسام" — ثابت لا ينزلق مع الشريط، يحل مشكلة عدم انتباه
+   العميل لوجود أقسام خارج حدود الشاشة. */
+.all-cats-btn{
+  flex-shrink: 0; margin-inline-start: var(--space-4);
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ink-soft); border: 1px solid var(--line);
+  color: var(--copper-light); cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.all-cats-btn:hover{ background: var(--copper); border-color: var(--copper); color: #fff; }
+
+/* تدرّج خفيف عند حافة الشريط يوحي بوجود أقسام إضافية للتمرير */
+.category-nav::after{
+  content: ""; position: absolute; inset-inline-end: 0; top: 0; bottom: 0;
+  width: 40px; pointer-events: none;
+  /* يطابق شفافية الهيدر تمامًا حتى لا يظهر كشريحة معتمة فوق خلفية شفافة */
+  background: linear-gradient(to left, color-mix(in srgb, var(--ink) 78%, transparent), transparent);
+}
+html[dir="ltr"] .category-nav::after{ background: linear-gradient(to right, color-mix(in srgb, var(--ink) 78%, transparent), transparent); }
+
+/* لوحة كل الأقسام */
+.all-cats-scrim{
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0,0,0,0.55); display: flex; align-items: flex-start; justify-content: center;
+  padding: 80px var(--space-5) var(--space-5);
+}
+.all-cats-panel{
+  width: 100%; max-width: 440px; max-height: 70vh; max-height: 70dvh;
+  background: var(--ink); border: 1px solid var(--line);
+  border-radius: var(--radius-xl); overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.5);
+}
+.all-cats-head{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line); flex-shrink: 0;
+  font-size: 1.05rem; color: var(--copper-light);
+}
+.all-cats-list{ overflow-y: auto; padding: var(--space-3); }
+.all-cats-item{
+  width: 100%; display: flex; align-items: center; gap: var(--space-3);
+  padding: 12px var(--space-4); border-radius: var(--radius-md);
+  background: transparent; border: none; cursor: pointer;
+  color: var(--parchment); font-size: 0.92rem; font-weight: 700; text-align: start;
+  transition: background .2s;
+}
+.all-cats-item:hover{ background: var(--ink-soft); }
+.all-cats-item .cat-count{ margin-inline-start: auto; font-size: 0.76rem; color: var(--brass); font-weight: 400; }
+
 .category-scroller{
-  max-width: 1200px; margin-inline: auto; padding: var(--space-3) var(--space-5);
+  flex: 1; padding: var(--space-3) var(--space-5);
   display: flex; gap: var(--space-3); overflow-x: auto;
   scroll-snap-type: x proximity;
   /* يمنع التباس المتصفح بين السحب الأفقي (تصفّح الأقسام) والسكرول
@@ -668,7 +729,9 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 
 /* زر العودة لأعلى — يظهر بعد التمرير لأسفل، في الجهة المقابلة لزر الحجز */
 .back-to-top{
-  position: fixed; inset-inline-end: 20px; bottom: 88px; z-index: 59;
+  position: fixed; inset-inline-end: 20px; z-index: 59;
+  /* يراعي شريط الهوم في آيفونات بلا زر هوم — وإلا ركب فوق الشريط السفلي */
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   width: 46px; height: 46px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   background: var(--copper); color: #fff; border: none; cursor: pointer;
@@ -680,7 +743,7 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 .back-to-top:hover{ background: var(--copper-light); }
 @media (min-width: 640px){ .back-to-top{ bottom: 28px; } }
 
-.book-now-fab{ position: fixed; inset-inline-start: 20px; bottom: 88px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 999px; background: linear-gradient(135deg, #25D366, #1ebe5b); color: #fff; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 10px 28px rgba(37,211,102,0.45); transition: transform .2s ease; }
+.book-now-fab{ position: fixed; inset-inline-start: 20px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 999px; background: linear-gradient(135deg, #25D366, #1ebe5b); color: #fff; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 10px 28px rgba(37,211,102,0.45); transition: transform .2s ease; }
 .book-now-fab:hover{ transform: scale(1.05); }
 @media (min-width: 640px){ .book-now-fab{ bottom: 28px; } }
 
@@ -698,7 +761,7 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
 /* ---------------------------------------------------------------------
    18. TOASTS
    --------------------------------------------------------------------- */
-.toast-container{ position: fixed; bottom: 96px; inset-inline-start: 50%; transform: translateX(-50%); z-index: 95; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding-inline: var(--space-4); width: 100%; max-width: 380px; }
+.toast-container{ position: fixed; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); inset-inline-start: 50%; transform: translateX(-50%); z-index: 95; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding-inline: var(--space-4); width: 100%; max-width: 380px; }
 html[dir="rtl"] .toast-container{ transform: translateX(50%); }
 @media (min-width: 640px){ .toast-container{ bottom: 32px; } }
 .toast{ width: 100%; border-radius: var(--radius-md); padding: 13px 16px; display: flex; align-items: center; gap: var(--space-3); background: var(--ink-soft); border: 1px solid var(--line); box-shadow: var(--shadow-deep); }
@@ -759,7 +822,7 @@ html[dir="rtl"] .toast-container{ transform: translateX(50%); }
     box-shadow: 0 -8px 28px -16px rgba(24,24,27,0.20);
   }
   
-  body{ padding-bottom: 66px; }
+  body{ padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
 }
 .promo-dot{ width: 8px; height: 8px; border-radius: 50%; padding: 0; cursor: pointer; border: none;
   background: color-mix(in srgb, var(--brass) 45%, transparent); transition: width .3s, background .3s; }

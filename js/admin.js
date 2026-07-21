@@ -366,7 +366,29 @@
   function renderProducts(){
     const tbody = document.getElementById("productsTableBody");
     const filter = document.getElementById("productCategoryFilter").value;
-    const items = filter ? db.products.filter(p => p.category === filter) : db.products;
+    const q = (document.getElementById("productSearchInput")?.value || "").trim();
+
+    // توحيد الهمزات والتاء المربوطة حتى يجد "اومليت" الطبق المكتوب "أومليت"
+    const norm = (s) => String(s || "")
+      .replace(/[أإآا]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه")
+      .toLowerCase().trim();
+    const nq = norm(q);
+
+    let items = filter ? db.products.filter(p => p.category === filter) : db.products;
+    if(nq){
+      items = items.filter(p =>
+        norm(p.name?.ar).includes(nq) ||
+        norm(p.name?.en).includes(nq)
+      );
+    }
+
+    // عدّاد النتائج — يوضّح لصاحب المطعم كم طبقًا يراه الآن
+    const countEl = document.getElementById("productsCount");
+    if(countEl){
+      countEl.textContent = q || filter
+        ? `عرض ${items.length} من ${db.products.length}`
+        : `${db.products.length} طبق`;
+    }
 
     tbody.innerHTML = items.map(p => {
       const cat = db.categories.find(c => c.id === p.category);
@@ -375,11 +397,17 @@
         <td><img src="${p.image}" alt="${escapeHTML(p.name.ar)}" loading="lazy"></td>
         <td>${escapeHTML(p.name.ar)}<br><span class="muted" style="font-size:0.75rem;">${escapeHTML(p.name.en)}</span></td>
         <td>${cat ? escapeHTML(cat.name.ar) : "—"}</td>
-        <td>${p.price} ${p.oldPrice ? `<br><span class="muted" style="text-decoration:line-through; font-size:0.75rem;">${p.oldPrice}</span>` : ""}</td>
+        <td>
+          <input type="number" class="quick-price" data-price-for="${p.id}" value="${p.price}"
+                 min="0" step="0.5" title="عدّل السعر واضغط Enter"
+                 style="width:82px; padding:5px 8px; border-radius:8px; border:1px solid var(--line); background:var(--ink); color:var(--parchment); font-size:0.85rem;">
+          ${p.oldPrice ? `<br><span class="muted" style="text-decoration:line-through; font-size:0.75rem;">${p.oldPrice}</span>` : ""}
+        </td>
         <td>${p.inStock ? '<span style="color:var(--success);">متوفر</span>' : '<span style="color:var(--danger);">غير متوفر</span>'}</td>
         <td>${(p.badges||[]).join("، ") || "—"}</td>
         <td class="admin-actions">
           <button class="btn btn-secondary btn-sm" data-edit-product="${p.id}">تعديل</button>
+          <button class="btn btn-secondary btn-sm" data-clone-product="${p.id}" title="إنشاء طبق جديد بنفس البيانات">نسخ</button>
           <button class="btn btn-sm" style="background:var(--danger); color:#fff;" data-delete-product="${p.id}">حذف</button>
         </td>
       </tr>`;
@@ -387,6 +415,62 @@
 
     tbody.querySelectorAll("[data-edit-product]").forEach(b => b.addEventListener("click", () => openProductForm(b.getAttribute("data-edit-product"))));
     tbody.querySelectorAll("[data-delete-product]").forEach(b => b.addEventListener("click", () => deleteProduct(b.getAttribute("data-delete-product"))));
+    tbody.querySelectorAll("[data-clone-product]").forEach(b => b.addEventListener("click", () => cloneProduct(b.getAttribute("data-clone-product"))));
+
+    // تعديل السعر مباشرة من الجدول — بلا فتح نافذة لكل طبق
+    tbody.querySelectorAll("[data-price-for]").forEach(inp => {
+      const commit = async () => {
+        const id = inp.getAttribute("data-price-for");
+        const product = db.products.find(p => p.id === id);
+        if(!product) return;
+        const newPrice = Number(inp.value);
+        if(!isFinite(newPrice) || newPrice <= 0){
+          showToast("السعر غير صالح", "⚠️");
+          inp.value = product.price;
+          return;
+        }
+        if(newPrice === product.price) return;
+        const prev = product.price;
+        product.price = newPrice;
+        inp.disabled = true;
+        try {
+          await saveDB();
+          showToast(`تم تحديث سعر "${product.name.ar}"`, "✅");
+        } catch(err){
+          product.price = prev;      // تراجع لو فشل الحفظ
+          inp.value = prev;
+        } finally {
+          inp.disabled = false;
+        }
+      };
+      inp.addEventListener("blur", commit);
+      inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
+    });
+  }
+
+  /* نسخ طبق: يفتح نموذجًا جديدًا بنفس بيانات الطبق الأصلي — يوفّر إعادة
+     إدخال كل الحقول عند إضافة أصناف متشابهة. */
+  async function cloneProduct(productId){
+    const src = db.products.find(p => p.id === productId);
+    if(!src) return;
+    const copy = JSON.parse(JSON.stringify(src));
+    copy.id = uid("prod");
+    copy.name = {
+      ar: (src.name?.ar || "") + " (نسخة)",
+      en: (src.name?.en || "") + " (copy)"
+    };
+    db.products.push(copy);
+    // نحفظ فورًا حتى لا تبقى نسخة ظاهرة محليًا وغير موجودة في قاعدة
+    // البيانات لو أغلق المستخدم النافذة دون حفظ.
+    try {
+      await saveDB();
+      renderProducts();
+      openProductForm(copy.id);
+      showToast("تم إنشاء نسخة — عدّل البيانات ثم احفظ", "📋");
+    } catch(err){
+      db.products = db.products.filter(p => p.id !== copy.id);
+      renderProducts();
+    }
   }
 
   function openProductForm(productId){
@@ -1864,6 +1948,7 @@ ${o.discount ? `<tr><td>الخصم</td><td style="text-align:left;">−${money(o
     document.getElementById("addEmployeeBtn")?.addEventListener("click", () => openEmployeeForm(null));
     document.getElementById("addRoleBtn")?.addEventListener("click", () => openRoleForm(null));
     document.getElementById("productCategoryFilter").addEventListener("change", renderProducts);
+    document.getElementById("productSearchInput")?.addEventListener("input", renderProducts);
     document.getElementById("minimumOrderInput").addEventListener("change", async (e) => {
       const prev = db.minimumOrder;
       db.minimumOrder = Number(e.target.value) || 0;
