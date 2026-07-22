@@ -480,9 +480,10 @@ html[dir="ltr"] .stamp-pill{ padding: 9px 12px 9px 18px; }
 /* إطار صورة شاشة التفاصيل: تُعرض الصورة كاملة بلا قص (object-fit: contain)
    فيرى العميل الطبق بنفس تأطير الكارت تمامًا — كان الإطار العريض يقصّ
    أعلى الصورة وأسفلها فتبدو مكبّرة ومختلفة عمّا رآه في القائمة.
-   الخلفية الناعمة تجعل المساحة حول الصورة تبدو جزءًا من التصميم. */
+   الخلفية بيضاء ثابتة في الوضعين (فاتح/داكن) لأن صور الأطباق نفسها على
+   خلفية بيضاء — فتندمج الجوانب مع الصورة بلا حدٍّ فاصل ظاهر. */
 .product-modal-img-wrap{
-  background: var(--panel);
+  background: #FFFFFF;
   display: flex; align-items: center; justify-content: center;
 }
 .badge-spicy{ background: linear-gradient(135deg,#E25B43,#B83A24); color:#fff; }

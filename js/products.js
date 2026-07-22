@@ -79,7 +79,13 @@
   function renderCategoryNav(){
     const nav = document.getElementById("categoryNav");
     if(!nav) return;
-    nav.innerHTML = M.categories.map(cat => {
+    // نعرض فقط الأقسام التي تحتوي أطباقًا فعلًا — القسم الفارغ لا يُنشأ له
+    // محتوى في المنيو، فكان زرّه لا يفعل شيئًا عند الضغط ولا يُبرز أبدًا
+    // أثناء التمرير، ويظهر للعميل كزر معطّل بلا سبب.
+    const visibleCats = M.categories.filter(cat =>
+      M.products.some(p => p.category === cat.id)
+    );
+    nav.innerHTML = visibleCats.map(cat => {
       const count = M.products.filter(p => p.category === cat.id).length;
       const itemsWord = M.lang === "ar" ? "صنف" : "items";
       return `
@@ -101,7 +107,11 @@
     const list = document.getElementById("allCatsList");
     if(!list) return;
     const itemsWord = M.lang === "ar" ? "صنف" : "items";
-    list.innerHTML = M.categories.map(cat => {
+    // نعرض الأقسام التي بها أطباق فقط — اتساقًا مع الشريط العلوي
+    const visibleCats = M.categories.filter(cat =>
+      M.products.some(p => p.category === cat.id)
+    );
+    list.innerHTML = visibleCats.map(cat => {
       const count = M.products.filter(p => p.category === cat.id).length;
       return `<button class="all-cats-item" type="button" data-goto="${cat.id}">
         <span aria-hidden="true">${cat.icon}</span>
