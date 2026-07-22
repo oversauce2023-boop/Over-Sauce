@@ -45,7 +45,8 @@
       sizes: r.sizes || [],     // jsonb already in nested {id,name:{ar,en},priceDiff} shape
       extras: r.extras || [],   // jsonb already in nested {id,name:{ar,en},price} shape
       calories: r.calories != null ? r.calories : null,
-      allergens: r.allergens || []
+      allergens: r.allergens || [],
+      sortOrder: r.sort_order != null ? Number(r.sort_order) : 999
     };
   }
   function toCoupon(r) {
@@ -155,7 +156,8 @@
       orders_count: p.orders || 0, in_stock: p.inStock !== false,
       sizes: p.sizes || [], extras: p.extras || [],
       calories: p.calories != null ? p.calories : null,
-      allergens: p.allergens || []
+      allergens: p.allergens || [],
+      sort_order: p.sortOrder != null ? Number(p.sortOrder) : 999
     };
   }
   function fromCategory(c) {

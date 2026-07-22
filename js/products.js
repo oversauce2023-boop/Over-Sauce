@@ -220,7 +220,11 @@
       case "priceDesc": result.sort((a,b) => b.price - a.price); break;
       case "rating": result.sort((a,b) => b.rating - a.rating); break;
       case "popular": result.sort((a,b) => b.orders - a.orders); break;
-      default: break; // "default" preserves catalog order
+      default:
+        // الترتيب الافتراضي = الترتيب الذي حدّده صاحب المطعم من لوحة التحكم
+        // (رقم أصغر يظهر أولًا)، وعند التساوي يبقى ترتيب المصدر كما هو.
+        result = [...result].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+        break;
     }
     return result;
   }

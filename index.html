@@ -166,7 +166,7 @@
   <!-- ============================================================
        BEST SELLERS (رُفِع لأعلى — أقوى محرّك للتحويل: الناس تطلب الأكثر مبيعًا)
        ============================================================ -->
-  <section class="section container" id="bestSellersSection">
+  <section class="section container rail-section" id="bestSellersSection">
     <h2 class="h2" style="margin-bottom:32px;" data-i18n="bestSellersTitle">الأفضل مبيعًا</h2>
     <div class="scroller-grid no-scrollbar" id="bestSellersGrid"></div>
   </section>
@@ -174,7 +174,7 @@
   <!-- ============================================================
        MOST ORDERED
        ============================================================ -->
-  <section class="section container" id="mostOrderedSection" style="padding-top:0;">
+  <section class="section container rail-section" id="mostOrderedSection">
     <h2 class="h2" style="margin-bottom:32px;" data-i18n="mostOrderedTitle">الأكثر طلبًا</h2>
     <div class="scroller-grid no-scrollbar" id="mostOrderedGrid"></div>
   </section>
@@ -182,7 +182,7 @@
   <!-- ============================================================
        FEATURED PRODUCTS
        ============================================================ -->
-  <section class="section container" id="featuredSection" style="padding-top:0;">
+  <section class="section container rail-section" id="featuredSection">
     <div class="seal-divider" style="margin-bottom:20px;"><span class="font-display" style="color:var(--copper-light); white-space:nowrap;" data-i18n="featuredTitle">أطباق مختارة لك</span></div>
     <div class="scroller-grid no-scrollbar" id="featuredGrid"></div>
   </section>
@@ -384,7 +384,7 @@
 
     <div style="overflow-y:auto; flex:1; padding: var(--space-6);">
       <div class="product-modal-img-wrap" style="border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px; position:relative; height:260px;">
-        <img id="productModalImg" src="" alt="" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in;" loading="lazy" decoding="async" width="600" height="400">
+        <img id="productModalImg" src="" alt="" style="width:100%; height:100%; object-fit:contain; cursor:zoom-in;" loading="lazy" decoding="async" width="600" height="400">
         <div id="productModalBadges" style="position:absolute; top:10px; inset-inline-end:10px;"></div>
         <div style="position:absolute; bottom:10px; inset-inline-start:10px; background:rgba(0,0,0,0.55); color:#fff; font-size:11px; padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:4px; pointer-events:none;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M21 21l-4-4M11 8v6M8 11h6"/></svg>

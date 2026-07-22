@@ -382,6 +382,12 @@
       );
     }
 
+    // الترتيب هنا يطابق ما يراه العميل: حسب الفئة ثم ترتيب الظهور
+    items = [...items].sort((a, b) => {
+      if(a.category !== b.category) return String(a.category).localeCompare(String(b.category));
+      return (a.sortOrder ?? 999) - (b.sortOrder ?? 999);
+    });
+
     // عدّاد النتائج — يوضّح لصاحب المطعم كم طبقًا يراه الآن
     const countEl = document.getElementById("productsCount");
     if(countEl){
@@ -398,12 +404,25 @@
         <td>${escapeHTML(p.name.ar)}<br><span class="muted" style="font-size:0.75rem;">${escapeHTML(p.name.en)}</span></td>
         <td>${cat ? escapeHTML(cat.name.ar) : "—"}</td>
         <td>
+          <input type="number" class="quick-order" data-order-for="${p.id}" value="${p.sortOrder != null ? p.sortOrder : 999}"
+                 min="1" step="1" title="رقم أصغر = يظهر أولًا في قسمه"
+                 style="width:70px; padding:5px 8px; border-radius:8px; border:1px solid var(--line); background:var(--ink); color:var(--parchment); font-size:0.85rem;">
+        </td>
+        <td>
           <input type="number" class="quick-price" data-price-for="${p.id}" value="${p.price}"
                  min="0" step="0.5" title="عدّل السعر واضغط Enter"
                  style="width:82px; padding:5px 8px; border-radius:8px; border:1px solid var(--line); background:var(--ink); color:var(--parchment); font-size:0.85rem;">
           ${p.oldPrice ? `<br><span class="muted" style="text-decoration:line-through; font-size:0.75rem;">${p.oldPrice}</span>` : ""}
         </td>
-        <td>${p.inStock ? '<span style="color:var(--success);">متوفر</span>' : '<span style="color:var(--danger);">غير متوفر</span>'}</td>
+        <td>
+          <button type="button" class="stock-toggle" data-stock-for="${p.id}"
+                  title="اضغط لتغيير حالة التوفر فورًا"
+                  style="border:none; cursor:pointer; padding:5px 12px; border-radius:999px; font-size:0.78rem; font-weight:800;
+                         background:${p.inStock ? 'rgba(34,197,94,0.15)' : 'rgba(224,89,74,0.15)'};
+                         color:${p.inStock ? 'var(--success)' : 'var(--danger)'};">
+            ${p.inStock ? "✓ متوفر" : "✕ نفد"}
+          </button>
+        </td>
         <td>${(p.badges||[]).join("، ") || "—"}</td>
         <td class="admin-actions">
           <button class="btn btn-secondary btn-sm" data-edit-product="${p.id}">تعديل</button>
@@ -445,6 +464,61 @@
       };
       inp.addEventListener("blur", commit);
       inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
+    });
+
+    // تعديل ترتيب ظهور الطبق داخل قسمه — رقم أصغر يعني يظهر أولًا
+    tbody.querySelectorAll("[data-order-for]").forEach(inp => {
+      const commitOrder = async () => {
+        const id = inp.getAttribute("data-order-for");
+        const product = db.products.find(p => p.id === id);
+        if(!product) return;
+        const val = Number(inp.value);
+        if(!isFinite(val) || val < 1){
+          showToast("رقم الترتيب غير صالح", "⚠️");
+          inp.value = product.sortOrder != null ? product.sortOrder : 999;
+          return;
+        }
+        if(val === product.sortOrder) return;
+        const prev = product.sortOrder;
+        product.sortOrder = val;
+        inp.disabled = true;
+        try {
+          await saveDB();
+          showToast(`تم تحديث ترتيب "${product.name.ar}"`, "✅");
+          renderProducts();
+        } catch(err){
+          product.sortOrder = prev;
+          inp.value = prev != null ? prev : 999;
+        } finally {
+          inp.disabled = false;
+        }
+      };
+      inp.addEventListener("blur", commitOrder);
+      inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
+    });
+
+    // تبديل التوفر بضغطة واحدة — أكثر عملية يحتاجها المطعم يوميًا
+    // (نفد صنف من المطبخ) فلا يصحّ أن تتطلب فتح نموذج كامل.
+    tbody.querySelectorAll("[data-stock-for]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-stock-for");
+        const product = db.products.find(p => p.id === id);
+        if(!product) return;
+        const prev = product.inStock !== false;
+        product.inStock = !prev;
+        btn.disabled = true;
+        try {
+          await saveDB();
+          renderProducts();
+          showToast(
+            product.inStock ? `"${product.name.ar}" متوفر الآن` : `"${product.name.ar}" أصبح غير متوفر`,
+            product.inStock ? "✅" : "🚫"
+          );
+        } catch(err){
+          product.inStock = prev;
+          renderProducts();
+        }
+      });
     });
   }
 
@@ -499,6 +573,7 @@
         <div>
           <label class="field-label">صورة الطبق</label>
           <input id="prodImageFile" type="file" accept="image/*" class="field">
+          <p class="muted" style="font-size:0.78rem; margin-top:6px;">💡 أفضل مقاس: <strong>مربّع 1:1</strong> (مثل 800×800) والطبق في المنتصف. أي مقاس آخر يظهر كاملًا بلا قص.</p>
           <input id="prodImageUrl" type="text" class="field" placeholder="أو ألصق رابط صورة مباشر" value="${product ? product.image : ''}" style="margin-top:8px;">
           <img id="prodImagePreview" src="${product ? product.image : ''}" alt="" style="width:80px; height:80px; object-fit:cover; border-radius:10px; margin-top:8px; ${product ? '' : 'display:none;'}">
         </div>
@@ -639,6 +714,9 @@
           badges,
           rating: product ? product.rating : 4.5,
           orders: product ? product.orders : 0,
+          // نحافظ على ترتيب الظهور الذي حدّده صاحب المطعم؛ وإلا كان يضيع
+          // في كل مرة يُعدَّل فيها الطبق من النموذج.
+          sortOrder: product && product.sortOrder != null ? product.sortOrder : 999,
           inStock: document.getElementById("prodInStock").checked,
           sizes: (function(){
             // نجمع صفوف الأحجام من الواجهة؛ نتجاهل أي صف بلا اسم عربي.
@@ -690,15 +768,50 @@
   async function deleteProduct(productId){
     if(!confirm("هل أنت متأكد من حذف هذا الطبق؟")) return;
     const backup = db.products.slice();
+    const removed = db.products.find(p => p.id === productId);
     db.products = db.products.filter(p => p.id !== productId);
     try {
       await saveDB();
       renderProducts(); renderDashboardStats();
-      showToast("تم حذف الطبق", "🗑️");
+      // تراجع فعلي: يستعيد الطبق كاملًا لو كان الحذف بالخطأ
+      showUndoToast(`تم حذف "${removed ? removed.name.ar : "الطبق"}"`, async () => {
+        db.products = backup;
+        try {
+          await saveDB();
+          renderProducts(); renderDashboardStats();
+          showToast("تم استرجاع الطبق", "↩️");
+        } catch(e){
+          db.products = db.products.filter(p => p.id !== productId);
+        }
+      });
     } catch(err){
       db.products = backup;   // استرجاع الطبق لو فشل الحذف فعليًا
       renderProducts(); renderDashboardStats();
     }
+  }
+
+  /* إشعار مع زر تراجع — يمنح صاحب المطعم فرصة لاسترجاع ما حذفه بالخطأ. */
+  function showUndoToast(message, onUndo){
+    const wrap = document.getElementById("toastContainer");
+    if(!wrap){ showToast(message, "🗑️"); return; }
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = `<span>🗑️</span><span style="flex:1;">${escapeHTML(message)}</span>`;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "تراجع";
+    btn.style.cssText = "background:var(--copper); color:#fff; border:none; padding:6px 14px; border-radius:999px; font-weight:800; cursor:pointer; font-size:0.8rem;";
+    let done = false;
+    const close = () => { if(el.parentNode) el.remove(); };
+    btn.addEventListener("click", async () => {
+      if(done) return;
+      done = true;
+      close();
+      await onUndo();
+    });
+    el.appendChild(btn);
+    wrap.appendChild(el);
+    setTimeout(() => { if(!done) close(); }, 8000);
   }
 
   /* =================================================================
@@ -823,6 +936,7 @@
         <div>
           <label class="field-label">صورة العرض (اختياري — لو رفعت صورة/تصميم، تظهر بدل النص)</label>
           <input id="dealImageInput" type="file" accept="image/*" class="field">
+          <p class="muted" style="font-size:0.78rem; margin-top:6px;">💡 أفضل مقاس: <strong>عريض 16:9</strong> (مثل 1280×720). أي مقاس آخر يظهر كاملًا بلا قص، لكن الشكل يكون أجمل بالمقاس المقترح.</p>
           <div id="dealImagePreview" style="margin-top:8px;">${deal && deal.imageUrl ? `<img src="${deal.imageUrl}" alt="" style="max-width:100%; border-radius:10px;">` : ''}</div>
           <input id="dealImageUrl" type="hidden" value="${deal && deal.imageUrl ? escapeHTML(deal.imageUrl) : ''}">
         </div>

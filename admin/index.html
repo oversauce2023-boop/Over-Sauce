@@ -32,6 +32,11 @@
   .admin-panel.active{ display: block; }
   .admin-card{ background: var(--ink-soft); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
   .admin-table{ width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  /* جدول المنتجات به 8 أعمدة وخانات إدخال وأزرار — نمنحه عرضًا أدنى
+     حتى تبقى الخانات مريحة للضغط بالإصبع على الموبايل، مع تمرير أفقي
+     سلس بدل أن تتزاحم العناصر وتصعب ملامستها. */
+  #productsTable{ min-width: 780px; }
+  .table-wrap{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .admin-table th{ text-align: start; color: var(--brass); font-weight: 700; padding: 10px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
   .admin-table td{ padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
   .admin-table img{ width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
@@ -236,8 +241,8 @@
         </div>
       </div>
       <div class="admin-card table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>الصورة</th><th>الاسم</th><th>الفئة</th><th>السعر</th><th>التوفر</th><th>الشارات</th><th>إجراءات</th></tr></thead>
+        <table class="admin-table" id="productsTable">
+          <thead><tr><th>الصورة</th><th>الاسم</th><th>الفئة</th><th title="رقم أصغر = يظهر أولًا في قسمه">الترتيب</th><th>السعر</th><th>التوفر</th><th>الشارات</th><th>إجراءات</th></tr></thead>
           <tbody id="productsTableBody"></tbody>
         </table>
       </div>
