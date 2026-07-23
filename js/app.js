@@ -490,6 +490,12 @@ function bindRestaurantInfo(){
       heroEl.src = M.restaurant.heroImage;
     }
   }
+
+  // صورة قسم "قصتنا" — تُستبدل بصورة صاحب المطعم إن رفع واحدة
+  if(M.restaurant.storyImage){
+    const storyEl = document.getElementById("storyImg");
+    if(storyEl) storyEl.src = M.restaurant.storyImage;
+  }
   document.querySelectorAll("[data-bind='restaurantName']").forEach(el => el.textContent = localized(M.restaurant.name));
   document.querySelectorAll("[data-bind='restaurantTagline']").forEach(el => el.textContent = localized(M.restaurant.tagline));
   document.querySelectorAll("[data-bind='restaurantAddress']").forEach(el => el.textContent = localized(M.restaurant.address));

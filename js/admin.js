@@ -1113,11 +1113,26 @@
       renderHeroPreview(db.restaurant.heroImage || "");
     }
 
+    // صورة قسم "قصتنا"
+    const storyUrlInput = document.getElementById("settingStoryUrl");
+    if(storyUrlInput){
+      storyUrlInput.value = db.restaurant.storyImage || "";
+      renderStoryPreview(db.restaurant.storyImage || "");
+    }
+
     // ملاحظة أعلى المنيو (اختيارية)
     const noticeAr = document.getElementById("settingNoticeAr");
     const noticeEn = document.getElementById("settingNoticeEn");
     if(noticeAr) noticeAr.value = (db.restaurant.menuNotice && db.restaurant.menuNotice.ar) || "";
     if(noticeEn) noticeEn.value = (db.restaurant.menuNotice && db.restaurant.menuNotice.en) || "";
+  }
+
+  function renderStoryPreview(url){
+    const box = document.getElementById("settingStoryPreview");
+    if(!box) return;
+    box.innerHTML = url
+      ? `<img src="${url}" alt="معاينة صورة قصتنا" style="width:150px; height:150px; object-fit:cover; border-radius:10px; border:1px solid var(--line);">`
+      : `<p class="muted" style="font-size:0.78rem;">لا توجد صورة مخصّصة — سيتم استخدام الصورة الافتراضية.</p>`;
   }
 
   function renderHeroPreview(url){
@@ -1152,6 +1167,34 @@
         showToast("تم رفع صورة الغلاف — اضغط حفظ الإعدادات", "✅");
       });
     }
+    // رفع صورة قسم "قصتنا" — نفس آلية الضغط والرفع
+    const storyFileInput = document.getElementById("settingStoryFile");
+    if(storyFileInput){
+      storyFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        let toUpload = file;
+        try {
+          showToast("جارٍ معالجة الصورة...", "🖼️");
+          toUpload = await compressImage(file, 1400, 0.84);
+        } catch(err){ toUpload = file; }
+        let url;
+        if(window.OSDB && OSDB.isConfigured()){
+          try { url = await OSDB.uploadProductImage(toUpload); }
+          catch(err){ showToast(err.message || "فشل رفع الصورة", "⚠️"); return; }
+        } else {
+          url = await readFileAsDataURL(toUpload);
+        }
+        document.getElementById("settingStoryUrl").value = url;
+        renderStoryPreview(url);
+        showToast("تم رفع الصورة — اضغط حفظ الإعدادات", "✅");
+      });
+    }
+    const storyUrlManual = document.getElementById("settingStoryUrl");
+    if(storyUrlManual){
+      storyUrlManual.addEventListener("change", () => renderStoryPreview(storyUrlManual.value.trim()));
+    }
+
     const heroUrlManual = document.getElementById("settingHeroUrl");
     if(heroUrlManual){
       heroUrlManual.addEventListener("change", () => renderHeroPreview(heroUrlManual.value.trim()));
@@ -1181,6 +1224,7 @@
       db.restaurant.tagline.ar = document.getElementById("settingTaglineAr").value.trim();
       db.restaurant.tagline.en = document.getElementById("settingTaglineEn").value.trim();
       db.restaurant.heroImage = document.getElementById("settingHeroUrl").value.trim();
+      db.restaurant.storyImage = document.getElementById("settingStoryUrl").value.trim();
       if(!db.restaurant.menuNotice) db.restaurant.menuNotice = {};
       db.restaurant.menuNotice.ar = document.getElementById("settingNoticeAr").value.trim();
       db.restaurant.menuNotice.en = document.getElementById("settingNoticeEn").value.trim();

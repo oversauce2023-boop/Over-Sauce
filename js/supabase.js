@@ -86,6 +86,7 @@
       },
       ordersPaused: !!r.orders_paused,
       heroImage: r.hero_image_url || "",
+      storyImage: r.story_image_url || "",
       menuNotice: { ar: r.menu_notice_ar || "", en: r.menu_notice_en || "" },
       features: r.feature_flags || {}
     };
@@ -239,6 +240,7 @@
     }
     if (currency) row.currency = currency;
     if (typeof restaurant.heroImage === "string") row.hero_image_url = restaurant.heroImage;
+    if (typeof restaurant.storyImage === "string") row.story_image_url = restaurant.storyImage;
     if (restaurant.menuNotice) {
       row.menu_notice_ar = restaurant.menuNotice.ar || "";
       row.menu_notice_en = restaurant.menuNotice.en || "";
@@ -251,7 +253,7 @@
       // قاعدة البيانات. في هذه الحالة نعيد الحفظ بدونها بدل إفشال حفظ كل
       // الإعدادات — فتبقى بقية البيانات تُحفظ بشكل طبيعي.
       var msg = String(res.error.message || "");
-      var optionalCols = ["hero_image_url", "menu_notice_ar", "menu_notice_en"];
+      var optionalCols = ["hero_image_url", "story_image_url", "menu_notice_ar", "menu_notice_en"];
       var mentionsOptional = optionalCols.some(function (c) { return msg.indexOf(c) !== -1; });
       if (mentionsOptional) {
         optionalCols.forEach(function (c) { delete row[c]; });

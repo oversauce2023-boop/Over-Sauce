@@ -159,19 +159,23 @@
     if(!nav) return;
     const chip = nav.querySelector(`[data-cat="${catId}"]`);
     if(!chip) return;
+    // نحسب المسافة المطلوبة كإزاحة نسبية (delta) لا كموضع مطلق.
+    // السبب: في الاتجاه العربي (RTL) تكون قيمة scrollLeft سالبة، فكان
+    // Math.max(0, ...) يحوّل كل هدف إلى صفر — أي أن الشريط لا يتحرك أبدًا.
+    // الإزاحة النسبية تعمل في الاتجاهين معًا (نفس الأسلوب المُستخدم في
+    // شريط العروض الذي يعمل بنجاح).
     const navRect = nav.getBoundingClientRect();
     const chipRect = chip.getBoundingClientRect();
-    const left = nav.scrollLeft + (chipRect.left - navRect.left) - (nav.clientWidth - chip.clientWidth) / 2;
-    // بديل آمن: لو المتصفح لا يدعم scrollTo بخيارات، نعدّل الموضع مباشرة
-    // بدل رمي خطأ يوقف تنفيذ باقي الكود (مثل تحديث القسم النشط).
+    const delta = (chipRect.left + chipRect.width / 2) - (navRect.left + navRect.width / 2);
+    if(Math.abs(delta) < 2) return;   // بالفعل في المنتصف — لا داعي للتحريك
     try {
-      if(typeof nav.scrollTo === "function"){
-        nav.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+      if(typeof nav.scrollBy === "function"){
+        nav.scrollBy({ left: delta, behavior: "smooth" });
       } else {
-        nav.scrollLeft = Math.max(0, left);
+        nav.scrollLeft += delta;
       }
     } catch(err){
-      try { nav.scrollLeft = Math.max(0, left); } catch(e){ /* تجاهل بأمان */ }
+      try { nav.scrollLeft += delta; } catch(e){ /* تجاهل بأمان */ }
     }
   }
   // Update active chip in place (no DOM rebuild) + center it horizontally.
