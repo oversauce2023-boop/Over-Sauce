@@ -300,8 +300,9 @@
     `, () => {
       document.getElementById("catSaveBtn").addEventListener("click", async () => {
         const nameAr = document.getElementById("catNameAr").value.trim();
-        const nameEn = document.getElementById("catNameEn").value.trim();
-        if(!nameAr || !nameEn){ showToast("يرجى تعبئة جميع الحقول", "⚠️"); return; }
+        let nameEn = document.getElementById("catNameEn").value.trim();
+        if(!nameAr){ showToast("يرجى تعبئة اسم الفئة بالعربي", "⚠️"); return; }
+        if(!nameEn) nameEn = nameAr;   // الإنجليزي اختياري — يُملأ بالعربي
         const payload = {
           id: cat ? cat.id : uid("cat"),
           icon: document.getElementById("catIcon").value.trim() || "🍽️",
@@ -681,16 +682,24 @@
       document.getElementById("prodSaveBtn").addEventListener("click", async () => {
         const saveBtn = document.getElementById("prodSaveBtn");
         const nameAr = document.getElementById("prodNameAr").value.trim();
-        const nameEn = document.getElementById("prodNameEn").value.trim();
+        let nameEn = document.getElementById("prodNameEn").value.trim();
         const price = Number(document.getElementById("prodPrice").value);
         const image = document.getElementById("prodImageUrl").value.trim();
 
-        // الاسم العربي والسعر والصورة إلزامية فقط — الاسم الإنجليزي اختياري
-        // (صاحب المطعم يكتب بالعربي، فلا نُجبره على ترجمة كل صنف).
-        if(!nameAr || !price || !image){
-          showToast("يرجى تعبئة الاسم العربي والسعر والصورة", "⚠️");
+        // الاسم العربي والسعر والصورة إلزامية — الاسم الإنجليزي اختياري.
+        if(!nameAr || !image){
+          showToast("يرجى تعبئة الاسم العربي والصورة", "⚠️");
           return;
         }
+        // السعر: يجب أن يكون رقمًا موجبًا فعليًا — نمنع النص والصفر والسالب
+        // (كان الفحص السابق يمرّر الأرقام السالبة).
+        if(!isFinite(price) || price <= 0){
+          showToast("يرجى إدخال سعر صحيح أكبر من صفر", "⚠️");
+          return;
+        }
+        // لو تُرك الاسم الإنجليزي فارغًا نستخدم العربي بدله، حتى لا يظهر
+        // الطبق بلا اسم عند تبديل العميل للّغة الإنجليزية.
+        if(!nameEn) nameEn = nameAr;
 
         const badges = [];
         if(document.getElementById("badgeNew").checked) badges.push("new");

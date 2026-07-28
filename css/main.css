@@ -350,6 +350,33 @@ html[dir="ltr"] .category-nav::after{ background: linear-gradient(to right, colo
   font-size: 1.05rem; color: var(--copper-light);
 }
 .all-cats-list{ overflow-y: auto; padding: var(--space-3); }
+
+/* معرض العروض — لوحة أوسع تعرض صور العروض كاملة وواضحة */
+.deals-gallery-panel{
+  width: 100%; max-width: 560px; max-height: 82vh; max-height: 82dvh;
+  background: var(--ink); border: 1px solid var(--line);
+  border-radius: var(--radius-xl); overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.5);
+}
+.deals-gallery-list{
+  overflow-y: auto; padding: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+.deals-gallery-item{
+  border-radius: var(--radius-lg); overflow: hidden;
+  background: var(--panel); border: 1px solid var(--line);
+  cursor: zoom-in; display: block; width: 100%;
+}
+.deals-gallery-item img{ width: 100%; height: auto; display: block; }
+/* بطاقة عرض نصية (بلا صورة) داخل المعرض */
+.deals-gallery-text{
+  border-radius: var(--radius-lg); padding: var(--space-6);
+  background: linear-gradient(135deg, #2A2118, #161616); color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.deals-gallery-text h3{ font-size: 1.15rem; margin-bottom: 6px; }
+.deals-gallery-empty{ text-align: center; color: var(--parchment-dim); padding: var(--space-8) var(--space-4); }
 .all-cats-item{
   width: 100%; display: flex; align-items: center; gap: var(--space-3);
   padding: 12px var(--space-4); border-radius: var(--radius-md);

@@ -63,7 +63,17 @@
           if(window.OverSauceCore) OverSauceCore.setPageTitle("menu"); setActive(btn); toEl("menu");
           break;
         case "offers":
-          if(window.OverSauceCore) OverSauceCore.setPageTitle("offers"); setActive(btn); toEl("promoStrip");
+          if(window.OverSauceSearch && window.OverSauce && window.OverSauce.searchQuery){
+            OverSauceSearch.clearSearch();
+          }
+          if(window.OverSauceCore) OverSauceCore.setPageTitle("offers");
+          setActive(btn);
+          // نفتح معرض كل العروض مكبّرة بدل التمرير للسلايدر الصغير فقط
+          if(window.OverSauceProducts && OverSauceProducts.openDealsGallery){
+            OverSauceProducts.openDealsGallery();
+          } else {
+            toEl("promoStrip");
+          }
           break;
       }
     });

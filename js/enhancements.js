@@ -153,5 +153,16 @@
       box.classList.add("open");
       if (window.lockBodyScroll) window.lockBodyScroll();
     });
+
+    // دالة تكبير عامة — يستخدمها معرض العروض لعرض صورة العرض مكبّرة.
+    window.OverSauceEnhancements = window.OverSauceEnhancements || {};
+    window.OverSauceEnhancements.openLightbox = function (src, alt) {
+      if (!src) return;
+      ensure();
+      imgEl.src = src;
+      imgEl.alt = alt || "";
+      box.classList.add("open");
+      if (window.lockBodyScroll) window.lockBodyScroll();
+    };
   });
 })();

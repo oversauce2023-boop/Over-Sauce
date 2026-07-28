@@ -150,8 +150,61 @@
       if(e.target.id === "allCatsScrim") closeAllCats();
     });
     document.addEventListener("keydown", (e) => {
-      if(e.key === "Escape") closeAllCats();
+      if(e.key === "Escape") { closeAllCats(); closeDealsGallery(); }
     });
+
+    // معرض العروض
+    document.getElementById("dealsGalleryCloseBtn")?.addEventListener("click", closeDealsGallery);
+    document.getElementById("dealsGalleryScrim")?.addEventListener("click", (e) => {
+      if(e.target.id === "dealsGalleryScrim") closeDealsGallery();
+    });
+  }
+
+  /* معرض العروض: يعرض كل العروض (صورًا كانت أو نصوصًا) في شاشة واحدة
+     واضحة — يفتح من زر "العروض" في الشريط السفلي. الضغط على صورة يكبّرها. */
+  function renderDealsGallery(){
+    const list = document.getElementById("dealsGalleryList");
+    if(!list) return;
+    const deals = M.flashDeals || [];
+    if(!deals.length){
+      list.innerHTML = `<p class="deals-gallery-empty">لا توجد عروض حاليًا</p>`;
+      return;
+    }
+    list.innerHTML = deals.map(deal => {
+      if(deal.imageUrl){
+        const alt = escapeHTML(localized(deal.title) || "عرض");
+        return `<button type="button" class="deals-gallery-item" data-deal-img="${escapeHTML(deal.imageUrl)}" aria-label="${alt}">
+          <img src="${escapeHTML(deal.imageUrl)}" alt="${alt}" loading="lazy" decoding="async">
+        </button>`;
+      }
+      return `<div class="deals-gallery-text">
+        <h3>${escapeHTML(localized(deal.title) || "")}</h3>
+        <p class="muted" style="font-size:0.9rem;">${escapeHTML(localized(deal.subtitle) || "")}</p>
+      </div>`;
+    }).join("");
+    // الضغط على صورة عرض يكبّرها بنفس معرض تكبير الصور الموجود
+    list.querySelectorAll("[data-deal-img]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const url = btn.getAttribute("data-deal-img");
+        if(window.OverSauceEnhancements && OverSauceEnhancements.openLightbox){
+          OverSauceEnhancements.openLightbox(url);
+        }
+      });
+    });
+  }
+
+  function openDealsGallery(){
+    const scrim = document.getElementById("dealsGalleryScrim");
+    if(!scrim) return;
+    renderDealsGallery();
+    scrim.classList.remove("hidden");
+    if(window.lockBodyScroll) window.lockBodyScroll();
+  }
+  function closeDealsGallery(){
+    const scrim = document.getElementById("dealsGalleryScrim");
+    if(!scrim || scrim.classList.contains("hidden")) return;
+    scrim.classList.add("hidden");
+    if(window.unlockBodyScroll) window.unlockBodyScroll();
   }
   // Scroll the horizontal category strip ONLY (never the page) to center a chip.
   function centerNavChip(catId){
@@ -666,6 +719,7 @@
     renderCategoryNav,
     openProductModal,
     closeProductModal,
+    openDealsGallery,
     productCardHTML,
     bindCardEvents
   };
