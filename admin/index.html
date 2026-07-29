@@ -100,7 +100,7 @@
       <button class="admin-nav-item" data-panel="orders">🧾 الطلبات</button>
       <button class="admin-nav-item" data-panel="categories">🗂️ الفئات</button>
       <button class="admin-nav-item" data-panel="products">🍽️ الأطباق</button>
-      <button class="admin-nav-item" data-panel="coupons">🏷️ الكوبونات والعروض</button>
+      <button class="admin-nav-item" data-panel="coupons">🎁 العروض والكوبونات</button>
       <button class="admin-nav-item" data-panel="zones">🚚 مناطق التوصيل</button>
       <button class="admin-nav-item" data-panel="settings">⚙️ الإعدادات</button>
       <button class="admin-nav-item" data-panel="users">👥 الموظفون والصلاحيات</button>
@@ -251,24 +251,24 @@
     <!-- ============== COUPONS & OFFERS ============== -->
     <section class="admin-panel" id="panel-coupons">
       <div class="flex" style="justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 class="h2">الكوبونات والعروض</h1>
-        <button class="btn btn-primary btn-sm" id="addCouponBtn">+ إضافة كوبون</button>
-      </div>
-      <div class="admin-card table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>الكود</th><th>النوع</th><th>القيمة</th><th>الحد الأدنى</th><th>الحالة</th><th>إجراءات</th></tr></thead>
-          <tbody id="couponsTableBody"></tbody>
-        </table>
-      </div>
-
-      <div class="flex" style="justify-content:space-between; align-items:center; margin:30px 0 20px;">
-        <h2 class="h3" style="font-size:1.15rem;">🎁 العروض (بنرات الصفحة الرئيسية)</h2>
+        <h1 class="h2">🎁 العروض (بنرات الصفحة الرئيسية)</h1>
         <button class="btn btn-primary btn-sm" id="addDealBtn">+ إضافة عرض</button>
       </div>
       <div class="admin-card table-wrap">
         <table class="admin-table">
           <thead><tr><th>العنوان</th><th>الوصف</th><th>الخصم %</th><th>المدة (ساعة)</th><th>إجراءات</th></tr></thead>
           <tbody id="dealsTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="flex" style="justify-content:space-between; align-items:center; margin:30px 0 20px;">
+        <h2 class="h3" style="font-size:1.15rem;">🏷️ الكوبونات (أكواد الخصم)</h2>
+        <button class="btn btn-primary btn-sm" id="addCouponBtn">+ إضافة كوبون</button>
+      </div>
+      <div class="admin-card table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>الكود</th><th>النوع</th><th>القيمة</th><th>الحد الأدنى</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody id="couponsTableBody"></tbody>
         </table>
       </div>
     </section>
