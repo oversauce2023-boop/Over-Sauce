@@ -696,6 +696,14 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
   max-height: 85vh;
   max-height: 85dvh;
 }
+/* زر الحفظ آخر عنصر في كل نموذج، وكان يقع خارج حدود النافذة في النماذج
+   الطويلة فلا يجده صاحب المطعم ويظن أن الحفظ غير موجود. نثبّته أسفل
+   النافذة ليبقى في متناوله دائمًا مهما طال النموذج. */
+#adminModal .modal-inner .btn-primary[id$="SaveBtn"]{
+  position: sticky; bottom: 0; z-index: 3;
+  width: 100%; margin-top: var(--space-2);
+  box-shadow: 0 -10px 20px -8px var(--ink);
+}
 .modal-header{ display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5); }
 
 /* بطاقة معلومات المنتج بصفوف منظّمة (تفاصيل الطبق) */
