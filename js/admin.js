@@ -960,12 +960,23 @@
           showToast("جارٍ معالجة الصورة...", "🖼️");
           try {
             const compressed = await compressImage(file, 1400, 0.82);
-            let url = compressed;
-            try { url = await OSDB.uploadProductImage(compressed); } catch(e){ /* fallback to data url */ }
+            let url;
+            if(window.OSDB && OSDB.isConfigured()){
+              // نرفع للتخزين السحابي. لو فشل الرفع لا نتراجع إلى نص Base64
+              // لأنه ضخم ويُفشل حفظ العرض لاحقًا بصمت — بل نُعلم المستخدم.
+              try {
+                url = await OSDB.uploadProductImage(compressed);
+              } catch(e){
+                showToast(e.message || "فشل رفع الصورة — حاول مرة أخرى", "⚠️");
+                return;
+              }
+            } else {
+              url = compressed;   // وضع محلي بلا قاعدة بيانات
+            }
             document.getElementById("dealImageUrl").value = url;
-            document.getElementById("dealImagePreview").innerHTML = `<img src="${url}" alt="" style="max-width:100%; border-radius:10px;">`;
-            showToast("تم رفع الصورة", "✅");
-          } catch(e){ showToast("تعذّر رفع الصورة", "⚠️"); }
+            document.getElementById("dealImagePreview").innerHTML = `<img src="${escapeHTML(url)}" alt="" style="max-width:100%; border-radius:10px;">`;
+            showToast("تم رفع الصورة — اضغط حفظ العرض", "✅");
+          } catch(e){ showToast("تعذّر معالجة الصورة", "⚠️"); }
         });
       }
       document.getElementById("dealSaveBtn").addEventListener("click", async () => {

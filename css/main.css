@@ -684,6 +684,18 @@ html[dir="rtl"] .drawer.closed{ transform: translateX(100%); }
   .modal-panel{ max-width: 500px; border-radius: var(--radius-xl); }
 }
 .modal-inner{ padding: var(--space-6); }
+
+/* نوافذ لوحة التحكم: المحتوى قد يكون أطول من ارتفاع الشاشة (نموذج العرض
+   مثلًا فيه ٦ حقول + رفع صورة + زر حفظ). كانت اللوحة تُخفي ما يزيد عن
+   حدودها بلا تمرير، فتُقتطع الحقول السفلية — أشهرها خانة "صورة العرض" —
+   ويظنّ صاحب المطعم أنها غير موجودة. نجعل المحتوى قابلًا للتمرير. */
+#adminModal{ display: flex; flex-direction: column; }
+#adminModal .modal-inner{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 85vh;
+  max-height: 85dvh;
+}
 .modal-header{ display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5); }
 
 /* بطاقة معلومات المنتج بصفوف منظّمة (تفاصيل الطبق) */
