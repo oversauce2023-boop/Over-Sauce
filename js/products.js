@@ -165,30 +165,94 @@
   function renderDealsGallery(){
     const list = document.getElementById("dealsGalleryList");
     if(!list) return;
-    const deals = M.flashDeals || [];
+    // العروض السارية فقط ومرتّبة حسب اختيار صاحب المطعم
+    const deals = (window.OverSauceCore && OverSauceCore.activeDeals)
+      ? OverSauceCore.activeDeals() : (M.flashDeals || []);
+
+    // عدّاد في العنوان يوضّح للعميل أن هناك أكثر من عرض
+    const countEl = document.getElementById("dealsGalleryCount");
+    if(countEl) countEl.textContent = deals.length ? `· ${toLocaleDigits(deals.length)}` : "";
+
     if(!deals.length){
       list.innerHTML = `<p class="deals-gallery-empty">لا توجد عروض حاليًا</p>`;
       return;
     }
-    list.innerHTML = deals.map(deal => {
-      if(deal.imageUrl){
-        const alt = escapeHTML(localized(deal.title) || "عرض");
-        return `<button type="button" class="deals-gallery-item" data-deal-img="${escapeHTML(deal.imageUrl)}" aria-label="${alt}">
-          <img src="${escapeHTML(deal.imageUrl)}" alt="${alt}" loading="lazy" decoding="async">
-        </button>`;
+
+    const waBase = (M.restaurant && M.restaurant.whatsappNumber) ? String(M.restaurant.whatsappNumber).replace(/[^0-9]/g, "") : "";
+
+    list.innerHTML = deals.map((deal, i) => {
+      const title = localized(deal.title) || "";
+      const alt = escapeHTML(title || "عرض");
+      const media = deal.imageUrl
+        ? `<button type="button" class="deals-gallery-item" data-deal-img="${escapeHTML(deal.imageUrl)}" aria-label="${alt}">
+             <img src="${escapeHTML(deal.imageUrl)}" alt="${alt}" loading="lazy" decoding="async">
+           </button>`
+        : `<div class="deals-gallery-text">
+             <h3>${escapeHTML(title)}</h3>
+             <p class="muted" style="font-size:0.9rem;">${escapeHTML(localized(deal.subtitle) || "")}</p>
+           </div>`;
+
+      // أزرار الإجراء: تظهر فقط للعروض التي لها عنوان فعلي — الإعلانات
+      // العامة (مثل "قريبًا") لا يصحّ أن تحمل زر حجز.
+      const actions = [];
+      if(title && waBase){
+        const msg = encodeURIComponent(`مرحبًا، مهتم بـ: ${title}`);
+        actions.push(`<a class="deal-act deal-act-book" href="https://wa.me/${waBase}?text=${msg}" target="_blank" rel="noopener noreferrer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Z"/></svg>
+          ${escapeHTML(t("bookNowLabel") || "احجز الآن")}
+        </a>`);
       }
-      return `<div class="deals-gallery-text">
-        <h3>${escapeHTML(localized(deal.title) || "")}</h3>
-        <p class="muted" style="font-size:0.9rem;">${escapeHTML(localized(deal.subtitle) || "")}</p>
+      if(deal.linkTo){
+        actions.push(`<button type="button" class="deal-act deal-act-view" data-deal-link="${escapeHTML(deal.linkTo)}">
+          ${escapeHTML(t("viewInMenu") || "شاهد في القائمة")}
+        </button>`);
+      }
+      if(title){
+        actions.push(`<button type="button" class="deal-act deal-act-share" data-deal-share="${i}" aria-label="مشاركة العرض">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.5 13.5L15.5 17M15.5 7L8.5 10.5M18 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm0 14a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM10 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
+        </button>`);
+      }
+
+      return `<div class="deals-gallery-card">
+        ${media}
+        ${actions.length ? `<div class="deal-actions">${actions.join("")}</div>` : ""}
       </div>`;
     }).join("");
-    // الضغط على صورة عرض يكبّرها بنفس معرض تكبير الصور الموجود
+
+    // تكبير صورة العرض
     list.querySelectorAll("[data-deal-img]").forEach(btn => {
       btn.addEventListener("click", () => {
         const url = btn.getAttribute("data-deal-img");
         if(window.OverSauceEnhancements && OverSauceEnhancements.openLightbox){
           OverSauceEnhancements.openLightbox(url);
         }
+      });
+    });
+
+    // الانتقال للصنف أو القسم المرتبط بالعرض
+    list.querySelectorAll("[data-deal-link]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const link = btn.getAttribute("data-deal-link") || "";
+        closeDealsGallery();
+        if(link.startsWith("cat:")) scrollToCategory(link.slice(4));
+        else if(link.startsWith("prod:")) openProductModal(link.slice(5));
+      });
+    });
+
+    // مشاركة العرض
+    list.querySelectorAll("[data-deal-share]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const deal = deals[Number(btn.getAttribute("data-deal-share"))];
+        if(!deal) return;
+        const title = localized(deal.title) || "عرض";
+        const shareData = { title, text: `${title} — ${localized(M.restaurant.name) || ""}`, url: location.origin + location.pathname };
+        try {
+          if(navigator.share) await navigator.share(shareData);
+          else {
+            await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+            showToast("تم نسخ رابط العرض", "🔗");
+          }
+        } catch(err){ /* ألغى المستخدم المشاركة — تجاهل بأمان */ }
       });
     });
   }

@@ -565,16 +565,34 @@ function renderReviews(){
 /* =====================================================================
    FLASH DEALS / PROMO STRIP RENDER
    ===================================================================== */
+/* العروض الفعّالة فقط: نستبعد ما انتهت مدته حتى لا يرى العميل عرضًا
+   لم يعد ساريًا فيطلبه ويُحرَج صاحب المطعم. مدة 0 تعني بلا انتهاء.
+   ومرتّبة حسب ترتيب صاحب المطعم (الأصغر أولًا). */
+function activeDeals(){
+  const now = Date.now();
+  return (M.flashDeals || [])
+    .filter(d => {
+      const hours = Number(d.endsInHours);
+      if(!hours || hours <= 0) return true;          // بلا انتهاء
+      if(!d.startedAt) return true;                  // بيانات قديمة بلا وقت بدء
+      const start = new Date(d.startedAt).getTime();
+      if(!isFinite(start)) return true;
+      return now < start + hours * 3600 * 1000;
+    })
+    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+}
+
 function renderFlashDeals(){
   const wrap = document.getElementById("promoStrip");
   const section = document.getElementById("promoSection");
-  // نُظهر قسم العروض فقط عند وجود عروض، ونُخفيه تمامًا إن كان فارغًا
-  if(!wrap || !M.flashDeals.length){
+  const deals = activeDeals();
+  // نُظهر قسم العروض فقط عند وجود عروض سارية، ونُخفيه تمامًا إن كان فارغًا
+  if(!wrap || !deals.length){
     if(section) section.classList.add("hidden");
     return;
   }
   if(section) section.classList.remove("hidden");
-  wrap.innerHTML = M.flashDeals.map(deal => {
+  wrap.innerHTML = deals.map(deal => {
     // لو العرض له صورة/تصميم جاهز → نعرض الصورة فقط. وإلا نعرض النص.
     if(deal.imageUrl){
       return `
@@ -740,5 +758,5 @@ window.OverSauceCore = {
   t, localized, formatPrice, toLocaleDigits, escapeHTML, sanitizeLine,
   clamp, debounce, findProduct, findCategory, showToast,
   storageGet, storageSet, storageGetJSON, storageSetJSON,
-  setupRevealObserver, applyLanguage, applyTheme, setPageTitle
+  setupRevealObserver, applyLanguage, applyTheme, setPageTitle, activeDeals
 };

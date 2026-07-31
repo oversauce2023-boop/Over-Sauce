@@ -352,8 +352,11 @@ html[dir="ltr"] .category-nav::after{ background: linear-gradient(to right, colo
 .all-cats-list{ overflow-y: auto; padding: var(--space-3); }
 
 /* معرض العروض — لوحة أوسع تعرض صور العروض كاملة وواضحة */
+/* يُعرض متوسّطًا بمسافات متوازنة بدل الالتصاق بأعلى الشاشة، فيستغل
+   المساحة الرأسية ويظهر عددًا أكبر من العروض دفعة واحدة. */
+#dealsGalleryScrim{ align-items: center; padding: var(--space-5); }
 .deals-gallery-panel{
-  width: 100%; max-width: 560px; max-height: 82vh; max-height: 82dvh;
+  width: 100%; max-width: 560px; max-height: 88vh; max-height: 88dvh;
   background: var(--ink); border: 1px solid var(--line);
   border-radius: var(--radius-xl); overflow: hidden;
   display: flex; flex-direction: column;
@@ -368,7 +371,12 @@ html[dir="ltr"] .category-nav::after{ background: linear-gradient(to right, colo
   background: var(--panel); border: 1px solid var(--line);
   cursor: zoom-in; display: block; width: 100%;
 }
-.deals-gallery-item img{ width: 100%; height: auto; display: block; }
+.deals-gallery-item img{
+  width: 100%; height: auto; display: block;
+  /* الصورة تظهر بكامل ارتفاعها الطبيعي — أي قص هنا يقتطع السعر أو
+     عبارة "اطلب الآن" أسفل البانر وهي أهم ما في العرض. */
+  max-height: none; object-fit: contain;
+}
 /* بطاقة عرض نصية (بلا صورة) داخل المعرض */
 .deals-gallery-text{
   border-radius: var(--radius-lg); padding: var(--space-6);
@@ -376,6 +384,23 @@ html[dir="ltr"] .category-nav::after{ background: linear-gradient(to right, colo
   border: 1px solid rgba(255,255,255,0.08);
 }
 .deals-gallery-text h3{ font-size: 1.15rem; margin-bottom: 6px; }
+/* بطاقة العرض داخل المعرض: الصورة + أزرار الإجراء أسفلها */
+.deals-gallery-card{ display: flex; flex-direction: column; gap: 10px; }
+.deal-actions{ display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.deal-act{
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 16px; border-radius: var(--radius-full);
+  font-size: 0.85rem; font-weight: 800; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--parchment);
+  text-decoration: none; transition: transform .15s ease, background .2s;
+}
+.deal-act:active{ transform: scale(0.97); }
+.deal-act-book{
+  flex: 1; min-width: 130px;
+  background: linear-gradient(135deg, #25D366, #1ebe5b); color: #fff; border: none;
+}
+.deal-act-view{ flex: 1; min-width: 120px; border-color: var(--copper); color: var(--copper-light); }
+.deal-act-share{ width: 42px; padding: 10px; flex-shrink: 0; }
 .deals-gallery-empty{ text-align: center; color: var(--parchment-dim); padding: var(--space-8) var(--space-4); }
 .all-cats-item{
   width: 100%; display: flex; align-items: center; gap: var(--space-3);

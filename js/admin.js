@@ -941,7 +941,20 @@
         <div><label class="field-label">الوصف (عربي)</label><input id="dealSubAr" class="field" value="${deal && deal.subtitle ? escapeHTML(deal.subtitle.ar) : ''}"></div>
         <div><label class="field-label">الوصف (إنجليزي)</label><input id="dealSubEn" class="field" value="${deal && deal.subtitle ? escapeHTML(deal.subtitle.en) : ''}"></div>
         <div><label class="field-label">نسبة الخصم (%)</label><input id="dealDiscount" type="number" min="0" max="100" class="field" value="${deal ? (deal.discountPercent || 0) : 0}"></div>
-        <div><label class="field-label">ينتهي خلال (ساعة)</label><input id="dealHours" type="number" min="0" class="field" value="${deal ? (deal.endsInHours || 24) : 24}"></div>
+        <div><label class="field-label">ينتهي خلال (ساعة)</label><input id="dealHours" type="number" min="0" class="field" value="${deal ? (deal.endsInHours || 24) : 24}">
+          <p class="muted" style="font-size:0.78rem; margin-top:6px;">اكتب 0 ليبقى العرض ظاهرًا بلا انتهاء. بعد انتهاء المدة يختفي العرض تلقائيًا من الموقع.</p>
+        </div>
+        <div><label class="field-label">ترتيب الظهور</label><input id="dealOrder" type="number" min="1" class="field" value="${deal && deal.sortOrder != null ? deal.sortOrder : 999}">
+          <p class="muted" style="font-size:0.78rem; margin-top:6px;">الرقم الأصغر يظهر أولًا.</p>
+        </div>
+        <div>
+          <label class="field-label">عند الضغط على العرض ينتقل إلى (اختياري)</label>
+          <select id="dealLinkTo" class="field">
+            <option value="">— لا شيء —</option>
+            ${db.categories.map(c => `<option value="cat:${escapeHTML(c.id)}" ${deal && deal.linkTo === "cat:"+c.id ? "selected" : ""}>قسم: ${escapeHTML(c.name.ar)}</option>`).join("")}
+            ${db.products.map(p => `<option value="prod:${escapeHTML(p.id)}" ${deal && deal.linkTo === "prod:"+p.id ? "selected" : ""}>طبق: ${escapeHTML(p.name.ar)}</option>`).join("")}
+          </select>
+        </div>
         <div>
           <label class="field-label">صورة العرض (اختياري — لو رفعت صورة/تصميم، تظهر بدل النص)</label>
           <input id="dealImageInput" type="file" accept="image/*" class="field">
@@ -990,8 +1003,12 @@
           title: { ar: titleAr || "عرض", en: titleEn || "Offer" },
           subtitle: { ar: document.getElementById("dealSubAr").value.trim(), en: document.getElementById("dealSubEn").value.trim() },
           discountPercent: Number(document.getElementById("dealDiscount").value) || 0,
-          endsInHours: Number(document.getElementById("dealHours").value) || 24,
+          endsInHours: Number(document.getElementById("dealHours").value) || 0,
           imageUrl: dealImageUrl,
+          linkTo: document.getElementById("dealLinkTo").value || "",
+          sortOrder: Number(document.getElementById("dealOrder").value) || 999,
+          // وقت البدء يُثبَّت عند الإنشاء ليُحسب انتهاء العرض منه
+          startedAt: deal && deal.startedAt ? deal.startedAt : new Date().toISOString(),
           active: true
         };
         const prevDeal = deal ? JSON.parse(JSON.stringify(deal)) : null;

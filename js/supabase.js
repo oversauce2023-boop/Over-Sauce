@@ -63,7 +63,10 @@
       id: r.id, title: { ar: r.title_ar, en: r.title_en },
       subtitle: { ar: r.subtitle_ar || "", en: r.subtitle_en || "" },
       discountPercent: r.discount_percent, endsInHours: r.ends_in_hours,
-      imageUrl: r.image_url || ""
+      imageUrl: r.image_url || "",
+      startedAt: r.started_at || r.created_at || null,
+      linkTo: r.link_to || "",
+      sortOrder: r.sort_order != null ? Number(r.sort_order) : 999
     };
   }
   function toRestaurant(r) {
@@ -180,6 +183,8 @@
       subtitle_ar: (d.subtitle && d.subtitle.ar) || "", subtitle_en: (d.subtitle && d.subtitle.en) || "",
       discount_percent: d.discountPercent || 0, ends_in_hours: d.endsInHours || 24,
       image_url: d.imageUrl || "",
+      link_to: d.linkTo || "",
+      sort_order: d.sortOrder != null ? Number(d.sortOrder) : 999,
       active: d.active !== false
     };
   }
