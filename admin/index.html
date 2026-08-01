@@ -32,6 +32,88 @@
   .admin-panel.active{ display: block; }
   .admin-card{ background: var(--ink-soft); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
   .admin-table{ width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  /* خلية الترتيب المشتركة (الأقسام + الأطباق) */
+  .order-cell{ white-space: nowrap; }
+  .order-grip{
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 30px; color: var(--brass); font-size: 1rem;
+    cursor: grab; touch-action: none; user-select: none; vertical-align: middle;
+  }
+  .order-pos{
+    width: 46px; height: 30px; padding: 0 4px; border-radius: 8px; text-align: center;
+    border: 1px solid var(--line); background: var(--ink); color: var(--parchment);
+    font-size: 0.85rem; font-weight: 800; vertical-align: middle;
+  }
+  .order-pos:focus{ border-color: var(--copper); outline: none; }
+  .order-arrows{ display: inline-flex; flex-direction: column; gap: 2px; margin-inline-start: 4px; vertical-align: middle; }
+  .order-arrow{ min-width: 24px; height: 15px; padding: 0; font-size: 0.6rem; line-height: 1; border-radius: 5px; }
+  tr[data-order-row]{ cursor: grab; }
+  tr[data-order-row].dragging{ opacity: 0.45; }
+  tr[data-order-row].drag-over{ box-shadow: inset 0 3px 0 0 var(--copper); }
+
+  /* لوحة العروض المرئية — الصور بنفس ترتيب ظهورها للعميل */
+  .deals-board{
+    display: grid; gap: 14px; padding: 4px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+  .deal-tile{
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+    background: var(--ink); transition: box-shadow .2s, opacity .2s, transform .2s;
+  }
+  .deal-tile.dragging{ opacity: 0.5; transform: scale(0.97); }
+  .deal-tile.drag-over{ box-shadow: 0 0 0 2px var(--copper); }
+  .deal-tile-media{ position: relative; aspect-ratio: 16 / 9; background: var(--panel); }
+  .deal-tile-media img{ width: 100%; height: 100%; object-fit: contain; display: block; }
+  .deal-tile-noimg{
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px; padding: 12px; text-align: center;
+    color: var(--parchment); font-size: 0.9rem;
+  }
+  .deal-tile-noimg span{ color: var(--brass); font-size: 0.76rem; }
+  .deal-tile-grip{
+    position: absolute; top: 8px; inset-inline-start: 8px;
+    width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.55); color: #fff; font-size: 1.05rem;
+    cursor: grab; touch-action: none; user-select: none;
+  }
+  .deal-tile-life{
+    position: absolute; top: 8px; inset-inline-end: 8px;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 0.7rem; font-weight: 700; padding: 4px 9px; border-radius: 999px;
+  }
+  .deal-tile-bar{
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 10px; border-top: 1px solid var(--line);
+  }
+  .tile-btn{
+    min-width: 34px; height: 34px; padding: 0 8px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--parchment);
+    cursor: pointer; font-size: 0.95rem; font-weight: 800;
+  }
+  .tile-btn:disabled{ opacity: 0.35; cursor: default; }
+  .tile-btn:not(:disabled):hover{ border-color: var(--copper); color: var(--copper-light); }
+  .tile-btn-danger:hover{ border-color: var(--danger); color: var(--danger); }
+  .deal-pos-input{
+    width: 52px; height: 34px; padding: 0 6px; border-radius: 9px; text-align: center;
+    border: 1px solid var(--line); background: var(--ink); color: var(--parchment);
+    font-size: 0.9rem; font-weight: 800;
+  }
+  .deal-pos-input:focus{ border-color: var(--copper); outline: none; }
+
+  /* معاينة الشريط كما يراه العميل */
+  .deals-preview-strip{ display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+  .deals-preview-card{
+    position: relative; flex-shrink: 0; width: 260px;
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel);
+  }
+  .deals-preview-card img{ width: 100%; aspect-ratio: 16/9; object-fit: contain; display: block; }
+  .deals-preview-num{
+    position: absolute; top: 8px; inset-inline-start: 8px; z-index: 2;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--copper); color: #fff; font-size: 0.8rem; font-weight: 800;
+  }
   /* جدول المنتجات به 8 أعمدة وخانات إدخال وأزرار — نمنحه عرضًا أدنى
      حتى تبقى الخانات مريحة للضغط بالإصبع على الموبايل، مع تمرير أفقي
      سلس بدل أن تتزاحم العناصر وتصعب ملامستها. */
@@ -223,7 +305,7 @@
       </div>
       <div class="admin-card table-wrap">
         <table class="admin-table">
-          <thead><tr><th>الأيقونة</th><th>الاسم (عربي)</th><th>الاسم (إنجليزي)</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+          <thead><tr><th title="اسحب أو اكتب الرقم">الترتيب</th><th>الأيقونة</th><th>الاسم</th><th>عدد الأصناف</th><th>إجراءات</th></tr></thead>
           <tbody id="categoriesTableBody"></tbody>
         </table>
       </div>
@@ -237,12 +319,13 @@
           <input id="productSearchInput" class="field" style="width:auto; min-width:200px;" type="search" placeholder="🔍 ابحث باسم الطبق...">
           <select id="productCategoryFilter" class="field" style="width:auto;"><option value="">كل الفئات</option></select>
           <span id="productsCount" class="muted" style="font-size:0.82rem; align-self:center;"></span>
+          <span id="productsOrderHint" class="muted" style="font-size:0.8rem; align-self:center; color:var(--copper-light);"></span>
           <button class="btn btn-primary btn-sm" id="addProductBtn">+ إضافة طبق</button>
         </div>
       </div>
       <div class="admin-card table-wrap">
         <table class="admin-table" id="productsTable">
-          <thead><tr><th>الصورة</th><th>الاسم</th><th>الفئة</th><th title="رقم أصغر = يظهر أولًا في قسمه">الترتيب</th><th>السعر</th><th>التوفر</th><th>الشارات</th><th>إجراءات</th></tr></thead>
+          <thead><tr><th title="اسحب أو اكتب الرقم">الترتيب</th><th>الصورة</th><th>الاسم</th><th>الفئة</th><th>السعر</th><th>التوفر</th><th>الشارات</th><th>إجراءات</th></tr></thead>
           <tbody id="productsTableBody"></tbody>
         </table>
       </div>
@@ -251,14 +334,14 @@
     <!-- ============== COUPONS & OFFERS ============== -->
     <section class="admin-panel" id="panel-coupons">
       <div class="flex" style="justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 class="h2">🎁 العروض (بنرات الصفحة الرئيسية)</h1>
-        <button class="btn btn-primary btn-sm" id="addDealBtn">+ إضافة عرض</button>
+        <div><h1 class="h2">🎁 العروض (بنرات الصفحة الرئيسية)</h1><p class="muted" style="font-size:0.82rem; margin-top:4px;">رتّبها كما ستظهر للعميل: <strong>اسحب الصورة</strong>، أو <strong>اكتب الرقم</strong>، أو استخدم <strong>← →</strong></p></div>
+        <div class="flex" style="gap:8px;">
+          <button class="btn btn-secondary btn-sm" id="previewDealsBtn">👁️ معاينة</button>
+          <button class="btn btn-primary btn-sm" id="addDealBtn">+ إضافة عرض</button>
+        </div>
       </div>
-      <div class="admin-card table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>العنوان</th><th>الوصف</th><th>الخصم %</th><th>المدة (ساعة)</th><th>إجراءات</th></tr></thead>
-          <tbody id="dealsTableBody"></tbody>
-        </table>
+      <div class="admin-card">
+        <div id="dealsBoard" class="deals-board"></div>
       </div>
 
       <div class="flex" style="justify-content:space-between; align-items:center; margin:30px 0 20px;">

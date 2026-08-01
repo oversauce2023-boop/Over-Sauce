@@ -268,23 +268,196 @@
   /* =================================================================
      CATEGORIES CRUD
      ================================================================= */
+  /* =================================================================
+     أداة ترتيب مشتركة: سحب (ماوس + لمس) + كتابة رقم + أزرار.
+     تُستخدم للأقسام والأطباق حتى لا يتكرر المنطق في كل جدول.
+     - rows: عناصر الصفوف التي تحمل data-order-row
+     - getList: يُرجع مصفوفة المعرّفات بالترتيب الحالي
+     - onReorder: تُستدعى بالمصفوفة الجديدة لحفظها
+     ================================================================= */
+  function setupReorder(container, getList, onReorder){
+    if(!container) return;
+
+    const apply = (draggedId, targetId) => {
+      if(!draggedId || !targetId || draggedId === targetId) return;
+      const list = getList();
+      const from = list.indexOf(draggedId), to = list.indexOf(targetId);
+      if(from < 0 || to < 0) return;
+      list.splice(to, 0, list.splice(from, 1)[0]);
+      onReorder(list);
+    };
+
+    // سحب بالماوس
+    let draggedId = null;
+    container.querySelectorAll("[data-order-row]").forEach(row => {
+      row.setAttribute("draggable", "true");
+      row.addEventListener("dragstart", (e) => {
+        draggedId = row.getAttribute("data-order-row");
+        row.classList.add("dragging");
+        if(e.dataTransfer){ e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", draggedId); } catch(err){} }
+      });
+      row.addEventListener("dragend", () => {
+        row.classList.remove("dragging");
+        container.querySelectorAll(".drag-over").forEach(r => r.classList.remove("drag-over"));
+      });
+      row.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if(row.getAttribute("data-order-row") !== draggedId) row.classList.add("drag-over");
+      });
+      row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+      row.addEventListener("drop", (e) => {
+        e.preventDefault();
+        row.classList.remove("drag-over");
+        apply(draggedId, row.getAttribute("data-order-row"));
+      });
+    });
+
+    // سحب باللمس (الهاتف)
+    let touchEl = null, moved = false;
+    const rowFromPoint = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      return el ? el.closest("[data-order-row]") : null;
+    };
+    container.querySelectorAll(".order-grip").forEach(grip => {
+      grip.addEventListener("touchstart", () => {
+        touchEl = grip.closest("[data-order-row]");
+        moved = false;
+        if(touchEl) touchEl.classList.add("dragging");
+      }, { passive: true });
+      grip.addEventListener("touchmove", (e) => {
+        if(!touchEl) return;
+        e.preventDefault();
+        moved = true;
+        const t = e.touches[0];
+        container.querySelectorAll(".drag-over").forEach(r => r.classList.remove("drag-over"));
+        const over = rowFromPoint(t.clientX, t.clientY);
+        if(over && over !== touchEl) over.classList.add("drag-over");
+      }, { passive: false });
+      grip.addEventListener("touchend", (e) => {
+        if(!touchEl) return;
+        touchEl.classList.remove("dragging");
+        container.querySelectorAll(".drag-over").forEach(r => r.classList.remove("drag-over"));
+        const t = e.changedTouches[0];
+        const target = rowFromPoint(t.clientX, t.clientY);
+        const id = touchEl.getAttribute("data-order-row");
+        touchEl = null;
+        if(moved && target) apply(id, target.getAttribute("data-order-row"));
+      });
+    });
+
+    // أزرار التحريك خطوة
+    container.querySelectorAll("[data-order-move]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-order-id");
+        const dir = btn.getAttribute("data-order-move");
+        const list = getList();
+        const i = list.indexOf(id);
+        const j = dir === "up" ? i - 1 : i + 1;
+        if(i < 0 || j < 0 || j >= list.length) return;
+        [list[i], list[j]] = [list[j], list[i]];
+        onReorder(list);
+      });
+    });
+
+    // كتابة الرقم مباشرة
+    container.querySelectorAll("[data-order-pos]").forEach(inp => {
+      const commit = () => {
+        const id = inp.getAttribute("data-order-pos");
+        const list = getList();
+        const current = list.indexOf(id);
+        let target = parseInt(inp.value, 10);
+        if(!isFinite(target) || target < 1) target = 1;
+        if(target > list.length) target = list.length;
+        if(current < 0 || current === target - 1){ onReorder(list); return; }
+        list.splice(target - 1, 0, list.splice(current, 1)[0]);
+        onReorder(list);
+      };
+      inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
+      inp.addEventListener("blur", commit);
+    });
+  }
+
+  /* خلية الترتيب الموحّدة (مقبض + رقم + سهمان) */
+  function orderCellHTML(id, index, total){
+    return `<td class="order-cell">
+      <span class="order-grip" aria-hidden="true" title="اسحب لتغيير الترتيب">⠿</span>
+      <input type="number" class="order-pos" data-order-pos="${escapeHTML(id)}"
+             value="${index + 1}" min="1" max="${total}" title="اكتب الرقم واضغط Enter">
+      <span class="order-arrows">
+        <button class="tile-btn order-arrow" data-order-move="up" data-order-id="${escapeHTML(id)}" ${index === 0 ? "disabled" : ""} title="لأعلى">▲</button>
+        <button class="tile-btn order-arrow" data-order-move="down" data-order-id="${escapeHTML(id)}" ${index === total - 1 ? "disabled" : ""} title="لأسفل">▼</button>
+      </span>
+    </td>`;
+  }
+
   function renderCategories(){
     const tbody = document.getElementById("categoriesTableBody");
-    tbody.innerHTML = db.categories.sort((a,b) => a.order - b.order).map(cat => `
-      <tr>
+    if(!tbody) return;
+    const ordered = [...db.categories].sort((a,b) => (a.order ?? 999) - (b.order ?? 999));
+
+    tbody.innerHTML = ordered.map((cat, i) => {
+      const count = db.products.filter(p => p.category === cat.id).length;
+      return `
+      <tr data-order-row="${escapeHTML(cat.id)}">
+        ${orderCellHTML(cat.id, i, ordered.length)}
         <td style="font-size:1.3rem;">${cat.icon}</td>
-        <td>${escapeHTML(cat.name.ar)}</td>
-        <td>${escapeHTML(cat.name.en)}</td>
-        <td>${cat.order}</td>
+        <td>${escapeHTML(cat.name.ar)}<br><span class="muted" style="font-size:0.75rem;">${escapeHTML(cat.name.en)}</span></td>
+        <td>${count ? count + " صنف" : '<span style="color:var(--danger);">فارغ — لا يظهر للعميل</span>'}</td>
         <td class="admin-actions">
-          <button class="btn btn-secondary btn-sm" data-edit-category="${cat.id}">تعديل</button>
-          <button class="btn btn-sm" style="background:var(--danger); color:#fff;" data-delete-category="${cat.id}">حذف</button>
+          <button class="btn btn-secondary btn-sm" data-edit-category="${escapeHTML(cat.id)}">تعديل</button>
+          <button class="btn btn-sm" style="background:var(--danger); color:#fff;" data-delete-category="${escapeHTML(cat.id)}">حذف</button>
         </td>
-      </tr>
-    `).join("");
+      </tr>`;
+    }).join("");
+
     tbody.querySelectorAll("[data-edit-category]").forEach(b => b.addEventListener("click", () => openCategoryForm(b.getAttribute("data-edit-category"))));
     tbody.querySelectorAll("[data-delete-category]").forEach(b => b.addEventListener("click", () => deleteCategory(b.getAttribute("data-delete-category"))));
+
+    setupReorder(
+      tbody,
+      () => [...db.categories].sort((a,b) => (a.order ?? 999) - (b.order ?? 999)).map(c => c.id),
+      persistCategoryOrder
+    );
     populateCategoryFilter();
+  }
+
+  /* حفظ ترتيب الأطباق داخل قسم واحد — الترقيم يبدأ من 1 لكل قسم. */
+  async function persistProductOrder(orderedIds){
+    const prev = db.products.map(p => ({ id: p.id, sortOrder: p.sortOrder }));
+    orderedIds.forEach((id, i) => {
+      const prod = db.products.find(p => p.id === id);
+      if(prod) prod.sortOrder = i + 1;
+    });
+    renderProducts();
+    try {
+      await saveDB();
+      showToast("تم حفظ ترتيب الأطباق", "✅");
+    } catch(err){
+      prev.forEach(p => {
+        const prod = db.products.find(x => x.id === p.id);
+        if(prod) prod.sortOrder = p.sortOrder;
+      });
+      renderProducts();
+    }
+  }
+
+  async function persistCategoryOrder(orderedIds){
+    const prev = db.categories.map(c => ({ id: c.id, order: c.order }));
+    orderedIds.forEach((id, i) => {
+      const cat = db.categories.find(c => c.id === id);
+      if(cat) cat.order = i + 1;
+    });
+    renderCategories();
+    try {
+      await saveDB();
+      showToast("تم حفظ ترتيب الأقسام", "✅");
+    } catch(err){
+      prev.forEach(p => {
+        const cat = db.categories.find(c => c.id === p.id);
+        if(cat) cat.order = p.order;
+      });
+      renderCategories();
+    }
   }
 
   function openCategoryForm(categoryId){
@@ -294,7 +467,6 @@
         <div><label class="field-label">الأيقونة (إيموجي)</label><input id="catIcon" class="field" value="${cat ? cat.icon : '🍽️'}"></div>
         <div><label class="field-label">الاسم (عربي)</label><input id="catNameAr" class="field" value="${cat ? escapeHTML(cat.name.ar) : ''}"></div>
         <div><label class="field-label">الاسم (إنجليزي)</label><input id="catNameEn" class="field" value="${cat ? escapeHTML(cat.name.en) : ''}"></div>
-        <div><label class="field-label">الترتيب</label><input id="catOrder" type="number" class="field" value="${cat ? cat.order : db.categories.length + 1}"></div>
         <button id="catSaveBtn" class="btn btn-primary">حفظ</button>
       </div>
     `, () => {
@@ -307,7 +479,7 @@
           id: cat ? cat.id : uid("cat"),
           icon: document.getElementById("catIcon").value.trim() || "🍽️",
           name: { ar: nameAr, en: nameEn },
-          order: Number(document.getElementById("catOrder").value) || 1
+          order: cat && cat.order != null ? cat.order : (db.categories.length + 1)
         };
         // نحفظ نسخة من الحالة السابقة للتراجع عنها لو فشل الحفظ فعليًا
         const prevState = cat ? JSON.parse(JSON.stringify(cat)) : null;
@@ -390,6 +562,14 @@
     });
 
     // عدّاد النتائج — يوضّح لصاحب المطعم كم طبقًا يراه الآن
+    // تلميح الترتيب: يوضّح لصاحب المطعم كيف يفعّل الترتيب
+    const hintEl = document.getElementById("productsOrderHint");
+    if(hintEl){
+      hintEl.textContent = (filter && !q)
+        ? "✋ يمكنك الآن سحب الأطباق لترتيبها داخل هذا القسم"
+        : "💡 اختر قسمًا من الفلتر لتتمكن من ترتيب أطباقه";
+    }
+
     const countEl = document.getElementById("productsCount");
     if(countEl){
       countEl.textContent = q || filter
@@ -397,18 +577,14 @@
         : `${db.products.length} طبق`;
     }
 
-    tbody.innerHTML = items.map(p => {
+    tbody.innerHTML = items.map((p, idx) => {
       const cat = db.categories.find(c => c.id === p.category);
       return `
-      <tr>
+      <tr data-order-row="${escapeHTML(p.id)}">
+        ${orderCellHTML(p.id, idx, items.length)}
         <td><img src="${p.image}" alt="${escapeHTML(p.name.ar)}" loading="lazy"></td>
         <td>${escapeHTML(p.name.ar)}<br><span class="muted" style="font-size:0.75rem;">${escapeHTML(p.name.en)}</span></td>
         <td>${cat ? escapeHTML(cat.name.ar) : "—"}</td>
-        <td>
-          <input type="number" class="quick-order" data-order-for="${p.id}" value="${p.sortOrder != null ? p.sortOrder : 999}"
-                 min="1" step="1" title="رقم أصغر = يظهر أولًا في قسمه"
-                 style="width:70px; padding:5px 8px; border-radius:8px; border:1px solid var(--line); background:var(--ink); color:var(--parchment); font-size:0.85rem;">
-        </td>
         <td>
           <input type="number" class="quick-price" data-price-for="${p.id}" value="${p.price}"
                  min="0" step="0.5" title="عدّل السعر واضغط Enter"
@@ -467,36 +643,25 @@
       inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
     });
 
-    // تعديل ترتيب ظهور الطبق داخل قسمه — رقم أصغر يعني يظهر أولًا
-    tbody.querySelectorAll("[data-order-for]").forEach(inp => {
-      const commitOrder = async () => {
-        const id = inp.getAttribute("data-order-for");
-        const product = db.products.find(p => p.id === id);
-        if(!product) return;
-        const val = Number(inp.value);
-        if(!isFinite(val) || val < 1){
-          showToast("رقم الترتيب غير صالح", "⚠️");
-          inp.value = product.sortOrder != null ? product.sortOrder : 999;
-          return;
-        }
-        if(val === product.sortOrder) return;
-        const prev = product.sortOrder;
-        product.sortOrder = val;
-        inp.disabled = true;
-        try {
-          await saveDB();
-          showToast(`تم تحديث ترتيب "${product.name.ar}"`, "✅");
-          renderProducts();
-        } catch(err){
-          product.sortOrder = prev;
-          inp.value = prev != null ? prev : 999;
-        } finally {
-          inp.disabled = false;
-        }
-      };
-      inp.addEventListener("blur", commitOrder);
-      inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
-    });
+    // ترتيب الأطباق يعمل داخل فئة واحدة فقط: الترقيم نسبي داخل القسم،
+    // فلو كانت القائمة مخلوطة من فئات (أو ناتج بحث) صار الترقيم مضلّلًا
+    // ويفسد ترتيب أطباق غير ظاهرة. لذا نفعّله فقط عند فلترة قسم واحد.
+    const singleCategory = filter && !nq;
+    if(singleCategory){
+      setupReorder(
+        tbody,
+        () => db.products
+          .filter(p => p.category === filter)
+          .sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+          .map(p => p.id),
+        persistProductOrder
+      );
+    } else {
+      // نعطّل أدوات الترتيب ونوضّح السبب بدل أن تبدو معطّلة بلا تفسير
+      tbody.querySelectorAll(".order-grip").forEach(g => { g.style.opacity = "0.3"; g.style.cursor = "default"; g.title = "اختر قسمًا واحدًا من الفلتر لتتمكن من الترتيب"; });
+      tbody.querySelectorAll(".order-pos, .order-arrow").forEach(el => { el.disabled = true; el.title = "اختر قسمًا واحدًا من الفلتر لتتمكن من الترتيب"; });
+      tbody.querySelectorAll("[data-order-row]").forEach(r => r.removeAttribute("draggable"));
+    }
 
     // تبديل التوفر بضغطة واحدة — أكثر عملية يحتاجها المطعم يوميًا
     // (نفد صنف من المطبخ) فلا يصحّ أن تتطلب فتح نموذج كامل.
@@ -530,6 +695,11 @@
     if(!src) return;
     const copy = JSON.parse(JSON.stringify(src));
     copy.id = uid("prod");
+    // النسخة تأخذ آخر ترتيب في قسمها بدل أن تشارك الأصل نفس الرقم
+    const maxInCat = db.products
+      .filter(p => p.category === copy.category)
+      .reduce((m, p) => Math.max(m, p.sortOrder ?? 0), 0);
+    copy.sortOrder = maxInCat + 1;
     copy.name = {
       ar: (src.name?.ar || "") + " (نسخة)",
       en: (src.name?.en || "") + " (copy)"
@@ -709,9 +879,10 @@
 
         const oldPriceVal = Number(document.getElementById("prodOldPrice").value) || null;
 
+        const categoryId = document.getElementById("prodCategory").value;
         const payload = {
           id: product ? product.id : uid("prod"),
-          category: document.getElementById("prodCategory").value,
+          category: categoryId,
           name: { ar: nameAr, en: nameEn || nameAr },
           description: {
             ar: document.getElementById("prodDescAr").value.trim(),
@@ -725,7 +896,10 @@
           orders: product ? product.orders : 0,
           // نحافظ على ترتيب الظهور الذي حدّده صاحب المطعم؛ وإلا كان يضيع
           // في كل مرة يُعدَّل فيها الطبق من النموذج.
-          sortOrder: product && product.sortOrder != null ? product.sortOrder : 999,
+          sortOrder: product && product.sortOrder != null
+            ? product.sortOrder
+            : (db.products.filter(p => p.category === categoryId)
+                .reduce((m, p) => Math.max(m, p.sortOrder ?? 0), 0) + 1),
           inStock: document.getElementById("prodInStock").checked,
           sizes: (function(){
             // نجمع صفوف الأحجام من الواجهة؛ نتجاهل أي صف بلا اسم عربي.
@@ -914,22 +1088,195 @@
      FLASH DEALS (HOME BANNERS) CRUD
      ================================================================= */
   function renderDeals(){
-    const tbody = document.getElementById("dealsTableBody");
-    if(!tbody) return;
-    tbody.innerHTML = db.flashDeals.map(d => `
-      <tr>
-        <td><strong>${escapeHTML(d.title.ar)}</strong></td>
-        <td class="muted">${escapeHTML(d.subtitle ? d.subtitle.ar : "")}</td>
-        <td>${d.discountPercent || 0}%</td>
-        <td>${d.endsInHours || 0}</td>
-        <td class="admin-actions">
-          <button class="btn btn-secondary btn-sm" data-edit-deal="${d.id}">تعديل</button>
-          <button class="btn btn-sm" style="background:var(--danger); color:#fff;" data-delete-deal="${d.id}">حذف</button>
-        </td>
-      </tr>
+    const board = document.getElementById("dealsBoard");
+    if(!board) return;
+
+    // مرتّبة بنفس ترتيب ظهورها للعميل تمامًا
+    const ordered = [...db.flashDeals].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+
+    if(!ordered.length){
+      board.innerHTML = `<p class="muted" style="padding:24px; text-align:center;">لا توجد عروض بعد — اضغط "+ إضافة عرض"</p>`;
+      return;
+    }
+
+    board.innerHTML = ordered.map((d, i) => `
+      <div class="deal-tile" draggable="true" data-deal-row="${escapeHTML(d.id)}">
+        <div class="deal-tile-media">
+          ${d.imageUrl
+            ? `<img src="${escapeHTML(d.imageUrl)}" alt="${escapeHTML(d.title.ar)}">`
+            : `<div class="deal-tile-noimg"><strong>${escapeHTML(d.title.ar)}</strong><span>${escapeHTML(d.subtitle ? d.subtitle.ar : "")}</span></div>`}
+          <span class="deal-tile-grip" aria-hidden="true">⠿</span>
+          <span class="deal-tile-life">${d.endsInHours ? d.endsInHours + " س" : "دائم"}</span>
+        </div>
+        <div class="deal-tile-bar">
+          <button class="tile-btn" data-move-deal="up" data-deal-id="${escapeHTML(d.id)}" ${i === 0 ? "disabled" : ""} title="تقديم">→</button>
+          <input type="number" class="deal-pos-input" data-pos-for="${escapeHTML(d.id)}"
+                 value="${i + 1}" min="1" max="${ordered.length}" title="اكتب رقم الترتيب واضغط Enter">
+          <button class="tile-btn" data-move-deal="down" data-deal-id="${escapeHTML(d.id)}" ${i === ordered.length - 1 ? "disabled" : ""} title="تأخير">←</button>
+          <span style="flex:1;"></span>
+          <button class="tile-btn" data-edit-deal="${escapeHTML(d.id)}" title="تعديل">✎</button>
+          <button class="tile-btn tile-btn-danger" data-delete-deal="${escapeHTML(d.id)}" title="حذف">🗑</button>
+        </div>
+      </div>
     `).join("");
-    tbody.querySelectorAll("[data-edit-deal]").forEach(b => b.addEventListener("click", () => openDealForm(b.getAttribute("data-edit-deal"))));
-    tbody.querySelectorAll("[data-delete-deal]").forEach(b => b.addEventListener("click", () => deleteDeal(b.getAttribute("data-delete-deal"))));
+
+    board.querySelectorAll("[data-edit-deal]").forEach(b => b.addEventListener("click", () => openDealForm(b.getAttribute("data-edit-deal"))));
+    board.querySelectorAll("[data-delete-deal]").forEach(b => b.addEventListener("click", () => deleteDeal(b.getAttribute("data-delete-deal"))));
+    board.querySelectorAll("[data-move-deal]").forEach(b => {
+      b.addEventListener("click", () => moveDeal(b.getAttribute("data-deal-id"), b.getAttribute("data-move-deal")));
+    });
+
+    // كتابة رقم الترتيب مباشرة
+    board.querySelectorAll("[data-pos-for]").forEach(inp => {
+      const applyPos = () => {
+        const id = inp.getAttribute("data-pos-for");
+        const list = [...db.flashDeals].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)).map(d => d.id);
+        const current = list.indexOf(id);
+        let target = parseInt(inp.value, 10);
+        if(!isFinite(target) || target < 1) target = 1;
+        if(target > list.length) target = list.length;
+        const to = target - 1;
+        if(current < 0 || current === to){ renderDeals(); return; }
+        list.splice(to, 0, list.splice(current, 1)[0]);
+        persistDealOrder(list);
+      };
+      inp.addEventListener("keydown", (e) => { if(e.key === "Enter") inp.blur(); });
+      inp.addEventListener("blur", applyPos);
+    });
+
+    setupDealDragAndDrop(board);
+    setupDealTouchDrag(board);
+  }
+
+  /* سحب باللمس على الموبايل — واجهة السحب القياسية (HTML5 drag) لا تعمل
+     على الشاشات اللمسية، وصاحب المطعم غالبًا يدير من هاتفه. */
+  function setupDealTouchDrag(board){
+    let dragEl = null, startY = 0, startX = 0, moved = false;
+
+    const tileFromPoint = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      return el ? el.closest("[data-deal-row]") : null;
+    };
+
+    board.querySelectorAll(".deal-tile-grip").forEach(grip => {
+      grip.addEventListener("touchstart", (e) => {
+        dragEl = grip.closest("[data-deal-row]");
+        if(!dragEl) return;
+        const t = e.touches[0];
+        startY = t.clientY; startX = t.clientX; moved = false;
+        dragEl.classList.add("dragging");
+      }, { passive: true });
+
+      grip.addEventListener("touchmove", (e) => {
+        if(!dragEl) return;
+        e.preventDefault();               // نمنع تمرير الصفحة أثناء السحب
+        const t = e.touches[0];
+        if(Math.abs(t.clientY - startY) > 6 || Math.abs(t.clientX - startX) > 6) moved = true;
+        board.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+        const over = tileFromPoint(t.clientX, t.clientY);
+        if(over && over !== dragEl) over.classList.add("drag-over");
+      }, { passive: false });
+
+      grip.addEventListener("touchend", (e) => {
+        if(!dragEl) return;
+        dragEl.classList.remove("dragging");
+        board.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+        const t = e.changedTouches[0];
+        const target = tileFromPoint(t.clientX, t.clientY);
+        const draggedId = dragEl.getAttribute("data-deal-row");
+        dragEl = null;
+        if(!moved || !target) return;
+        const targetId = target.getAttribute("data-deal-row");
+        if(!targetId || targetId === draggedId) return;
+        const list = [...db.flashDeals].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)).map(d => d.id);
+        const from = list.indexOf(draggedId), to = list.indexOf(targetId);
+        if(from < 0 || to < 0) return;
+        list.splice(to, 0, list.splice(from, 1)[0]);
+        persistDealOrder(list);
+      });
+    });
+  }
+
+  /* معاينة: تعرض العروض كما سيراها العميل في الشريط الأفقي. */
+  function previewDeals(){
+    const ordered = [...db.flashDeals].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+    if(!ordered.length){ showToast("لا توجد عروض للمعاينة", "⚠️"); return; }
+    openModal("معاينة العروض كما يراها العميل", `
+      <p class="muted" style="font-size:0.82rem; margin-bottom:12px;">هذا هو الترتيب الذي سيظهر في الموقع.</p>
+      <div class="deals-preview-strip">
+        ${ordered.map((d, i) => `
+          <div class="deals-preview-card">
+            <span class="deals-preview-num">${i + 1}</span>
+            ${d.imageUrl
+              ? `<img src="${escapeHTML(d.imageUrl)}" alt="${escapeHTML(d.title.ar)}">`
+              : `<div class="deal-tile-noimg"><strong>${escapeHTML(d.title.ar)}</strong></div>`}
+          </div>`).join("")}
+      </div>
+    `, () => {});
+  }
+
+  /* إعادة ترقيم العروض بالترتيب المعروض ثم الحفظ — نُبقي الأرقام
+     متسلسلة (1,2,3...) حتى يبقى الترتيب واضحًا ومستقرًا. */
+  async function persistDealOrder(orderedIds){
+    const prev = db.flashDeals.map(d => ({ id: d.id, sortOrder: d.sortOrder }));
+    orderedIds.forEach((id, idx) => {
+      const deal = db.flashDeals.find(d => d.id === id);
+      if(deal) deal.sortOrder = idx + 1;
+    });
+    renderDeals();
+    try {
+      await saveDB();
+      showToast("تم حفظ الترتيب", "✅");
+    } catch(err){
+      prev.forEach(p => {
+        const deal = db.flashDeals.find(d => d.id === p.id);
+        if(deal) deal.sortOrder = p.sortOrder;
+      });
+      renderDeals();
+    }
+  }
+
+  function moveDeal(id, dir){
+    const ordered = [...db.flashDeals].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+    const i = ordered.findIndex(d => d.id === id);
+    if(i < 0) return;
+    const j = dir === "up" ? i - 1 : i + 1;
+    if(j < 0 || j >= ordered.length) return;
+    [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
+    persistDealOrder(ordered.map(d => d.id));
+  }
+
+  /* السحب والإفلات لإعادة الترتيب مباشرة بالماوس. */
+  function setupDealDragAndDrop(board){
+    let draggedId = null;
+    board.querySelectorAll("[data-deal-row]").forEach(row => {
+      row.addEventListener("dragstart", (e) => {
+        draggedId = row.getAttribute("data-deal-row");
+        row.classList.add("dragging");
+        if(e.dataTransfer){ e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", draggedId); } catch(err){} }
+      });
+      row.addEventListener("dragend", () => {
+        row.classList.remove("dragging");
+        board.querySelectorAll(".drag-over").forEach(r => r.classList.remove("drag-over"));
+      });
+      row.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if(row.getAttribute("data-deal-row") !== draggedId) row.classList.add("drag-over");
+      });
+      row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+      row.addEventListener("drop", (e) => {
+        e.preventDefault();
+        row.classList.remove("drag-over");
+        const targetId = row.getAttribute("data-deal-row");
+        if(!draggedId || draggedId === targetId) return;
+        const ordered = [...db.flashDeals].sort((a,b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)).map(d => d.id);
+        const from = ordered.indexOf(draggedId);
+        const to = ordered.indexOf(targetId);
+        if(from < 0 || to < 0) return;
+        ordered.splice(to, 0, ordered.splice(from, 1)[0]);
+        persistDealOrder(ordered);
+      });
+    });
   }
 
   function openDealForm(id){
@@ -943,9 +1290,6 @@
         <div><label class="field-label">نسبة الخصم (%)</label><input id="dealDiscount" type="number" min="0" max="100" class="field" value="${deal ? (deal.discountPercent || 0) : 0}"></div>
         <div><label class="field-label">ينتهي خلال (ساعة)</label><input id="dealHours" type="number" min="0" class="field" value="${deal ? (deal.endsInHours || 24) : 24}">
           <p class="muted" style="font-size:0.78rem; margin-top:6px;">اكتب 0 ليبقى العرض ظاهرًا بلا انتهاء. بعد انتهاء المدة يختفي العرض تلقائيًا من الموقع.</p>
-        </div>
-        <div><label class="field-label">ترتيب الظهور</label><input id="dealOrder" type="number" min="1" class="field" value="${deal && deal.sortOrder != null ? deal.sortOrder : 999}">
-          <p class="muted" style="font-size:0.78rem; margin-top:6px;">الرقم الأصغر يظهر أولًا.</p>
         </div>
         <div>
           <label class="field-label">عند الضغط على العرض ينتقل إلى (اختياري)</label>
@@ -1006,7 +1350,7 @@
           endsInHours: Number(document.getElementById("dealHours").value) || 0,
           imageUrl: dealImageUrl,
           linkTo: document.getElementById("dealLinkTo").value || "",
-          sortOrder: Number(document.getElementById("dealOrder").value) || 999,
+          sortOrder: deal && deal.sortOrder != null ? deal.sortOrder : (db.flashDeals.length + 1),
           // وقت البدء يُثبَّت عند الإنشاء ليُحسب انتهاء العرض منه
           startedAt: deal && deal.startedAt ? deal.startedAt : new Date().toISOString(),
           active: true
@@ -2139,6 +2483,7 @@ ${o.discount ? `<tr><td>الخصم</td><td style="text-align:left;">−${money(o
     document.getElementById("addProductBtn").addEventListener("click", () => openProductForm(null));
     document.getElementById("addCouponBtn").addEventListener("click", () => openCouponForm(null));
     document.getElementById("addDealBtn")?.addEventListener("click", () => openDealForm(null));
+    document.getElementById("previewDealsBtn")?.addEventListener("click", previewDeals);
     document.getElementById("addZoneBtn").addEventListener("click", () => openZoneForm(null));
     document.getElementById("addEmployeeBtn")?.addEventListener("click", () => openEmployeeForm(null));
     document.getElementById("addRoleBtn")?.addEventListener("click", () => openRoleForm(null));
