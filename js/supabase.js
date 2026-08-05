@@ -165,7 +165,7 @@
     };
   }
   function fromCategory(c) {
-    return { id: c.id, icon: c.icon || "🍽️", name_ar: c.name.ar, name_en: c.name.en, sort_order: c.order || 1 };
+    return { id: c.id, icon: c.icon || "🍽️", name_ar: c.name.ar, name_en: c.name.en, sort_order: c.order != null ? Number(c.order) : 1 };
   }
   function fromCoupon(c) {
     return {
@@ -181,10 +181,16 @@
     return {
       id: d.id, title_ar: d.title.ar, title_en: d.title.en,
       subtitle_ar: (d.subtitle && d.subtitle.ar) || "", subtitle_en: (d.subtitle && d.subtitle.en) || "",
-      discount_percent: d.discountPercent || 0, ends_in_hours: d.endsInHours || 24,
+      discount_percent: d.discountPercent || 0,
+      // الصفر يعني "بلا انتهاء" وهو قيمة صحيحة — استخدام || كان يستبدله
+      // بـ 24 فيختفي العرض بعد يوم رغم أن صاحب المطعم جعله دائمًا.
+      ends_in_hours: d.endsInHours != null ? Number(d.endsInHours) : 24,
       image_url: d.imageUrl || "",
       link_to: d.linkTo || "",
       sort_order: d.sortOrder != null ? Number(d.sortOrder) : 999,
+      // وقت البدء يُحفظ فعليًا — كان يُقرأ ولا يُكتب، فلا يتجدّد العرض
+      // عند تعديل مدته ويبقى منتهيًا رغم تجديد صاحب المطعم له.
+      started_at: d.startedAt || new Date().toISOString(),
       active: d.active !== false
     };
   }
@@ -241,7 +247,7 @@
       row.years_experience = restaurant.stats.yearsOfExperience || 0;
       row.happy_customers = restaurant.stats.happyCustomers || 0;
       row.menu_items_count = restaurant.stats.menuItems || 0;
-      row.average_rating = restaurant.stats.averageRating || 4.5;
+      row.average_rating = restaurant.stats.averageRating != null ? restaurant.stats.averageRating : 4.5;
     }
     if (currency) row.currency = currency;
     if (typeof restaurant.heroImage === "string") row.hero_image_url = restaurant.heroImage;

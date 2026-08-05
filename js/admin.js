@@ -1288,7 +1288,7 @@
         <div><label class="field-label">الوصف (عربي)</label><input id="dealSubAr" class="field" value="${deal && deal.subtitle ? escapeHTML(deal.subtitle.ar) : ''}"></div>
         <div><label class="field-label">الوصف (إنجليزي)</label><input id="dealSubEn" class="field" value="${deal && deal.subtitle ? escapeHTML(deal.subtitle.en) : ''}"></div>
         <div><label class="field-label">نسبة الخصم (%)</label><input id="dealDiscount" type="number" min="0" max="100" class="field" value="${deal ? (deal.discountPercent || 0) : 0}"></div>
-        <div><label class="field-label">ينتهي خلال (ساعة)</label><input id="dealHours" type="number" min="0" class="field" value="${deal ? (deal.endsInHours || 24) : 24}">
+        <div><label class="field-label">ينتهي خلال (ساعة)</label><input id="dealHours" type="number" min="0" class="field" value="${deal && deal.endsInHours != null ? deal.endsInHours : 24}">
           <p class="muted" style="font-size:0.78rem; margin-top:6px;">اكتب 0 ليبقى العرض ظاهرًا بلا انتهاء. بعد انتهاء المدة يختفي العرض تلقائيًا من الموقع.</p>
         </div>
         <div>
@@ -1352,7 +1352,14 @@
           linkTo: document.getElementById("dealLinkTo").value || "",
           sortOrder: deal && deal.sortOrder != null ? deal.sortOrder : (db.flashDeals.length + 1),
           // وقت البدء يُثبَّت عند الإنشاء ليُحسب انتهاء العرض منه
-          startedAt: deal && deal.startedAt ? deal.startedAt : new Date().toISOString(),
+          // وقت البدء: يُجدَّد إذا غيّر صاحب المطعم المدة — وإلا يبقى
+          // العرض المنتهي منتهيًا رغم تجديد مدته، وهو ما لا يتوقعه.
+          startedAt: (() => {
+            const newHours = Number(document.getElementById("dealHours").value) || 0;
+            const changedHours = !deal || Number(deal.endsInHours) !== newHours;
+            if(changedHours || !deal || !deal.startedAt) return new Date().toISOString();
+            return deal.startedAt;
+          })(),
           active: true
         };
         const prevDeal = deal ? JSON.parse(JSON.stringify(deal)) : null;
@@ -1429,7 +1436,10 @@
           id: zone ? zone.id : uid("zone"),
           name: { ar: nameAr, en: nameEn },
           fee: Number(document.getElementById("zoneFee").value) || 0,
-          etaMinutes: Number(document.getElementById("zoneEta").value) || 30
+          etaMinutes: (() => {
+            const v = Number(document.getElementById("zoneEta").value);
+            return isFinite(v) && v >= 0 ? v : 30;   // الصفر قيمة صحيحة (استلام فوري)
+          })()
         };
         const prevZone = zone ? JSON.parse(JSON.stringify(zone)) : null;
         if(zone){ Object.assign(zone, payload); } else { db.deliveryZones.push(payload); }
