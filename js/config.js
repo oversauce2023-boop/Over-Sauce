@@ -13,6 +13,6 @@
    من ملفات data/*.json المحلية. أول ما تحط قيمك الحقيقية، يقرأ من Supabase.
    ===================================================================== */
 window.OS_CONFIG = {
-  SUPABASE_URL: "",
-  SUPABASE_PUBLISHABLE_KEY: ""
+  SUPABASE_URL: "https://mzdgfifsfipscicdszwu.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16ZGdmaWZzZmlwc2NpY2Rzend1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1ODQ2MTUsImV4cCI6MjA5ODE2MDYxNX0.p3aQWDUBFYruVRUXhSyGVKQccjpUfoEImvyJr71MrpQ"
 };
